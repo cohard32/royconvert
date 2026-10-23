@@ -13,6 +13,7 @@ public enum JobState
 public sealed class ConversionJob(string input, Preset preset)
 {
     private readonly CancellationTokenSource _cancel = new();
+    private readonly TaskCompletionSource _completion = new(TaskCreationOptions.RunContinuationsAsynchronously);
 
     public string Input { get; } = input;
 
@@ -28,28 +29,29 @@ public sealed class ConversionJob(string input, Preset preset)
 
     public string? Error { get; private set; }
 
+    public bool IsFinished => State is JobState.Done or JobState.Failed or JobState.Canceled;
+
+    /// <summary>Completes (never faults) when the job reaches a finished state.</summary>
+    public Task Completion => _completion.Task;
+
     public event Action<ConversionJob>? Changed;
 
+    /// <summary>Cancels a running job, or makes a queued job finish as canceled without starting.</summary>
     public void Cancel() => _cancel.Cancel();
 
-    internal async Task RunAsync(Func<Preset, IConverter> converterFor, Func<ConversionJob, string> chooseOutput, CancellationToken cancellationToken)
+    internal async Task RunAsync(Func<Preset, IConverter> converterFor, Func<ConversionJob, string> chooseOutput)
     {
-        using var linked = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken, _cancel.Token);
-        if (linked.IsCancellationRequested)
-        {
-            Update(JobState.Canceled, Progress);
-            return;
-        }
-
+        var token = _cancel.Token;
         try
         {
+            token.ThrowIfCancellationRequested();
             Output = chooseOutput(this);
             Update(JobState.Running, 0);
             var progress = new SyncProgress(value => Update(JobState.Running, value));
-            await converterFor(Preset).ConvertAsync(Input, Output, Preset, progress, linked.Token);
+            await converterFor(Preset).ConvertAsync(Input, Output, Preset, progress, token);
             Update(JobState.Done, 1);
         }
-        catch (OperationCanceledException) when (linked.IsCancellationRequested)
+        catch (OperationCanceledException) when (token.IsCancellationRequested)
         {
             Update(JobState.Canceled, Progress);
         }
@@ -58,10 +60,20 @@ public sealed class ConversionJob(string input, Preset preset)
             Error = e.Message;
             Update(JobState.Failed, Progress);
         }
+        finally
+        {
+            _completion.TrySetResult();
+        }
     }
 
     private void Update(JobState state, double? progress)
     {
+        // A late progress report from the converter must not overwrite a finished state.
+        if (IsFinished)
+        {
+            return;
+        }
+
         State = state;
         Progress = progress;
         Changed?.Invoke(this);

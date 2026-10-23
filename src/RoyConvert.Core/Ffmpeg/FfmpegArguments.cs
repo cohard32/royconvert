@@ -106,7 +106,8 @@ public static class FfmpegArguments
         // Encoders such as libx264 with yuv420p require even dimensions.
         if (s.Scale.Height is { } height)
         {
-            filters.Add($"scale=-2:{Num(height - height % 2)}");
+            // Only shrink: a 360p source must not be upscaled by a "720p" preset.
+            filters.Add($"scale=-2:'min({Num(height - height % 2)},trunc(ih/2)*2)'");
         }
         else if (s.Scale.Factor is { } factor && factor != 1.0)
         {

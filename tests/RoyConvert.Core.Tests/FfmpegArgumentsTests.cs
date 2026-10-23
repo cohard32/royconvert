@@ -94,13 +94,13 @@ public class FfmpegArgumentsTests
     [Fact]
     public void ScaleHeight_KeepsAspectRatio()
     {
-        Assert.Equal("scale=-2:720", FfmpegArguments.VideoFilter(Defaults with { Scale = Scale.ToHeight(720) }));
+        Assert.Equal("scale=-2:'min(720,trunc(ih/2)*2)'", FfmpegArguments.VideoFilter(Defaults with { Scale = Scale.ToHeight(720) }));
     }
 
     [Fact]
     public void RotationIsAppliedBeforeScale()
     {
-        Assert.Equal("transpose=2,scale=-2:720",
+        Assert.Equal("transpose=2,scale=-2:'min(720,trunc(ih/2)*2)'",
             FfmpegArguments.VideoFilter(Defaults with { Rotation = Rotation.Left, Scale = Scale.ToHeight(720) }));
     }
 
@@ -117,7 +117,7 @@ public class FfmpegArgumentsTests
         var args = FfmpegArguments.Build("in.mov", "out.gif", OutputFormat.Gif, Defaults with { Scale = Scale.ToHeight(480) });
         var filter = args[args.ToList().IndexOf("-vf") + 1];
 
-        Assert.StartsWith("scale=-2:480,fps=15,split[a][b];[a]palettegen", filter);
+        Assert.StartsWith("scale=-2:'min(480,trunc(ih/2)*2)',fps=15,split[a][b];[a]palettegen", filter);
         Assert.Contains("paletteuse", filter);
         Assert.Contains("-an", args);
     }

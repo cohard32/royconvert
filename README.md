@@ -20,7 +20,8 @@ Sonraki sürümler: Office → PDF (LibreOffice), PDF → resim, DVD çıkarma.
 |---|---|
 | `src/RoyConvert.Core` | Presetler, dönüştürme işleri, FFmpeg/ImageMagick komut üretimi (platformdan bağımsız) |
 | `src/RoyConvert.App` | Avalonia arayüzü: ilerleme penceresi, ayarlar |
-| `tests/RoyConvert.Core.Tests` | Birim testleri |
+| `tests/RoyConvert.Core.Tests` | Motor testleri (gerçek ffmpeg ile uçtan uca dahil) |
+| `tests/RoyConvert.App.Tests` | Komut satırı ve tek-örnek testleri |
 | `docs/` | Analiz ve tasarım notları |
 
 ## Geliştirme

@@ -13,6 +13,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "tests", "tests", "{9B47121B
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RoyConvert.Core.Tests", "tests\RoyConvert.Core.Tests\RoyConvert.Core.Tests.csproj", "{3493E673-75F9-4736-98EE-D8E1EDB0CCC5}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RoyConvert.App.Tests", "tests\RoyConvert.App.Tests\RoyConvert.App.Tests.csproj", "{9B20F037-BDF0-40D5-8D4B-366795D5F240}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -34,10 +36,15 @@ Global
 		{3493E673-75F9-4736-98EE-D8E1EDB0CCC5}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{3493E673-75F9-4736-98EE-D8E1EDB0CCC5}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{3493E673-75F9-4736-98EE-D8E1EDB0CCC5}.Release|Any CPU.Build.0 = Release|Any CPU
+		{9B20F037-BDF0-40D5-8D4B-366795D5F240}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{9B20F037-BDF0-40D5-8D4B-366795D5F240}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{9B20F037-BDF0-40D5-8D4B-366795D5F240}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{9B20F037-BDF0-40D5-8D4B-366795D5F240}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
 		{F8B87DDA-2483-4D90-97EA-15C486DB7B97} = {A09A00B5-44F2-42B8-A382-EE7A4465B506}
 		{A0F176FC-C7AD-4039-9533-B09894379A75} = {A09A00B5-44F2-42B8-A382-EE7A4465B506}
 		{3493E673-75F9-4736-98EE-D8E1EDB0CCC5} = {9B47121B-7E4D-433D-9DDB-ACDDD3B8B20C}
+		{9B20F037-BDF0-40D5-8D4B-366795D5F240} = {9B47121B-7E4D-433D-9DDB-ACDDD3B8B20C}
 	EndGlobalSection
 EndGlobal

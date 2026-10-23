@@ -27,7 +27,8 @@ public sealed class ImageConverter : IConverter
 
             if (s.Scale.Height is { } height)
             {
-                image.Resize(new MagickGeometry(0, (uint)height));
+                // Greater: only shrink images taller than the target, never upscale.
+                image.Resize(new MagickGeometry(0, (uint)height) { Greater = true });
             }
             else if (s.Scale.Factor is { } factor && factor != 1.0)
             {

@@ -35,12 +35,36 @@ public sealed class ConversionIntegrationTests : IDisposable
         var progress = new List<double?>();
         job.Changed += j => { lock (progress) { progress.Add(j.Progress); } };
 
-        await ConversionRunner.CreateDefault(Ffmpeg).RunAsync([job], 1);
+        using var runner = ConversionRunner.CreateDefault(Ffmpeg, 1);
+        await runner.RunAsync([job]);
 
         Assert.True(job.State == JobState.Done, job.Error);
         Assert.True(new FileInfo(job.Output!).Length > 0);
         // Intermediate values depend on timing (ffmpeg reports every 0.5 s), so only the end is checked.
         Assert.Equal(1, progress[^1]);
+    }
+
+    [Theory]
+    [InlineData("720p/mp4", "320x240")]
+    [InlineData("scale50/mp4", "160x120")]
+    [InlineData("rotate-right/mp4", "240x320")]
+    public async Task VideoTransforms_ProduceExpectedSize_AndNeverUpscale(string presetId, string expectedSize)
+    {
+        var ffprobe = ToolLocator.Find("ffprobe");
+        if (Ffmpeg is null || ffprobe is null)
+        {
+            return;
+        }
+
+        var input = Path.Combine(_dir, "sample.mov");
+        GenerateSampleVideo(input);
+        var job = new ConversionJob(input, PresetCatalog.Find(PresetCatalog.Default, presetId)!);
+
+        using var runner = ConversionRunner.CreateDefault(Ffmpeg, 1);
+        await runner.RunAsync([job]);
+
+        Assert.True(job.State == JobState.Done, job.Error);
+        Assert.Equal(expectedSize, Run(ffprobe, "-v", "error", "-select_streams", "v:0", "-show_entries", "stream=width,height", "-of", "csv=p=0:s=x", job.Output!).Trim());
     }
 
     [Fact]
@@ -55,7 +79,8 @@ public sealed class ConversionIntegrationTests : IDisposable
         await File.WriteAllTextAsync(input, "not a video");
         var job = new ConversionJob(input, PresetCatalog.Find(PresetCatalog.Default, "mkv")!);
 
-        await ConversionRunner.CreateDefault(Ffmpeg).RunAsync([job], 1);
+        using var runner = ConversionRunner.CreateDefault(Ffmpeg, 1);
+        await runner.RunAsync([job]);
 
         Assert.Equal(JobState.Failed, job.State);
         Assert.Contains("ffmpeg exited", job.Error);
@@ -72,7 +97,8 @@ public sealed class ConversionIntegrationTests : IDisposable
         var png = PresetCatalog.Find(PresetCatalog.Default, "png")!;
         ConversionJob[] jobs = [new(a, png), new(b, png)];
 
-        await ConversionRunner.CreateDefault(null).RunAsync(jobs, 2);
+        using var runner = ConversionRunner.CreateDefault(null, 2);
+        await runner.RunAsync(jobs);
 
         Assert.All(jobs, j => Assert.Equal(JobState.Done, j.State));
         Assert.NotEqual(jobs[0].Output, jobs[1].Output);
@@ -89,7 +115,8 @@ public sealed class ConversionIntegrationTests : IDisposable
         CreateImage(input, 400, 200);
         var job = new ConversionJob(input, PresetCatalog.Find(PresetCatalog.Default, presetId)!);
 
-        await ConversionRunner.CreateDefault(null).RunAsync([job], 1);
+        using var runner = ConversionRunner.CreateDefault(null, 1);
+        await runner.RunAsync([job]);
 
         Assert.True(job.State == JobState.Done, job.Error);
         using var result = new MagickImage(job.Output!);
@@ -105,7 +132,8 @@ public sealed class ConversionIntegrationTests : IDisposable
         var job = new ConversionJob(input, PresetCatalog.Find(PresetCatalog.Default, "jpg")!);
         job.Cancel();
 
-        await ConversionRunner.CreateDefault(null).RunAsync([job], 1);
+        using var runner = ConversionRunner.CreateDefault(null, 1);
+        await runner.RunAsync([job]);
 
         Assert.Equal(JobState.Canceled, job.State);
     }
@@ -116,26 +144,30 @@ public sealed class ConversionIntegrationTests : IDisposable
         image.Write(path);
     }
 
-    private static void GenerateSampleVideo(string path)
+    private static void GenerateSampleVideo(string path) =>
+        Run(Ffmpeg!, "-hide_banner", "-y", "-f", "lavfi", "-i", "testsrc=duration=3:size=320x240:rate=25",
+            "-f", "lavfi", "-i", "sine=frequency=440:duration=3", "-shortest", path);
+
+    /// <summary>Runs a tool, asserts success and returns its standard output.</summary>
+    private static string Run(string tool, params string[] args)
     {
-        var info = new ProcessStartInfo(Ffmpeg!)
+        var info = new ProcessStartInfo(tool)
         {
+            RedirectStandardOutput = true,
             RedirectStandardError = true,
             UseShellExecute = false,
             CreateNoWindow = true,
         };
-        foreach (var arg in new[]
-                 {
-                     "-hide_banner", "-y", "-f", "lavfi", "-i", "testsrc=duration=3:size=320x240:rate=25",
-                     "-f", "lavfi", "-i", "sine=frequency=440:duration=3", "-shortest", path,
-                 })
+        foreach (var arg in args)
         {
             info.ArgumentList.Add(arg);
         }
 
         using var process = Process.Start(info)!;
-        var stderr = process.StandardError.ReadToEnd();
+        var stderr = process.StandardError.ReadToEndAsync();
+        var stdout = process.StandardOutput.ReadToEnd();
         process.WaitForExit();
-        Assert.True(process.ExitCode == 0, stderr);
+        Assert.True(process.ExitCode == 0, stderr.Result);
+        return stdout;
     }
 }
