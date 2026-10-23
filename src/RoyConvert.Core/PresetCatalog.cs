@@ -1,0 +1,110 @@
+namespace RoyConvert.Core;
+
+/// <summary>Built-in presets. Names use "/" for submenus.</summary>
+public static class PresetCatalog
+{
+    private static readonly OutputFormat[] VideoOutputs = [OutputFormat.Mp4, OutputFormat.Mkv, OutputFormat.Webm, OutputFormat.Avi];
+    private static readonly OutputFormat[] AudioOutputs = [OutputFormat.Mp3, OutputFormat.Ogg, OutputFormat.Flac, OutputFormat.Wav, OutputFormat.Aac];
+    private static readonly OutputFormat[] ImageOutputs = [OutputFormat.Png, OutputFormat.Jpg, OutputFormat.Webp, OutputFormat.Avif, OutputFormat.Ico];
+
+    private static readonly IReadOnlySet<string> VideoSources = Union(Formats.VideoInputs, ["gif"]);
+    private static readonly IReadOnlySet<string> AudioSources = Union(Formats.AudioInputs, Formats.VideoInputs);
+
+    public static IReadOnlyList<Preset> Default { get; } = CreateDefault();
+
+    public static Preset? Find(IEnumerable<Preset> presets, string id) =>
+        presets.FirstOrDefault(p => string.Equals(p.Id, id, StringComparison.OrdinalIgnoreCase));
+
+    /// <summary>Presets that accept every one of the given files.</summary>
+    public static IEnumerable<Preset> ForFiles(IEnumerable<Preset> presets, IReadOnlyCollection<string> paths) =>
+        presets.Where(p => paths.Count > 0 && paths.All(p.Accepts));
+
+    private static List<Preset> CreateDefault()
+    {
+        var presets = new List<Preset>();
+        var video = new ConversionSettings();
+        var image = new ConversionSettings();
+
+        foreach (var format in VideoOutputs)
+        {
+            presets.Add(Make(format, video, VideoSources));
+        }
+
+        presets.Add(new Preset("mp4-small", "MP4 (small)", OutputFormat.Mp4, VideoSources,
+            video with { VideoQuality = 28, EncodingSpeed = EncodingSpeed.Faster, AudioBitrate = 128 },
+            "{dir}/{name}-small"));
+        presets.Add(Make(OutputFormat.Gif, video, Formats.VideoInputs));
+
+        foreach (var format in AudioOutputs)
+        {
+            presets.Add(Make(format, video, AudioSources));
+        }
+
+        foreach (var format in ImageOutputs)
+        {
+            presets.Add(Make(format, image, Formats.ImageInputs));
+        }
+
+        AddGroup(presets, "scale75", "Scale 75%", video with { Scale = Scale.ByFactor(0.75) }, image with { Scale = Scale.ByFactor(0.75) }, "-75%");
+        AddGroup(presets, "scale50", "Scale 50%", video with { Scale = Scale.ByFactor(0.5) }, image with { Scale = Scale.ByFactor(0.5) }, "-50%");
+        AddGroup(presets, "scale25", "Scale 25%", video with { Scale = Scale.ByFactor(0.25) }, image with { Scale = Scale.ByFactor(0.25) }, "-25%");
+        AddGroup(presets, "720p", "720p", video with { Scale = Scale.ToHeight(720) }, null, " (720p)");
+        AddGroup(presets, "1080p", "1080p", video with { Scale = Scale.ToHeight(1080) }, null, " (1080p)");
+        AddGroup(presets, "rotate-left", "Rotate left", video with { Rotation = Rotation.Left }, image with { Rotation = Rotation.Left }, " (rotated)");
+        AddGroup(presets, "rotate-right", "Rotate right", video with { Rotation = Rotation.Right }, image with { Rotation = Rotation.Right }, " (rotated)");
+
+        return presets;
+    }
+
+    /// <summary>Adds a submenu with the same transform for every video (and optionally image) output.</summary>
+    private static void AddGroup(List<Preset> presets, string id, string name, ConversionSettings video, ConversionSettings? image, string suffix)
+    {
+        var template = "{dir}/{name}" + suffix;
+        foreach (var format in VideoOutputs.Append(OutputFormat.Gif))
+        {
+            var sources = format == OutputFormat.Gif ? Formats.VideoInputs : VideoSources;
+            presets.Add(Make(format, video, sources, id, name, template));
+        }
+
+        if (image is null)
+        {
+            return;
+        }
+
+        foreach (var format in ImageOutputs.Where(f => f != OutputFormat.Ico))
+        {
+            presets.Add(Make(format, image, Formats.ImageInputs, id, name, template));
+        }
+    }
+
+    private static Preset Make(OutputFormat format, ConversionSettings settings, IReadOnlySet<string> inputs,
+        string? groupId = null, string? groupName = null, string template = OutputPath.DefaultTemplate)
+    {
+        var formatId = Formats.Extension(format);
+        var label = formatId.ToUpperInvariant();
+        // A file never needs converting to its own format unless something else changes.
+        var sources = groupId is null ? Without(inputs, formatId) : inputs;
+        return new Preset(
+            groupId is null ? formatId : $"{groupId}/{formatId}",
+            groupName is null ? label : $"{groupName}/{label}",
+            format,
+            sources,
+            settings,
+            template);
+    }
+
+    private static IReadOnlySet<string> Union(IEnumerable<string> a, IEnumerable<string> b) =>
+        new HashSet<string>(a.Concat(b), StringComparer.OrdinalIgnoreCase);
+
+    private static IReadOnlySet<string> Without(IReadOnlySet<string> set, string extension)
+    {
+        var result = new HashSet<string>(set, StringComparer.OrdinalIgnoreCase);
+        result.Remove(extension);
+        if (extension == "jpg")
+        {
+            result.ExceptWith(["jpeg", "jfif"]);
+        }
+
+        return result;
+    }
+}
