@@ -15,6 +15,18 @@ Geliştirme aşamasında (v0.1 hedefi).
 
 Sonraki sürümler: Office → PDF (LibreOffice), PDF → resim, DVD çıkarma.
 
+## Kullanım
+```
+royconvert                                   ana pencere (dosya seç / sürükle-bırak, sağ tık menüsünü kur/kaldır)
+royconvert --preset 720p/mp4 a.mov b.mkv     dönüştür (ilerleme penceresi)
+royconvert --preset mp3 --input-list l.txt   dosya listesini metin dosyasından oku
+royconvert --list-presets                    tüm preset kimlikleri
+royconvert --register-shell                  Windows sağ tık menüsünü kur (yalnızca bu kullanıcı)
+royconvert --unregister-shell                menüyü kaldır
+```
+Explorer çoklu seçimde her dosya için ayrı süreç başlatır; ilk süreç pencereyi açar, diğerleri dosyalarını
+ona (named pipe) iletip kapanır, böylece tüm dosyalar tek pencerede görünür.
+
 ## Mimari
 | Klasör | Açıklama |
 |---|---|
