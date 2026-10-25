@@ -10,7 +10,7 @@ namespace RoyConvert.App.Platform;
 /// <summary>
 /// Adds a "royconvert" menu to Explorer's context menu for every supported extension, for the current user only
 /// (HKCU, no admin rights). The items come from royconvert_shell.dll next to the exe, which reads
-/// <see cref="MenuFileName"/>. Registry-only menus (static verbs, even with ExplorerCommandHandler) are cut off after
+/// <see cref="MenuFilePath"/>. Registry-only menus (static verbs, even with ExplorerCommandHandler) are cut off after
 /// 16 items on Windows 10; a context menu handler builds its own popup menus and has no such limit.
 /// </summary>
 /// <remarks>
@@ -32,7 +32,9 @@ public static class WindowsShellMenu
     public const string ContextMenuClsid = "{34C9CD3A-4231-4BBA-B15E-9C1DF9B05DB2}";
 
     public const string HandlerFileName = "royconvert_shell.dll";
-    public const string MenuFileName = "shell-menu.txt";
+    /// <summary>Per user, in that user's language; the install folder may not be writable.</summary>
+    public static string MenuFilePath { get; } =
+        Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "royconvert", "shell-menu.txt");
 
     private const string Name = "royconvert";
     private const string ClassesPath = @"Software\Classes";
@@ -60,7 +62,7 @@ public static class WindowsShellMenu
         }
 
         Unregister(notify: false);
-        WriteMenuFile(directory, presets);
+        WriteMenuFile(presets);
 
         using (var server = Registry.CurrentUser.CreateSubKey($@"{ContextMenuServerPath}\InprocServer32"))
         {
@@ -86,13 +88,12 @@ public static class WindowsShellMenu
         return WindowsModernMenu.IsSupported ? WindowsModernMenu.Unregister() : null;
     }
 
-    /// <summary>Rewrites the menu labels in the current UI language, if the menu is installed for this exe.</summary>
-    public static void RefreshMenuFile(string exePath, IReadOnlyList<Preset> presets)
+    /// <summary>Rewrites the menu labels in the current UI language, if the menu is installed.</summary>
+    public static void RefreshMenuFile(IReadOnlyList<Preset> presets)
     {
-        var directory = Path.GetDirectoryName(exePath)!;
-        if (IsRegistered() && File.Exists(Path.Combine(directory, MenuFileName)))
+        if (IsRegistered())
         {
-            WriteMenuFile(directory, presets);
+            WriteMenuFile(presets);
         }
     }
 
@@ -114,8 +115,11 @@ public static class WindowsShellMenu
         return text.ToString();
     }
 
-    private static void WriteMenuFile(string directory, IReadOnlyList<Preset> presets) =>
-        File.WriteAllText(Path.Combine(directory, MenuFileName), BuildMenuFile(presets, PresetNames.DisplayName), new UTF8Encoding(false));
+    private static void WriteMenuFile(IReadOnlyList<Preset> presets)
+    {
+        Directory.CreateDirectory(Path.GetDirectoryName(MenuFilePath)!);
+        File.WriteAllText(MenuFilePath, BuildMenuFile(presets, PresetNames.DisplayName), new UTF8Encoding(false));
+    }
 
     private static string HandlerKeyPath(string extension) => $@"{AssociationsPath}\.{extension}\shellex\ContextMenuHandlers\{Name}";
 
@@ -139,6 +143,10 @@ public static class WindowsShellMenu
         }
 
         Registry.CurrentUser.DeleteSubKeyTree(ContextMenuServerPath, throwOnMissingSubKey: false);
+        if (File.Exists(MenuFilePath))
+        {
+            File.Delete(MenuFilePath);
+        }
         Registry.CurrentUser.DeleteSubKeyTree(LegacyCommandServerPath, throwOnMissingSubKey: false);
 
         if (notify)

@@ -8,6 +8,8 @@
     <RootNamespace>RoyConvert.App</RootNamespace>
     <AvaloniaUseCompiledBindingsByDefault>true</AvaloniaUseCompiledBindingsByDefault>
     <ApplicationManifest>app.manifest</ApplicationManifest>
+    <!-- Also the installer version (installer/build-installer.ps1). -->
+    <Version>0.1.0</Version>
     <!-- Also the icon of the Explorer menu, which royconvert_shell.dll reads from the exe. -->
     <ApplicationIcon>Assets\royconvert.ico</ApplicationIcon>
   </PropertyGroup>
@@ -63,5 +65,9 @@
     <!-- Explorer keeps the DLL loaded while a menu is in use; a failed copy only means the old handler stays. -->
     <Copy SourceFiles="$(ShellHandlerDll);$(ShellHandlerPackage)" DestinationFolder="$(OutDir)" SkipUnchangedFiles="true"
           Retries="0" ContinueOnError="WarnAndContinue" />
+  </Target>
+
+  <Target Name="PublishShellHandler" AfterTargets="Publish" Condition="'$(OS)' == 'Windows_NT'">
+    <Copy SourceFiles="$(ShellHandlerDll);$(ShellHandlerPackage)" DestinationFolder="$(PublishDir)" />
   </Target>
 </Project>

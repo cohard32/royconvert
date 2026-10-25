@@ -45,6 +45,16 @@ Son güncelleme: 2026-10-25
     (`ApplicationIcon`), pencereler ve sağ tık menüsü kök öğesi bunu kullanır
   - Doğrulama: Türkçe/İngilizce ana pencere ve Türkçe ilerleme penceresi ekran görüntüsüyle; UI Automation ile dil listesinden
     English → System default seçildi (pencere, ayar dosyası, menü etiketleri değişti); menü dökümünde Türkçe etiketler ve ikon var
+- Kurulum paketi (2026-10-25): `installer\build-installer.ps1` + `installer\royconvert.iss` (Inno Setup 6, Türkçe/İngilizce)
+  - Self-contained win-x64 yayın + `royconvert_shell.dll/.msix` + ffmpeg 9.0.2 essentials (gyan.dev, SHA-256 sabit) `tools\`
+    altında; kurulum dosyası ~70 MB. Uygulama sürümü csproj `<Version>` (0.1.0)
+  - Program Files (yönetici) veya `/CURRENTUSER` (yöneticisiz). Sonda `--register-shell` kurulumu başlatan kullanıcı olarak
+    çalışır; kaldırırken `--unregister-shell`. Explorer'ın kilitlediği DLL yeniden başlatmada değiştirilir/silinir
+  - Menü dosyası artık kullanıcıya özel: `%LOCALAPPDATA%\royconvert\shell-menu.txt` (Program Files'a yazılamaz; her kullanıcının
+    dili ayrı)
+  - Doğrulama: core testleri paketteki ffmpeg 9.0.2 ile 71/71; `/CURRENTUSER /VERYSILENT` kurulum → menü kurulu DLL'e bağlı,
+    döküm ve çalıştırma tamam, uygulama `tools\ffmpeg.exe`'yi kullanıyor → sessiz kaldırma: klasör, kayıt defteri ve menü dosyası
+    temizlendi. Program Files (yönetici) kurulumu ve Win 11 denenmedi
 - Testler: 95/95 (Core 71; App 24). Dil kültürüne dokunan testler ortak, paralel çalışmayan koleksiyonda (`UiCultureCollection`)
 
 ## Açık konular
@@ -62,8 +72,11 @@ Son güncelleme: 2026-10-25
    yazamadı. `icacls … /grant "<kullanıcı>:(OI)(CI)F" /T` ile düzeltildi. Win 11'de Debug klasöründen `--register-shell` aynı
    sorunu çıkarabilir; kurulum paketi Program Files'a kurulacağı için orada sorun olmaması beklenir (denenmedi).
 8. Çıktı dosya adı ekleri ("(rotated)", "-small" vb.) İngilizce kalıyor; istenirse çevrilebilir.
+9. Program Files kurulumu yönetici olmayan bir hesapta başka bir yöneticinin şifresiyle yapılırsa, kaldırma menü kaydını kurulumu
+   yapan hesap yerine yönetici hesabından silmeye çalışır (Inno'da kaldırma adımı "asıl kullanıcı olarak" çalıştırılamıyor).
+10. Kurulum dosyası imzasız: Windows SmartScreen "tanınmayan uygulama" uyarısı verir (kod imzalama sertifikasıyla çözülür).
 
 ## Sıradaki adımlar (öneri sırası)
-1. Win 11 PC'de `royconvert --register-shell` ile compact menüyü dene (kod hazır)
-2. Kurulum paketi (ffmpeg gömülü; DLL, paket ve kayıt dahil)
-3. macOS (Finder Quick Action / Finder Sync) — Mac gerekiyor
+1. Win 11 PC'de kurulum dosyasıyla dene (compact menü + Program Files kurulumu)
+2. macOS (Finder Quick Action / Finder Sync) — Mac gerekiyor
+3. Sonraki sürüm özellikleri: Office → PDF (LibreOffice), PDF → resim

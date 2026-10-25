@@ -76,9 +76,9 @@ public partial class App : Application
         try
         {
             Settings.Save();
-            if (OperatingSystem.IsWindows() && Environment.ProcessPath is { } exe)
+            if (OperatingSystem.IsWindows())
             {
-                WindowsShellMenu.RefreshMenuFile(exe, _presets);
+                WindowsShellMenu.RefreshMenuFile(_presets);
             }
         }
         catch (Exception e) when (e is IOException or UnauthorizedAccessException)
