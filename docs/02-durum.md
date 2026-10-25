@@ -76,7 +76,22 @@ Son güncelleme: 2026-10-25
    yapan hesap yerine yönetici hesabından silmeye çalışır (Inno'da kaldırma adımı "asıl kullanıcı olarak" çalıştırılamıyor).
 10. Kurulum dosyası imzasız: Windows SmartScreen "tanınmayan uygulama" uyarısı verir (kod imzalama sertifikasıyla çözülür).
 
+## Kaldığımız yer (2026-10-25)
+- Kullanıcı Win 11 PC'ye geçip deneyecek. Test kurulumu GitHub'da private ön sürüm olarak:
+  https://github.com/cohard32/royconvert/releases/tag/v0.1.0-test1 (`royconvert-0.1.0-setup.exe`,
+  SHA-256 `b2e241088735bc2552930ec667fea689738a2856b58ece397911b6fffb72b0c0`, `kurulum-paketi` dalı da57586'dan)
+- `kurulum-paketi` dalı henüz `main`'e birleştirilmedi (kullanıcı onayı bekleniyor); `main` = a0e262d (dil + ikon)
+- Win 11 denemesinde talimatlar **tek tek** verilecek (kullanıcı tercihi). Önerilen sıra:
+  1. Ön sürüm sayfasından setup'ı indir (SmartScreen: "Ek bilgi" → "Yine de çalıştır")
+  2. Varsayılan (Program Files, yönetici) kurulum, "Sağ tık menüsünü kur" işaretli
+  3. Bir resme sağ tık → compact menüde "royconvert" var mı, alt menüler (Rotate, %75 küçült…) tam mı
+  4. Bir öğeyi çalıştır → çıktı dosyası oluştu mu
+  5. "Diğer seçenekleri göster" altındaki klasik menüde de var mı
+  6. Hata olursa: `"C:\Program Files\royconvert\royconvert.exe" --register-shell` komutunun mesajı;
+     `Get-AppxPackage royconvert.ContextMenu` çıktısı
+  7. Kaldır → menü ve paket gitti mi (`Get-AppxPackage royconvert.ContextMenu` boş olmalı)
+
 ## Sıradaki adımlar (öneri sırası)
-1. Win 11 PC'de kurulum dosyasıyla dene (compact menü + Program Files kurulumu)
+1. Win 11 PC'de kurulum dosyasıyla dene (compact menü + Program Files kurulumu) — yukarıdaki sıra
 2. macOS (Finder Quick Action / Finder Sync) — Mac gerekiyor
 3. Sonraki sürüm özellikleri: Office → PDF (LibreOffice), PDF → resim
