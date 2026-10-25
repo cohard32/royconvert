@@ -46,6 +46,19 @@ dotnet test
 dotnet run --project src/RoyConvert.App
 ```
 
+## Kurulum paketi (Windows)
+Gereken: yukarıdakiler + [Inno Setup 6](https://jrsoftware.org/isinfo.php).
+
+```
+powershell -ExecutionPolicy Bypass -File installer\build-installer.ps1
+```
+`artifacts\royconvert-<sürüm>-setup.exe` üretir: .NET gerektirmeyen (self-contained) uygulama, sağ tık eklentisi ve
+ffmpeg (sürümü ve SHA-256'sı betikte sabit; indirilip doğrulanır). Kurulum varsayılan olarak Program Files'a yapılır;
+`/CURRENTUSER` ile (ya da kurulumdaki seçimle) yönetici izni olmadan kullanıcı klasörüne kurulur. Kurulum sağ tık
+menüsünü kurar, kaldırma onu da kaldırır.
+
+ffmpeg GPLv3 lisanslıdır ve kurulumda ayrı bir program olarak bulunur; lisansı ve kaynak bilgisi `tools\` klasöründedir.
+
 ## Kullanılan araçlar
 - [Avalonia UI](https://avaloniaui.net/)
 - [FFmpeg](https://ffmpeg.org/) (ayrı süreç olarak çalıştırılır)

@@ -7,7 +7,8 @@
 //     (static verbs with ExplorerCommandHandler hit the same limit on Windows 10).
 //   RootCommand (IExplorerCommand): the Windows 11 menu, declared by the sparse package.
 //
-// The menu comes from shell-menu.txt next to this DLL, written by `royconvert --register-shell`:
+// The menu comes from %LOCALAPPDATA%\royconvert\shell-menu.txt (per user, in that user's language; the install folder
+// may not be writable), written by `royconvert --register-shell`:
 //   <preset id> TAB <label, "Group/Item" for a submenu> TAB <space separated input extensions>
 // Choosing an item starts royconvert.exe (also next to this DLL) once for the whole selection.
 
@@ -86,10 +87,23 @@ namespace
         return text;
     }
 
+    std::wstring MenuFilePath()
+    {
+        PWSTR folder = nullptr;
+        std::wstring path;
+        if (SUCCEEDED(SHGetKnownFolderPath(FOLDERID_LocalAppData, 0, nullptr, &folder)))
+        {
+            path = std::wstring(folder) + L"\\royconvert\\shell-menu.txt";
+        }
+
+        CoTaskMemFree(folder);
+        return path;
+    }
+
     std::vector<Preset> LoadPresets()
     {
         std::vector<Preset> presets;
-        std::ifstream file(ModuleDirectory() + L"shell-menu.txt", std::ios::binary);
+        std::ifstream file(MenuFilePath(), std::ios::binary);
         std::string line;
         while (std::getline(file, line))
         {
