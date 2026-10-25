@@ -1,4 +1,4 @@
-; royconvert Windows installer (Inno Setup 6). Built by build-installer.ps1, which passes:
+﻿; royconvert Windows installer (Inno Setup 6). Built by build-installer.ps1, which passes:
 ;   AppVersion  version from src\RoyConvert.App\RoyConvert.App.csproj
 ;   PublishDir  self-contained publish output, with ffmpeg in tools\
 ;   OutputDir   where the setup .exe is written
