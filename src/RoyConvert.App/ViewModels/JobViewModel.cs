@@ -2,6 +2,7 @@ using Avalonia.Threading;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using RoyConvert.App.Platform;
+using RoyConvert.App.Resources;
 using RoyConvert.Core;
 
 namespace RoyConvert.App.ViewModels;
@@ -34,7 +35,7 @@ public partial class JobViewModel : ViewModelBase
 
     public string FileName => Path.GetFileName(Job.Input);
 
-    public string PresetName => Job.Preset.Name.Replace("/", " › ");
+    public string PresetName => PresetNames.DisplayName(Job.Preset).Replace("/", " › ");
 
     public bool IsFinished => State is JobState.Done or JobState.Failed or JobState.Canceled;
 
@@ -62,12 +63,12 @@ public partial class JobViewModel : ViewModelBase
         Percent = (Job.Progress ?? 0) * 100;
         Status = Job.State switch
         {
-            JobState.Queued => "Waiting",
+            JobState.Queued => Strings.Job_Waiting,
             JobState.Running when Job.Progress is { } p => $"{p:P0}",
-            JobState.Running => "Converting",
-            JobState.Done => "Done",
-            JobState.Failed => "Failed",
-            _ => "Canceled",
+            JobState.Running => Strings.Job_Converting,
+            JobState.Done => Strings.Job_Done,
+            JobState.Failed => Strings.Job_Failed,
+            _ => Strings.Job_Canceled,
         };
         OnPropertyChanged(nameof(IsFinished));
         OnPropertyChanged(nameof(IsDone));

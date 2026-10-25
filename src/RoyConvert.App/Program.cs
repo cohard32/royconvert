@@ -12,6 +12,9 @@ sealed class Program
     [STAThread]
     public static int Main(string[] args)
     {
+        // Before anything produces text: the menu labels written by --register-shell are translated too.
+        var settings = AppSettings.Load();
+        settings.ApplyLanguage();
         var command = CommandLine.Parse(args);
         SingleInstance? instance = null;
 
@@ -60,14 +63,14 @@ sealed class Program
         }
 
         // Invalid commands still open the progress window, which shows the error.
-        return BuildAvaloniaApp(command, instance).StartWithClassicDesktopLifetime(args);
+        return BuildAvaloniaApp(command, instance, settings).StartWithClassicDesktopLifetime(args);
     }
 
     // Avalonia configuration, don't remove; also used by visual designer.
-    public static AppBuilder BuildAvaloniaApp() => BuildAvaloniaApp(CommandLine.Parse([]), null);
+    public static AppBuilder BuildAvaloniaApp() => BuildAvaloniaApp(CommandLine.Parse([]), null, new AppSettings());
 
-    private static AppBuilder BuildAvaloniaApp(CommandLine command, SingleInstance? instance)
-        => AppBuilder.Configure(() => new App { Command = command, Instance = instance })
+    private static AppBuilder BuildAvaloniaApp(CommandLine command, SingleInstance? instance, AppSettings settings)
+        => AppBuilder.Configure(() => new App { Command = command, Instance = instance, Settings = settings })
             .UsePlatformDetect()
 #if DEBUG
             .WithDeveloperTools()

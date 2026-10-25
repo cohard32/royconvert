@@ -2,6 +2,7 @@ using System.ComponentModel;
 using System.Diagnostics;
 using System.Runtime.Versioning;
 using System.Text;
+using RoyConvert.App.Resources;
 
 namespace RoyConvert.App.Platform;
 
@@ -25,7 +26,7 @@ public static class WindowsModernMenu
         var package = Path.Combine(directory, PackageFileName);
         if (!File.Exists(package))
         {
-            return $"The Windows 11 menu package is missing: {package}";
+            return string.Format(Strings.Shell_PackageMissing, package);
         }
 
         var script = AddPackageScript(package, directory);
@@ -36,7 +37,7 @@ public static class WindowsModernMenu
 
     /// <returns>Null on success, otherwise why the package could not be removed.</returns>
     public static string? Unregister()
-        => RunPowerShell(RemovePackageScript(), elevated: false) == 0 ? null : "Could not remove the Windows 11 menu package.";
+        => RunPowerShell(RemovePackageScript(), elevated: false) == 0 ? null : Strings.Shell_PackageRemoveFailed;
 
     public static string AddPackageScript(string package, string directory)
         => $"$ErrorActionPreference = 'Stop'; Add-AppxPackage -Path {Quote(package)} -ExternalLocation {Quote(directory)} -AllowUnsigned -ForceUpdateFromAnyVersion";
@@ -52,11 +53,11 @@ public static class WindowsModernMenu
         {
             return RunPowerShell(script, elevated: true) == 0
                 ? null
-                : "Windows did not accept the Windows 11 menu package.";
+                : Strings.Shell_PackageRejected;
         }
         catch (Win32Exception e) when (e.NativeErrorCode == 1223) // ERROR_CANCELLED: the UAC prompt was declined
         {
-            return "Administrator permission is needed for the Windows 11 menu.";
+            return Strings.Shell_PackageNeedsAdmin;
         }
     }
 

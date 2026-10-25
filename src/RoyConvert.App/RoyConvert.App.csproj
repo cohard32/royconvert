@@ -8,10 +8,20 @@
     <RootNamespace>RoyConvert.App</RootNamespace>
     <AvaloniaUseCompiledBindingsByDefault>true</AvaloniaUseCompiledBindingsByDefault>
     <ApplicationManifest>app.manifest</ApplicationManifest>
+    <!-- Also the icon of the Explorer menu, which royconvert_shell.dll reads from the exe. -->
+    <ApplicationIcon>Assets\royconvert.ico</ApplicationIcon>
   </PropertyGroup>
 
   <ItemGroup>
-    <AvaloniaResource Include="Assets\**" />
+    <!-- Assets\icon holds the SVG source of royconvert.ico. -->
+    <AvaloniaResource Include="Assets\**" Exclude="Assets\icon\**" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <!-- UI text; Strings.tr.resx holds the Turkish translation. The class is public for {x:Static} in XAML. -->
+    <EmbeddedResource Update="Resources\Strings.resx" StronglyTypedLanguage="C#" StronglyTypedNamespace="RoyConvert.App.Resources"
+                      StronglyTypedClassName="Strings" StronglyTypedFileName="$(IntermediateOutputPath)Strings.Designer.cs"
+                      PublicClass="true" />
   </ItemGroup>
 
   <ItemGroup>

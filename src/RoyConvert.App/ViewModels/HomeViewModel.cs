@@ -2,21 +2,26 @@ using System.Collections.ObjectModel;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using RoyConvert.App.Platform;
+using RoyConvert.App.Resources;
 using RoyConvert.Core;
 
 namespace RoyConvert.App.ViewModels;
+
+/// <param name="Code">One of <see cref="AppSettings.Languages"/>, or null for the system language.</param>
+public sealed record LanguageOption(string? Code, string Name);
 
 public partial class HomeViewModel : ViewModelBase
 {
     private readonly IReadOnlyList<Preset> _presets;
     private readonly Action<Preset, IReadOnlyList<string>> _startConversion;
+    private readonly Action<string?> _changeLanguage;
 
     [ObservableProperty]
     [NotifyCanExecuteChangedFor(nameof(ConvertCommand))]
     private Preset? _selectedPreset;
 
     [ObservableProperty]
-    private string _filesText = "No files selected. Choose files or drop them here.";
+    private string _filesText = Strings.Home_NoFiles;
 
     [ObservableProperty]
     private string _shellMenuStatus = string.Empty;
@@ -24,19 +29,27 @@ public partial class HomeViewModel : ViewModelBase
     [ObservableProperty]
     private bool _isShellMenuRegistered;
 
-    public HomeViewModel(IReadOnlyList<Preset> presets, string? ffmpegPath, Action<Preset, IReadOnlyList<string>> startConversion)
+    [ObservableProperty]
+    private LanguageOption _selectedLanguage;
+
+    public HomeViewModel(IReadOnlyList<Preset> presets, string? ffmpegPath, string? language,
+        Action<Preset, IReadOnlyList<string>> startConversion, Action<string?> changeLanguage)
     {
         _presets = presets;
         _startConversion = startConversion;
-        FfmpegStatus = ffmpegPath is null
-            ? "ffmpeg not found: video and audio conversions are unavailable."
-            : $"ffmpeg: {ffmpegPath}";
+        _changeLanguage = changeLanguage;
+        FfmpegStatus = ffmpegPath is null ? Strings.Ffmpeg_NotFound : $"ffmpeg: {ffmpegPath}";
+        // Language names are written in their own language so they can be found whatever the current one is.
+        Languages = [new(null, Strings.Language_System), new("en", "English"), new("tr", "Türkçe")];
+        _selectedLanguage = Languages.FirstOrDefault(l => l.Code == language) ?? Languages[0];
         RefreshShellMenu();
     }
 
     public IReadOnlyList<string> Files { get; private set; } = [];
 
     public ObservableCollection<Preset> AvailablePresets { get; } = [];
+
+    public IReadOnlyList<LanguageOption> Languages { get; }
 
     public string FfmpegStatus { get; }
 
@@ -47,9 +60,9 @@ public partial class HomeViewModel : ViewModelBase
         Files = files;
         FilesText = files.Count switch
         {
-            0 => "No files selected.",
+            0 => Strings.Home_NoFilesShort,
             1 => files[0],
-            _ => $"{files.Count} files selected",
+            _ => string.Format(Strings.Home_FilesSelected, files.Count),
         };
 
         AvailablePresets.Clear();
@@ -61,9 +74,11 @@ public partial class HomeViewModel : ViewModelBase
         SelectedPreset = AvailablePresets.FirstOrDefault();
         if (files.Count > 0 && AvailablePresets.Count == 0)
         {
-            FilesText += " (no common conversion for these files)";
+            FilesText += " " + Strings.Home_NoCommonConversion;
         }
     }
+
+    partial void OnSelectedLanguageChanged(LanguageOption value) => _changeLanguage(value.Code);
 
     private bool CanConvert() => SelectedPreset is not null && Files.Count > 0;
 
@@ -85,12 +100,12 @@ public partial class HomeViewModel : ViewModelBase
             var registration = await Task.Run(() => OperatingSystem.IsWindows()
                 ? WindowsShellMenu.Register(exe, _presets)
                 : throw new PlatformNotSupportedException());
-            var message = $"Added to the right-click menu for {registration.Extensions} file types.";
+            var message = string.Format(Strings.Shell_Added, registration.Extensions);
             RefreshShellMenu(registration.ModernMenuError is { } error ? $"{message} {error}" : message);
         }
         catch (Exception e) when (e is UnauthorizedAccessException or IOException or System.Security.SecurityException)
         {
-            RefreshShellMenu($"Could not update the right-click menu: {e.Message}");
+            RefreshShellMenu(string.Format(Strings.Shell_UpdateFailed, e.Message));
         }
     }
 
@@ -105,19 +120,17 @@ public partial class HomeViewModel : ViewModelBase
         try
         {
             var error = await Task.Run(WindowsShellMenu.Unregister);
-            RefreshShellMenu(error ?? "Removed from the right-click menu.");
+            RefreshShellMenu(error ?? Strings.Shell_Removed);
         }
         catch (Exception e) when (e is UnauthorizedAccessException or IOException or System.Security.SecurityException)
         {
-            RefreshShellMenu($"Could not update the right-click menu: {e.Message}");
+            RefreshShellMenu(string.Format(Strings.Shell_UpdateFailed, e.Message));
         }
     }
 
     private void RefreshShellMenu(string? message = null)
     {
         IsShellMenuRegistered = OperatingSystem.IsWindows() && WindowsShellMenu.IsRegistered();
-        ShellMenuStatus = message ?? (IsShellMenuRegistered
-            ? "The right-click menu is installed."
-            : "The right-click menu is not installed.");
+        ShellMenuStatus = message ?? (IsShellMenuRegistered ? Strings.Shell_Installed : Strings.Shell_NotInstalled);
     }
 }

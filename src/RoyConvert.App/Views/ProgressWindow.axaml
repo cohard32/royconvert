@@ -1,17 +1,18 @@
 <Window xmlns="https://github.com/avaloniaui"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:vm="using:RoyConvert.App.ViewModels"
+        xmlns:res="using:RoyConvert.App.Resources"
         x:Class="RoyConvert.App.Views.ProgressWindow"
         x:DataType="vm:ProgressViewModel"
         Title="royconvert"
-        Icon="/Assets/avalonia-logo.ico"
+        Icon="/Assets/royconvert.ico"
         Width="560" SizeToContent="Height" MaxHeight="640" MinHeight="160"
         CanResize="False" WindowStartupLocation="CenterScreen">
 
     <DockPanel Margin="16">
         <Grid DockPanel.Dock="Bottom" ColumnDefinitions="*,Auto" Margin="0,12,0,0">
             <TextBlock Text="{Binding Summary}" VerticalAlignment="Center" />
-            <Button Grid.Column="1" Content="Cancel all" Command="{Binding CancelAllCommand}"
+            <Button Grid.Column="1" Content="{x:Static res:Strings.Progress_CancelAll}" Command="{Binding CancelAllCommand}"
                     IsVisible="{Binding !AllFinished}" />
         </Grid>
 
@@ -43,8 +44,8 @@
                                 <ProgressBar Value="{Binding Percent}" IsIndeterminate="{Binding IsIndeterminate}"
                                              VerticalAlignment="Center" />
                                 <StackPanel Grid.Column="1" Orientation="Horizontal" Margin="8,0,0,0">
-                                    <Button Content="Cancel" Command="{Binding CancelCommand}" IsVisible="{Binding !IsFinished}" />
-                                    <Button Content="Show" Command="{Binding ShowOutputCommand}" IsVisible="{Binding IsDone}" />
+                                    <Button Content="{x:Static res:Strings.Progress_Cancel}" Command="{Binding CancelCommand}" IsVisible="{Binding !IsFinished}" />
+                                    <Button Content="{x:Static res:Strings.Progress_Show}" Command="{Binding ShowOutputCommand}" IsVisible="{Binding IsDone}" />
                                 </StackPanel>
                             </Grid>
 

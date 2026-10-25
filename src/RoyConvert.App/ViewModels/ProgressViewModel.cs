@@ -2,6 +2,7 @@ using System.Collections.ObjectModel;
 using Avalonia.Threading;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
+using RoyConvert.App.Resources;
 using RoyConvert.Core;
 
 namespace RoyConvert.App.ViewModels;
@@ -36,17 +37,23 @@ public partial class ProgressViewModel : ViewModelBase, IDisposable
     {
         if (command.Kind != CommandKind.Convert)
         {
-            Messages.Add(command.Error ?? $"Unsupported command: {command.Kind}");
+            AddMessage(command.Error ?? string.Format(Strings.Progress_UnsupportedCommand, command.Kind));
             return;
         }
 
         if (PresetCatalog.Find(_presets, command.PresetId!) is not { } preset)
         {
-            Messages.Add($"Unknown preset \"{command.PresetId}\".");
+            AddMessage(string.Format(Strings.Progress_UnknownPreset, command.PresetId));
             return;
         }
 
         Add(preset, command.Files);
+    }
+
+    private void AddMessage(string message)
+    {
+        Messages.Add(message);
+        UpdateSummary();
     }
 
     public void Add(Preset preset, IEnumerable<string> files)
@@ -99,8 +106,8 @@ public partial class ProgressViewModel : ViewModelBase, IDisposable
         var done = Jobs.Count(j => j.IsDone);
         var failed = Jobs.Count(j => j.IsFailed);
         AllFinished = Jobs.All(j => j.IsFinished);
-        Summary = failed > 0
-            ? $"{done} of {Jobs.Count} converted, {failed} failed"
-            : $"{done} of {Jobs.Count} converted";
+        Summary = Jobs.Count == 0 ? string.Empty : failed > 0
+            ? string.Format(Strings.Progress_SummaryFailed, done, Jobs.Count, failed)
+            : string.Format(Strings.Progress_Summary, done, Jobs.Count);
     }
 }

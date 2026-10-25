@@ -2,6 +2,7 @@ using System.Runtime.InteropServices;
 using System.Runtime.Versioning;
 using System.Text;
 using Microsoft.Win32;
+using RoyConvert.App.Resources;
 using RoyConvert.Core;
 
 namespace RoyConvert.App.Platform;
@@ -55,11 +56,11 @@ public static class WindowsShellMenu
         var handler = Path.Combine(directory, HandlerFileName);
         if (!File.Exists(handler))
         {
-            throw new FileNotFoundException($"The context menu handler is missing: {handler}", handler);
+            throw new FileNotFoundException(string.Format(Strings.Shell_HandlerMissing, handler), handler);
         }
 
         Unregister(notify: false);
-        File.WriteAllText(Path.Combine(directory, MenuFileName), BuildMenuFile(presets), new UTF8Encoding(false));
+        WriteMenuFile(directory, presets);
 
         using (var server = Registry.CurrentUser.CreateSubKey($@"{ContextMenuServerPath}\InprocServer32"))
         {
@@ -85,23 +86,36 @@ public static class WindowsShellMenu
         return WindowsModernMenu.IsSupported ? WindowsModernMenu.Unregister() : null;
     }
 
+    /// <summary>Rewrites the menu labels in the current UI language, if the menu is installed for this exe.</summary>
+    public static void RefreshMenuFile(string exePath, IReadOnlyList<Preset> presets)
+    {
+        var directory = Path.GetDirectoryName(exePath)!;
+        if (IsRegistered() && File.Exists(Path.Combine(directory, MenuFileName)))
+        {
+            WriteMenuFile(directory, presets);
+        }
+    }
+
     /// <summary>
-    /// One line per preset: id, menu label and input extensions, tab separated. Presets without a submenu come
-    /// first, then the submenus in catalog order; the handler keeps this order.
+    /// One line per preset: id, menu label (from <paramref name="label"/>) and input extensions, tab separated.
+    /// Presets without a submenu come first, then the submenus in catalog order; the handler keeps this order.
     /// </summary>
-    public static string BuildMenuFile(IReadOnlyList<Preset> presets)
+    public static string BuildMenuFile(IReadOnlyList<Preset> presets, Func<Preset, string> label)
     {
         var ordered = presets.Where(p => !p.Name.Contains('/'))
             .Concat(presets.Where(p => p.Name.Contains('/')).GroupBy(p => p.Name[..p.Name.IndexOf('/')]).SelectMany(g => g));
         var text = new StringBuilder();
         foreach (var preset in ordered)
         {
-            text.Append(preset.Id).Append('\t').Append(preset.Name).Append('\t')
+            text.Append(preset.Id).Append('\t').Append(label(preset)).Append('\t')
                 .AppendJoin(' ', preset.InputExtensions.Order(StringComparer.OrdinalIgnoreCase)).Append("\r\n");
         }
 
         return text.ToString();
     }
+
+    private static void WriteMenuFile(string directory, IReadOnlyList<Preset> presets) =>
+        File.WriteAllText(Path.Combine(directory, MenuFileName), BuildMenuFile(presets, PresetNames.DisplayName), new UTF8Encoding(false));
 
     private static string HandlerKeyPath(string extension) => $@"{AssociationsPath}\.{extension}\shellex\ContextMenuHandlers\{Name}";
 

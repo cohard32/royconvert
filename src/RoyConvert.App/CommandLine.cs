@@ -1,3 +1,5 @@
+using RoyConvert.App.Resources;
+
 namespace RoyConvert.App;
 
 public enum CommandKind
@@ -51,12 +53,12 @@ public sealed record CommandLine(CommandKind Kind, string? PresetId, IReadOnlyLi
                     }
                     catch (Exception e) when (e is IOException or UnauthorizedAccessException)
                     {
-                        return Invalid($"Cannot read input list {list}: {e.Message}");
+                        return Invalid(string.Format(Strings.Cli_InputListUnreadable, list, e.Message));
                     }
 
                     break;
                 case var option when option.StartsWith("--", StringComparison.Ordinal):
-                    return Invalid($"Unknown or incomplete option: {option}");
+                    return Invalid(string.Format(Strings.Cli_UnknownOption, option));
                 default:
                     files.Add(args[i]);
                     break;
@@ -65,12 +67,12 @@ public sealed record CommandLine(CommandKind Kind, string? PresetId, IReadOnlyLi
 
         if (presetId is null)
         {
-            return Invalid("Missing --preset <id>.");
+            return Invalid(Strings.Cli_MissingPreset);
         }
 
         if (files.Count == 0)
         {
-            return Invalid("No input files.");
+            return Invalid(Strings.Cli_NoFiles);
         }
 
         // Absolute paths, so the arguments can be forwarded to an instance with another working directory.

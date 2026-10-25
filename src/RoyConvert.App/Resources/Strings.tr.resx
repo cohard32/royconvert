@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <resheader name="resmimetype"><value>text/microsoft-resx</value></resheader>
+  <resheader name="version"><value>2.0</value></resheader>
+  <resheader name="reader"><value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value></resheader>
+  <resheader name="writer"><value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value></resheader>
+  <data name="Home_NoFiles" xml:space="preserve"><value>Dosya seçilmedi. Dosya seçin veya buraya bırakın.</value></data>
+  <data name="Home_NoFilesShort" xml:space="preserve"><value>Dosya seçilmedi.</value></data>
+  <data name="Home_FilesSelected" xml:space="preserve"><value>{0} dosya seçildi</value></data>
+  <data name="Home_NoCommonConversion" xml:space="preserve"><value>(bu dosyalar için ortak bir dönüştürme yok)</value></data>
+  <data name="Home_ChooseFiles" xml:space="preserve"><value>Dosya seç…</value></data>
+  <data name="Home_ChooseFilesTitle" xml:space="preserve"><value>Dönüştürülecek dosyaları seçin</value></data>
+  <data name="Home_OutputFormat" xml:space="preserve"><value>Çıktı biçimi</value></data>
+  <data name="Home_Convert" xml:space="preserve"><value>Dönüştür</value></data>
+  <data name="Home_Language" xml:space="preserve"><value>Dil</value></data>
+  <data name="Language_System" xml:space="preserve"><value>Sistem dili</value></data>
+  <data name="Shell_Title" xml:space="preserve"><value>Sağ tık menüsü</value></data>
+  <data name="Shell_Install" xml:space="preserve"><value>Kur</value></data>
+  <data name="Shell_Remove" xml:space="preserve"><value>Kaldır</value></data>
+  <data name="Shell_Installed" xml:space="preserve"><value>Sağ tık menüsü kurulu.</value></data>
+  <data name="Shell_NotInstalled" xml:space="preserve"><value>Sağ tık menüsü kurulu değil.</value></data>
+  <data name="Shell_Added" xml:space="preserve"><value>Sağ tık menüsü {0} dosya türü için eklendi.</value></data>
+  <data name="Shell_Removed" xml:space="preserve"><value>Sağ tık menüsünden kaldırıldı.</value></data>
+  <data name="Shell_UpdateFailed" xml:space="preserve"><value>Sağ tık menüsü güncellenemedi: {0}</value></data>
+  <data name="Shell_HandlerMissing" xml:space="preserve"><value>Sağ tık menüsü eklentisi bulunamadı: {0}</value></data>
+  <data name="Shell_PackageMissing" xml:space="preserve"><value>Windows 11 menü paketi bulunamadı: {0}</value></data>
+  <data name="Shell_PackageRejected" xml:space="preserve"><value>Windows, Windows 11 menü paketini kabul etmedi.</value></data>
+  <data name="Shell_PackageNeedsAdmin" xml:space="preserve"><value>Windows 11 menüsü için yönetici izni gerekiyor.</value></data>
+  <data name="Shell_PackageRemoveFailed" xml:space="preserve"><value>Windows 11 menü paketi kaldırılamadı.</value></data>
+  <data name="Ffmpeg_NotFound" xml:space="preserve"><value>ffmpeg bulunamadı: video ve ses dönüştürme kullanılamıyor.</value></data>
+  <data name="Progress_CancelAll" xml:space="preserve"><value>Tümünü iptal et</value></data>
+  <data name="Progress_Cancel" xml:space="preserve"><value>İptal</value></data>
+  <data name="Progress_Show" xml:space="preserve"><value>Göster</value></data>
+  <data name="Progress_Summary" xml:space="preserve"><value>{1} dosyadan {0} tanesi dönüştürüldü</value></data>
+  <data name="Progress_SummaryFailed" xml:space="preserve"><value>{1} dosyadan {0} tanesi dönüştürüldü, {2} başarısız</value></data>
+  <data name="Progress_UnknownPreset" xml:space="preserve"><value>Bilinmeyen ayar: "{0}".</value></data>
+  <data name="Progress_UnsupportedCommand" xml:space="preserve"><value>Desteklenmeyen komut: {0}</value></data>
+  <data name="Job_Waiting" xml:space="preserve"><value>Bekliyor</value></data>
+  <data name="Job_Converting" xml:space="preserve"><value>Dönüştürülüyor</value></data>
+  <data name="Job_Done" xml:space="preserve"><value>Bitti</value></data>
+  <data name="Job_Failed" xml:space="preserve"><value>Başarısız</value></data>
+  <data name="Job_Canceled" xml:space="preserve"><value>İptal edildi</value></data>
+  <data name="Preset_mp4-small" xml:space="preserve"><value>MP4 (küçük)</value></data>
+  <data name="Preset_scale75" xml:space="preserve"><value>%75 küçült</value></data>
+  <data name="Preset_scale50" xml:space="preserve"><value>%50 küçült</value></data>
+  <data name="Preset_scale25" xml:space="preserve"><value>%25 küçült</value></data>
+  <data name="Preset_rotate-left" xml:space="preserve"><value>Sola döndür</value></data>
+  <data name="Preset_rotate-right" xml:space="preserve"><value>Sağa döndür</value></data>
+  <data name="Cli_InputListUnreadable" xml:space="preserve"><value>Dosya listesi okunamadı {0}: {1}</value></data>
+  <data name="Cli_UnknownOption" xml:space="preserve"><value>Bilinmeyen veya eksik seçenek: {0}</value></data>
+  <data name="Cli_MissingPreset" xml:space="preserve"><value>--preset &lt;kimlik&gt; eksik.</value></data>
+  <data name="Cli_NoFiles" xml:space="preserve"><value>Dönüştürülecek dosya yok.</value></data>
+</root>

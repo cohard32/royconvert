@@ -31,10 +31,10 @@ Açık bir pencere varsa yeni dosyalar ona (named pipe) eklenir.
 | Klasör | Açıklama |
 |---|---|
 | `src/RoyConvert.Core` | Presetler, dönüştürme işleri, FFmpeg/ImageMagick komut üretimi (platformdan bağımsız) |
-| `src/RoyConvert.App` | Avalonia arayüzü: ilerleme penceresi, ayarlar |
+| `src/RoyConvert.App` | Avalonia arayüzü: ilerleme penceresi, ayarlar; Türkçe/İngilizce (`Resources/Strings*.resx`) |
 | `src/RoyConvert.Shell` | Explorer sağ tık eklentisi (C++): Win 10 `IContextMenu`, Win 11 `IExplorerCommand` + sparse paket |
 | `tests/RoyConvert.Core.Tests` | Motor testleri (gerçek ffmpeg ile uçtan uca dahil) |
-| `tests/RoyConvert.App.Tests` | Komut satırı ve tek-örnek testleri |
+| `tests/RoyConvert.App.Tests` | Komut satırı, tek-örnek, sağ tık menüsü ve çeviri testleri |
 | `docs/` | Analiz ve tasarım notları |
 
 ## Geliştirme

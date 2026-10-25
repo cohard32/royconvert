@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <resheader name="resmimetype"><value>text/microsoft-resx</value></resheader>
+  <resheader name="version"><value>2.0</value></resheader>
+  <resheader name="reader"><value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value></resheader>
+  <resheader name="writer"><value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value></resheader>
+  <data name="Home_NoFiles" xml:space="preserve"><value>No files selected. Choose files or drop them here.</value></data>
+  <data name="Home_NoFilesShort" xml:space="preserve"><value>No files selected.</value></data>
+  <data name="Home_FilesSelected" xml:space="preserve"><value>{0} files selected</value></data>
+  <data name="Home_NoCommonConversion" xml:space="preserve"><value>(no common conversion for these files)</value></data>
+  <data name="Home_ChooseFiles" xml:space="preserve"><value>Choose files…</value></data>
+  <data name="Home_ChooseFilesTitle" xml:space="preserve"><value>Choose files to convert</value></data>
+  <data name="Home_OutputFormat" xml:space="preserve"><value>Output format</value></data>
+  <data name="Home_Convert" xml:space="preserve"><value>Convert</value></data>
+  <data name="Home_Language" xml:space="preserve"><value>Language</value></data>
+  <data name="Language_System" xml:space="preserve"><value>System default</value></data>
+  <data name="Shell_Title" xml:space="preserve"><value>Right-click menu</value></data>
+  <data name="Shell_Install" xml:space="preserve"><value>Install</value></data>
+  <data name="Shell_Remove" xml:space="preserve"><value>Remove</value></data>
+  <data name="Shell_Installed" xml:space="preserve"><value>The right-click menu is installed.</value></data>
+  <data name="Shell_NotInstalled" xml:space="preserve"><value>The right-click menu is not installed.</value></data>
+  <data name="Shell_Added" xml:space="preserve"><value>Added to the right-click menu for {0} file types.</value></data>
+  <data name="Shell_Removed" xml:space="preserve"><value>Removed from the right-click menu.</value></data>
+  <data name="Shell_UpdateFailed" xml:space="preserve"><value>Could not update the right-click menu: {0}</value></data>
+  <data name="Shell_HandlerMissing" xml:space="preserve"><value>The context menu handler is missing: {0}</value></data>
+  <data name="Shell_PackageMissing" xml:space="preserve"><value>The Windows 11 menu package is missing: {0}</value></data>
+  <data name="Shell_PackageRejected" xml:space="preserve"><value>Windows did not accept the Windows 11 menu package.</value></data>
+  <data name="Shell_PackageNeedsAdmin" xml:space="preserve"><value>Administrator permission is needed for the Windows 11 menu.</value></data>
+  <data name="Shell_PackageRemoveFailed" xml:space="preserve"><value>Could not remove the Windows 11 menu package.</value></data>
+  <data name="Ffmpeg_NotFound" xml:space="preserve"><value>ffmpeg not found: video and audio conversions are unavailable.</value></data>
+  <data name="Progress_CancelAll" xml:space="preserve"><value>Cancel all</value></data>
+  <data name="Progress_Cancel" xml:space="preserve"><value>Cancel</value></data>
+  <data name="Progress_Show" xml:space="preserve"><value>Show</value></data>
+  <data name="Progress_Summary" xml:space="preserve"><value>{0} of {1} converted</value></data>
+  <data name="Progress_SummaryFailed" xml:space="preserve"><value>{0} of {1} converted, {2} failed</value></data>
+  <data name="Progress_UnknownPreset" xml:space="preserve"><value>Unknown preset "{0}".</value></data>
+  <data name="Progress_UnsupportedCommand" xml:space="preserve"><value>Unsupported command: {0}</value></data>
+  <data name="Job_Waiting" xml:space="preserve"><value>Waiting</value></data>
+  <data name="Job_Converting" xml:space="preserve"><value>Converting</value></data>
+  <data name="Job_Done" xml:space="preserve"><value>Done</value></data>
+  <data name="Job_Failed" xml:space="preserve"><value>Failed</value></data>
+  <data name="Job_Canceled" xml:space="preserve"><value>Canceled</value></data>
+  <data name="Preset_mp4-small" xml:space="preserve"><value>MP4 (small)</value></data>
+  <data name="Preset_scale75" xml:space="preserve"><value>Scale 75%</value></data>
+  <data name="Preset_scale50" xml:space="preserve"><value>Scale 50%</value></data>
+  <data name="Preset_scale25" xml:space="preserve"><value>Scale 25%</value></data>
+  <data name="Preset_rotate-left" xml:space="preserve"><value>Rotate left</value></data>
+  <data name="Preset_rotate-right" xml:space="preserve"><value>Rotate right</value></data>
+  <data name="Cli_InputListUnreadable" xml:space="preserve"><value>Cannot read input list {0}: {1}</value></data>
+  <data name="Cli_UnknownOption" xml:space="preserve"><value>Unknown or incomplete option: {0}</value></data>
+  <data name="Cli_MissingPreset" xml:space="preserve"><value>Missing --preset &lt;id&gt;.</value></data>
+  <data name="Cli_NoFiles" xml:space="preserve"><value>No input files.</value></data>
+</root>

@@ -2,6 +2,7 @@ using Avalonia.Controls;
 using Avalonia.Input;
 using Avalonia.Interactivity;
 using Avalonia.Platform.Storage;
+using RoyConvert.App.Resources;
 using RoyConvert.App.ViewModels;
 
 namespace RoyConvert.App.Views;
@@ -20,7 +21,7 @@ public partial class MainWindow : Window
     {
         var files = await StorageProvider.OpenFilePickerAsync(new FilePickerOpenOptions
         {
-            Title = "Choose files to convert",
+            Title = Strings.Home_ChooseFilesTitle,
             AllowMultiple = true,
         });
         SetFiles(files);

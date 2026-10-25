@@ -7,7 +7,7 @@ namespace RoyConvert.App.Tests;
 public class WindowsShellMenuTests
 {
     private static readonly string[] Lines =
-        WindowsShellMenu.BuildMenuFile(PresetCatalog.Default).Split("\r\n", StringSplitOptions.RemoveEmptyEntries);
+        WindowsShellMenu.BuildMenuFile(PresetCatalog.Default, p => p.Name).Split("\r\n", StringSplitOptions.RemoveEmptyEntries);
 
     [Fact]
     public void MenuFile_HasOneLinePerPreset_WithIdLabelAndExtensions()

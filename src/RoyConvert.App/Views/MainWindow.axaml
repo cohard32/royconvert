@@ -2,10 +2,12 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:vm="using:RoyConvert.App.ViewModels"
         xmlns:core="using:RoyConvert.Core"
+        xmlns:app="using:RoyConvert.App"
+        xmlns:res="using:RoyConvert.App.Resources"
         x:Class="RoyConvert.App.Views.MainWindow"
         x:DataType="vm:HomeViewModel"
         Title="royconvert"
-        Icon="/Assets/avalonia-logo.ico"
+        Icon="/Assets/royconvert.ico"
         Width="560" SizeToContent="Height" CanResize="False"
         WindowStartupLocation="CenterScreen"
         DragDrop.AllowDrop="True">
@@ -18,29 +20,40 @@
             <StackPanel Spacing="10">
                 <Grid ColumnDefinitions="*,Auto">
                     <TextBlock Text="{Binding FilesText}" VerticalAlignment="Center" TextTrimming="CharacterEllipsis" />
-                    <Button Grid.Column="1" Content="Choose files…" Click="ChooseFiles_Click" Margin="8,0,0,0" />
+                    <Button Grid.Column="1" Content="{x:Static res:Strings.Home_ChooseFiles}" Click="ChooseFiles_Click" Margin="8,0,0,0" />
                 </Grid>
                 <Grid ColumnDefinitions="*,Auto">
                     <ComboBox ItemsSource="{Binding AvailablePresets}" SelectedItem="{Binding SelectedPreset}"
-                              HorizontalAlignment="Stretch" PlaceholderText="Output format">
+                              HorizontalAlignment="Stretch" PlaceholderText="{x:Static res:Strings.Home_OutputFormat}">
                         <ComboBox.ItemTemplate>
                             <DataTemplate x:DataType="core:Preset">
-                                <TextBlock Text="{Binding Name}" />
+                                <TextBlock Text="{Binding Converter={x:Static app:PresetNames.Converter}}" />
                             </DataTemplate>
                         </ComboBox.ItemTemplate>
                     </ComboBox>
-                    <Button Grid.Column="1" Content="Convert" Command="{Binding ConvertCommand}" Classes="accent" Margin="8,0,0,0" />
+                    <Button Grid.Column="1" Content="{x:Static res:Strings.Home_Convert}" Command="{Binding ConvertCommand}" Classes="accent" Margin="8,0,0,0" />
                 </Grid>
             </StackPanel>
         </Border>
 
         <StackPanel Spacing="8" IsVisible="{Binding CanManageShellMenu}">
-            <TextBlock Text="Right-click menu" FontWeight="SemiBold" />
+            <TextBlock Text="{x:Static res:Strings.Shell_Title}" FontWeight="SemiBold" />
             <TextBlock Text="{Binding ShellMenuStatus}" TextWrapping="Wrap" Opacity="0.8" />
             <StackPanel Orientation="Horizontal" Spacing="8">
-                <Button Content="Install" Command="{Binding RegisterShellMenuCommand}" />
-                <Button Content="Remove" Command="{Binding UnregisterShellMenuCommand}" IsEnabled="{Binding IsShellMenuRegistered}" />
+                <Button Content="{x:Static res:Strings.Shell_Install}" Command="{Binding RegisterShellMenuCommand}" />
+                <Button Content="{x:Static res:Strings.Shell_Remove}" Command="{Binding UnregisterShellMenuCommand}" IsEnabled="{Binding IsShellMenuRegistered}" />
             </StackPanel>
+        </StackPanel>
+
+        <StackPanel Orientation="Horizontal" Spacing="8">
+            <TextBlock Text="{x:Static res:Strings.Home_Language}" VerticalAlignment="Center" />
+            <ComboBox ItemsSource="{Binding Languages}" SelectedItem="{Binding SelectedLanguage}" MinWidth="160">
+                <ComboBox.ItemTemplate>
+                    <DataTemplate x:DataType="vm:LanguageOption">
+                        <TextBlock Text="{Binding Name}" />
+                    </DataTemplate>
+                </ComboBox.ItemTemplate>
+            </ComboBox>
         </StackPanel>
 
         <TextBlock Text="{Binding FfmpegStatus}" FontSize="12" Opacity="0.6" TextWrapping="Wrap" />

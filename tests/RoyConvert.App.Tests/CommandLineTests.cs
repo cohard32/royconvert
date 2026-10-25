@@ -1,5 +1,8 @@
+using RoyConvert.App.Resources;
+
 namespace RoyConvert.App.Tests;
 
+[Collection(UiCultureCollection.Name)]
 public class CommandLineTests
 {
     private static readonly string Cwd = Path.Combine(Path.GetTempPath(), "rc-cwd");
@@ -39,16 +42,18 @@ public class CommandLineTests
     }
 
     [Theory]
-    [InlineData(new[] { "a.mov" }, "Missing --preset")]
-    [InlineData(new[] { "--preset", "mp4" }, "No input files")]
-    [InlineData(new[] { "--preset" }, "Unknown or incomplete option")]
-    [InlineData(new[] { "--bogus", "a.mov" }, "Unknown or incomplete option")]
-    public void InvalidInput_ExplainsWhy(string[] args, string expected)
+    [InlineData(new[] { "a.mov" }, nameof(Strings.Cli_MissingPreset))]
+    [InlineData(new[] { "--preset", "mp4" }, nameof(Strings.Cli_NoFiles))]
+    [InlineData(new[] { "--preset" }, nameof(Strings.Cli_UnknownOption))]
+    [InlineData(new[] { "--bogus", "a.mov" }, nameof(Strings.Cli_UnknownOption))]
+    public void InvalidInput_ExplainsWhy(string[] args, string message)
     {
         var command = CommandLine.Parse(args, Cwd);
 
+        // The text before the first placeholder, in the UI language of the machine running the tests.
+        var expected = Strings.ResourceManager.GetString(message, Strings.Culture)!.Split("{0}")[0];
         Assert.Equal(CommandKind.Invalid, command.Kind);
-        Assert.Contains(expected, command.Error);
+        Assert.StartsWith(expected, command.Error);
     }
 
     [Theory]

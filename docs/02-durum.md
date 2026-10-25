@@ -34,7 +34,18 @@ Son güncelleme: 2026-10-25
     - Geliştirici modunda manifest (OID'siz kopya) `-Register -ExternalLocation` ile kaydedildi: Status Ok, COM sınıfı kayıt
       defteri olmadan paketten etkinleşti, Win 10 menüsünde çift giriş oluşmadı; sonra kaldırıldı
     - PowerShell betiklerinin çıkış kodları: kaldırma (paket yok) 0, kurulum hatası 1
-- Testler: 87/87 (Core 71; App 16)
+- Dil ve ikon (2026-10-25)
+  - Arayüz İngilizce + Türkçe: `src\RoyConvert.App\Resources\Strings.resx` / `Strings.tr.resx` (derlemede `Strings` sınıfı üretilir,
+    XAML'da `{x:Static res:Strings.…}`). Varsayılan Windows dili; ana penceredeki "Dil" listesinden değişir, anında uygulanır
+    (pencere yeniden kurulur) ve `%APPDATA%\royconvert\settings.json`'a kaydedilir
+  - Preset adları da çevrilir (`PresetNames`, id parçasına göre: `scale75` → "%75 küçült", `rotate-left` → "Sola döndür",
+    `mp4-small` → "MP4 (küçük)"); sağ tık menüsü etiketleri de seçili dilde (`shell-menu.txt` dil değişince yeniden yazılır).
+    Çıktı dosya adları (ör. "(rotated)") değişmedi
+  - İkon: `Assets\icon\royconvert.svg` → `Assets\royconvert.ico` (16–256 px) ve Win 11 paket logoları; exe ikonu
+    (`ApplicationIcon`), pencereler ve sağ tık menüsü kök öğesi bunu kullanır
+  - Doğrulama: Türkçe/İngilizce ana pencere ve Türkçe ilerleme penceresi ekran görüntüsüyle; UI Automation ile dil listesinden
+    English → System default seçildi (pencere, ayar dosyası, menü etiketleri değişti); menü dökümünde Türkçe etiketler ve ikon var
+- Testler: 95/95 (Core 71; App 24). Dil kültürüne dokunan testler ortak, paralel çalışmayan koleksiyonda (`UiCultureCollection`)
 
 ## Açık konular
 1. **Win 11'de gerçek deneme yapılmadı** (kullanıcının Win 11 PC'si). Sınanamayanlar: `-AllowUnsigned` kurulumu (Win 10'da bu
@@ -46,10 +57,13 @@ Son güncelleme: 2026-10-25
 4. Menü şu an Debug derlemesini gösteriyor (`src\RoyConvert.App\bin\Debug\net8.0\`). Kaldırmak için: `royconvert --unregister-shell`.
 5. `--input-list` geçici dosyaları %TEMP%'te kalıyor.
 6. Pencere kapanırken gelen dosya çok dar bir aralıkta kaybolabilir.
-7. Arayüz İngilizce; ikon Avalonia varsayılanı (exe'de Win32 ikon yok → menüde ikon görünmüyor).
+7. **Sparse paket kaydı klasör izinlerini değiştiriyor:** Win 10'daki geliştirici modu testinde `-ExternalLocation` olarak verilen
+   `bin\Debug\net8.0`'ın izinleri korumalı hale geldi, paket kaldırılınca geri gelmedi ve derleme yeni alt klasöre (`tr\`)
+   yazamadı. `icacls … /grant "<kullanıcı>:(OI)(CI)F" /T` ile düzeltildi. Win 11'de Debug klasöründen `--register-shell` aynı
+   sorunu çıkarabilir; kurulum paketi Program Files'a kurulacağı için orada sorun olmaması beklenir (denenmedi).
+8. Çıktı dosya adı ekleri ("(rotated)", "-small" vb.) İngilizce kalıyor; istenirse çevrilebilir.
 
 ## Sıradaki adımlar (öneri sırası)
 1. Win 11 PC'de `royconvert --register-shell` ile compact menüyü dene (kod hazır)
-2. Türkçe/İngilizce arayüz + ikon
-3. Kurulum paketi (ffmpeg gömülü; DLL ve kayıt dahil)
-4. macOS (Finder Quick Action / Finder Sync) — Mac gerekiyor
+2. Kurulum paketi (ffmpeg gömülü; DLL, paket ve kayıt dahil)
+3. macOS (Finder Quick Action / Finder Sync) — Mac gerekiyor

@@ -2,6 +2,7 @@ using Avalonia;
 using Avalonia.Controls.ApplicationLifetimes;
 using Avalonia.Markup.Xaml;
 using Avalonia.Threading;
+using RoyConvert.App.Platform;
 using RoyConvert.App.ViewModels;
 using RoyConvert.App.Views;
 using RoyConvert.Core;
@@ -19,6 +20,9 @@ public partial class App : Application
     /// <summary>Present when started for a conversion; receives files from later Explorer invocations.</summary>
     public SingleInstance? Instance { get; init; }
 
+    /// <summary>Loaded by <see cref="Program"/>, which already applied the language.</summary>
+    public AppSettings Settings { get; init; } = new();
+
     public override void Initialize()
     {
         AvaloniaXamlLoader.Load(this);
@@ -30,10 +34,7 @@ public partial class App : Application
         {
             if (Command.Kind == CommandKind.Home)
             {
-                desktop.MainWindow = new MainWindow
-                {
-                    DataContext = new HomeViewModel(_presets, _ffmpegPath, ShowProgress),
-                };
+                desktop.MainWindow = CreateMainWindow([]);
             }
             else
             {
@@ -50,6 +51,55 @@ public partial class App : Application
         }
 
         base.OnFrameworkInitializationCompleted();
+    }
+
+    private MainWindow CreateMainWindow(IReadOnlyList<string> files)
+    {
+        var home = new HomeViewModel(_presets, _ffmpegPath, Settings.Language, ShowProgress, ChangeLanguage);
+        if (files.Count > 0)
+        {
+            home.SetFiles(files);
+        }
+
+        return new MainWindow { DataContext = home };
+    }
+
+    private void ChangeLanguage(string? language)
+    {
+        if (language == Settings.Language)
+        {
+            return;
+        }
+
+        Settings.Language = language;
+        Settings.ApplyLanguage();
+        try
+        {
+            Settings.Save();
+            if (OperatingSystem.IsWindows() && Environment.ProcessPath is { } exe)
+            {
+                WindowsShellMenu.RefreshMenuFile(exe, _presets);
+            }
+        }
+        catch (Exception e) when (e is IOException or UnauthorizedAccessException)
+        {
+            // The new language still applies until the app closes.
+        }
+
+        // The texts come from {x:Static}, so a new window shows the new language. Posted because this runs while
+        // the language list is still handling the selection.
+        Dispatcher.UIThread.Post(() =>
+        {
+            if (ApplicationLifetime is IClassicDesktopStyleApplicationLifetime { MainWindow: MainWindow old } desktop)
+            {
+                var window = CreateMainWindow((old.DataContext as HomeViewModel)?.Files ?? []);
+                window.Position = old.Position;
+                window.WindowStartupLocation = Avalonia.Controls.WindowStartupLocation.Manual;
+                desktop.MainWindow = window;
+                window.Show();
+                old.Close();
+            }
+        });
     }
 
     private void ShowProgress(Preset preset, IReadOnlyList<string> files)
