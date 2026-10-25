@@ -21,23 +21,24 @@ royconvert                                   ana pencere (dosya seç / sürükle
 royconvert --preset 720p/mp4 a.mov b.mkv     dönüştür (ilerleme penceresi)
 royconvert --preset mp3 --input-list l.txt   dosya listesini metin dosyasından oku
 royconvert --list-presets                    tüm preset kimlikleri
-royconvert --register-shell                  Windows sağ tık menüsünü kur (yalnızca bu kullanıcı)
+royconvert --register-shell                  Windows sağ tık menüsünü kur (bu kullanıcı; Win 11 compact menü dahil)
 royconvert --unregister-shell                menüyü kaldır
 ```
-Explorer çoklu seçimde her dosya için ayrı süreç başlatır; ilk süreç pencereyi açar, diğerleri dosyalarını
-ona (named pipe) iletip kapanır, böylece tüm dosyalar tek pencerede görünür.
+Sağ tık menüsü `royconvert_shell.dll` (C++ COM eklentisi) tarafından kurulur; seçili tüm dosyalar tek süreçle iletilir.
+Açık bir pencere varsa yeni dosyalar ona (named pipe) eklenir.
 
 ## Mimari
 | Klasör | Açıklama |
 |---|---|
 | `src/RoyConvert.Core` | Presetler, dönüştürme işleri, FFmpeg/ImageMagick komut üretimi (platformdan bağımsız) |
 | `src/RoyConvert.App` | Avalonia arayüzü: ilerleme penceresi, ayarlar |
+| `src/RoyConvert.Shell` | Explorer sağ tık eklentisi (C++): Win 10 `IContextMenu`, Win 11 `IExplorerCommand` + sparse paket |
 | `tests/RoyConvert.Core.Tests` | Motor testleri (gerçek ffmpeg ile uçtan uca dahil) |
 | `tests/RoyConvert.App.Tests` | Komut satırı ve tek-örnek testleri |
 | `docs/` | Analiz ve tasarım notları |
 
 ## Geliştirme
-Gereken: .NET 8 SDK.
+Gereken: .NET 8 SDK; Windows'ta ayrıca Visual Studio (Build Tools) C++ x64 araçları ve Windows 10 SDK (sağ tık eklentisi için).
 
 ```
 dotnet build

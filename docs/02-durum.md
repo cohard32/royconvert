@@ -1,9 +1,9 @@
 # Durum ve sonraki adımlar
 
-Son güncelleme: 2026-10-23
+Son güncelleme: 2026-10-25
 
 ## Tamamlananlar
-- REA ile File Converter v2.2 analizi → `01-analiz-file-converter.md`
+- REA ile File Converter v2.2 analizi → `01-analiz-file-converter.md`; sağ tık eklentisi analizi → `03-analiz-fc-kabuk-eklentisi.md`
 - Proje iskeleti: Avalonia 11.3.9 + .NET 8 (Avalonia 12, .NET 9 derleyicisi istediği için 11'de kalındı)
 - `RoyConvert.Core` dönüştürme motoru
   - 76 preset (`PresetCatalog`): düz format, MP4 (small), Scale 75/50/25%, 720p, 1080p (yalnızca küçültür), Rotate left/right
@@ -14,24 +14,42 @@ Son güncelleme: 2026-10-23
   - İlerleme penceresi (iptal, "Göster", başarıyla bitince otomatik kapanma)
   - Ana pencere (dosya seç / sürükle-bırak, menüyü kur/kaldır)
   - Tek-örnek: Explorer'ın çoklu seçimde açtığı süreçler dosyalarını named pipe ile ilk pencereye iletir
-  - Windows klasik sağ tık menüsü (HKCU, `ExtendedSubCommandsKey` ile alt menüler)
-- Testler: 83/83 (Core 71, gerçek ffmpeg ile uçtan uca dahil; App 12)
+- `RoyConvert.Shell` (C++ DLL, `royconvert_shell.dll`) — sağ tık menüsü (2026-10-25)
+  - Eski kayıt defteri menüsü Explorer'da **16 öğede kesiliyordu** (Rotate kaybolma sorununun nedeni; video menüsünde 720p/1080p/Rotate de yoktu)
+  - Win 10 klasik menü: `IShellExtInit` + `IContextMenu`, HKCU `SystemFileAssociations\.ext\shellex\ContextMenuHandlers\royconvert`
+  - Win 11 compact menü: `IExplorerCommand` (`{F350E4E0-…}`) + imzasız sparse paket `royconvert_shell.msix`
+    (`src\RoyConvert.Shell\package\AppxManifest.xml`, yayıncıda imzasız-paket OID'i). Yalnızca Win 11'de (build ≥ 22000)
+    `Add-AppxPackage -AllowUnsigned -ExternalLocation <exe klasörü>` ile kurulur (`WindowsModernMenu`); başarısız olursa UAC ile
+    yükseltilmiş olarak yeniden dener. Klasik menü Win 11'de "Diğer seçenekleri göster" altında da kalır
+  - Menü verisi: `royconvert --register-shell` exe yanına `shell-menu.txt` yazar. Çoklu seçimde yalnızca tüm uzantıları kabul eden presetler gösterilir
+  - Tıklanınca tek `royconvert.exe --preset <id> "<dosyalar>"` süreci; uzun seçimde `--input-list` (%TEMP%\rcv*.tmp)
+  - `dotnet build` DLL'i Visual Studio C++ araçlarıyla derleyip exe yanına kopyalar (`src\RoyConvert.Shell\build.cmd`)
+  - Doğrulama (menüyü Explorer'ın yoluyla `IContextMenu` üzerinden döküp çalıştırarak): jpg 29/29, mp4 45/45 öğe; Rotate, 720p,
+    3 dosya (Türkçe ad dahil) ve 400 dosya (liste dosyası) dönüştürüldü; jpg+mp4 karışık seçimde menü gizli.
+    Kullanıcı Win 10 Explorer'da gerçek sağ tıkla doğruladı (2026-10-25)
+  - Win 11 yolu bu Win 10 PC'de sınanabildiği kadar (2026-10-25):
+    - `IExplorerCommand` doğrudan sürüldü (Explorer'ın sırası: GetState→GetTitle→EnumSubCommands→Invoke): jpg 24, mp4 45 yaprak,
+      karışık seçimde `ECS_HIDDEN`, çoklu seçimde Invoke dönüştürdü
+    - makeappx şema doğrulaması geçiyor (`/nv` yalnızca "exe paketin içinde" denetimini atlar; bozuk manifest yine hata verir)
+    - Geliştirici modunda manifest (OID'siz kopya) `-Register -ExternalLocation` ile kaydedildi: Status Ok, COM sınıfı kayıt
+      defteri olmadan paketten etkinleşti, Win 10 menüsünde çift giriş oluşmadı; sonra kaldırıldı
+    - PowerShell betiklerinin çıkış kodları: kaldırma (paket yok) 0, kurulum hatası 1
+- Testler: 87/87 (Core 71; App 16)
 
 ## Açık konular
-1. **Resim menüsünde "Rotate left/right" görünmedi** (Windows 10, kullanıcının ekran görüntüsü). Kayıt defterinde 9 giriş var,
-   Explorer'da 7'si görünüyor. Kırpılmış ekran görüntüsü mü yoksa Explorer sınırı mı, henüz doğrulanmadı.
-   Video menüsünde 18 giriş var; orada da kesilme olup olmadığına bakılmalı.
-2. **Windows 11 modern sağ tık menüsü zorunlu** (kullanıcının diğer PC'si Win 11). Klasik registry menüsü Win 11'de
-   yalnızca "Diğer seçenekleri göster" altında çıkar. Gerekli: `IExplorerCommand` COM eklentisi + sparse MSIX paket
-   kimliği (imzalı). Win 10'da klasik menü kalmalı → iki yol birlikte desteklenecek.
-3. Menü şu an Debug derlemesini gösteriyor (`src\RoyConvert.App\bin\Debug\net8.0\royconvert.exe`).
-   Kaldırmak için: `royconvert --unregister-shell`.
-4. Pencere kapanırken gelen dosya çok dar bir aralıkta kaybolabilir.
-5. Arayüz İngilizce; ikon Avalonia varsayılanı.
+1. **Win 11'de gerçek deneme yapılmadı** (kullanıcının Win 11 PC'si). Sınanamayanlar: `-AllowUnsigned` kurulumu (Win 10'da bu
+   parametre yok ve OID'li yayıncıyı "imzasız ad alanında değil" diye reddediyor), yönetici izni gerekip gerekmediği,
+   compact menüde görünüm. Denemek için: `royconvert --register-shell` → sağ tık. Sorun olursa çıkış kodu 1 ve hata mesajı verir.
+   Kalıcı dağıtımda Microsoft imzalı paket öneriyor (imzasız paket "test için"): proje herkese açılırken kod imzalama sertifikası düşünülmeli.
+2. Explorer menüsü hemen değişmezse: `taskkill /f /im explorer.exe & start explorer`.
+3. DLL Explorer tarafından yüklüyken yeniden derlenirse kopyalama uyarı verir; eski DLL kalır (Explorer'ı yeniden başlatınca düzelir).
+4. Menü şu an Debug derlemesini gösteriyor (`src\RoyConvert.App\bin\Debug\net8.0\`). Kaldırmak için: `royconvert --unregister-shell`.
+5. `--input-list` geçici dosyaları %TEMP%'te kalıyor.
+6. Pencere kapanırken gelen dosya çok dar bir aralıkta kaybolabilir.
+7. Arayüz İngilizce; ikon Avalonia varsayılanı (exe'de Win32 ikon yok → menüde ikon görünmüyor).
 
 ## Sıradaki adımlar (öneri sırası)
-1. Açık konu 1'i doğrula/düzelt
-2. Windows 11 modern menü (IExplorerCommand + sparse package), Win 10 klasik menü ile birlikte
-3. Türkçe/İngilizce arayüz + ikon
-4. Kurulum paketi (ffmpeg gömülü)
-5. macOS (Finder Quick Action / Finder Sync) — Mac gerekiyor
+1. Win 11 PC'de `royconvert --register-shell` ile compact menüyü dene (kod hazır)
+2. Türkçe/İngilizce arayüz + ikon
+3. Kurulum paketi (ffmpeg gömülü; DLL ve kayıt dahil)
+4. macOS (Finder Quick Action / Finder Sync) — Mac gerekiyor

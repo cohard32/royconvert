@@ -29,4 +29,29 @@
   <ItemGroup>
     <ProjectReference Include="..\RoyConvert.Core\RoyConvert.Core.csproj" />
   </ItemGroup>
+
+  <!--
+    Explorer context menu handler (C++) and its Windows 11 sparse package, built with the Visual Studio C++ tools and
+    the Windows SDK and placed next to royconvert.exe.
+  -->
+  <PropertyGroup>
+    <ShellHandlerDir>$(MSBuildThisFileDirectory)..\RoyConvert.Shell\</ShellHandlerDir>
+    <ShellHandlerDll>$(ShellHandlerDir)bin\royconvert_shell.dll</ShellHandlerDll>
+    <ShellHandlerPackage>$(ShellHandlerDir)bin\royconvert_shell.msix</ShellHandlerPackage>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ShellHandlerSource Include="$(ShellHandlerDir)RoyConvertShell.*;$(ShellHandlerDir)build.cmd;$(ShellHandlerDir)package\**" />
+  </ItemGroup>
+
+  <Target Name="BuildShellHandler" BeforeTargets="Build" Condition="'$(OS)' == 'Windows_NT'"
+          Inputs="@(ShellHandlerSource)" Outputs="$(ShellHandlerDll);$(ShellHandlerPackage)">
+    <Exec Command="&quot;$(ShellHandlerDir)build.cmd&quot;" />
+  </Target>
+
+  <Target Name="CopyShellHandler" AfterTargets="Build" Condition="'$(OS)' == 'Windows_NT'">
+    <!-- Explorer keeps the DLL loaded while a menu is in use; a failed copy only means the old handler stays. -->
+    <Copy SourceFiles="$(ShellHandlerDll);$(ShellHandlerPackage)" DestinationFolder="$(OutDir)" SkipUnchangedFiles="true"
+          Retries="0" ContinueOnError="WarnAndContinue" />
+  </Target>
 </Project>

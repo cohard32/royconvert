@@ -71,7 +71,7 @@ public partial class HomeViewModel : ViewModelBase
     private void Convert() => _startConversion(SelectedPreset!, Files);
 
     [RelayCommand]
-    private void RegisterShellMenu()
+    private async Task RegisterShellMenu()
     {
         if (!OperatingSystem.IsWindows() || Environment.ProcessPath is not { } exe)
         {
@@ -80,8 +80,13 @@ public partial class HomeViewModel : ViewModelBase
 
         try
         {
-            var count = WindowsShellMenu.Register(exe, _presets);
-            RefreshShellMenu($"Added to the right-click menu for {count} file types.");
+            // The Windows 11 package is installed through PowerShell, which takes a few seconds.
+            // The platform check is repeated because the analyzer does not carry it into the lambda.
+            var registration = await Task.Run(() => OperatingSystem.IsWindows()
+                ? WindowsShellMenu.Register(exe, _presets)
+                : throw new PlatformNotSupportedException());
+            var message = $"Added to the right-click menu for {registration.Extensions} file types.";
+            RefreshShellMenu(registration.ModernMenuError is { } error ? $"{message} {error}" : message);
         }
         catch (Exception e) when (e is UnauthorizedAccessException or IOException or System.Security.SecurityException)
         {
@@ -90,7 +95,7 @@ public partial class HomeViewModel : ViewModelBase
     }
 
     [RelayCommand]
-    private void UnregisterShellMenu()
+    private async Task UnregisterShellMenu()
     {
         if (!OperatingSystem.IsWindows())
         {
@@ -99,8 +104,8 @@ public partial class HomeViewModel : ViewModelBase
 
         try
         {
-            WindowsShellMenu.Unregister();
-            RefreshShellMenu("Removed from the right-click menu.");
+            var error = await Task.Run(WindowsShellMenu.Unregister);
+            RefreshShellMenu(error ?? "Removed from the right-click menu.");
         }
         catch (Exception e) when (e is UnauthorizedAccessException or IOException or System.Security.SecurityException)
         {

@@ -26,11 +26,22 @@ sealed class Program
                 return 0;
 
             case CommandKind.RegisterShell when OperatingSystem.IsWindows():
-                WindowsShellMenu.Register(Environment.ProcessPath!, PresetCatalog.Default);
+                var registration = WindowsShellMenu.Register(Environment.ProcessPath!, PresetCatalog.Default);
+                if (registration.ModernMenuError is { } registerError)
+                {
+                    Console.Error.WriteLine(registerError);
+                    return 1;
+                }
+
                 return 0;
 
             case CommandKind.UnregisterShell when OperatingSystem.IsWindows():
-                WindowsShellMenu.Unregister();
+                if (WindowsShellMenu.Unregister() is { } unregisterError)
+                {
+                    Console.Error.WriteLine(unregisterError);
+                    return 1;
+                }
+
                 return 0;
 
             case CommandKind.RegisterShell or CommandKind.UnregisterShell:
