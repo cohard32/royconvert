@@ -30,4 +30,18 @@ public static class PresetNames
 
         return string.Join('/', names);
     }
+
+    /// <summary>
+    /// The preset with its output file name suffix in the UI language, looked up by the first id segment
+    /// ("FileName_rotate-left": " (rotated)" → " (döndürülmüş)"). Presets without a translated suffix are returned as they are.
+    /// </summary>
+    public static Preset WithLocalizedFileName(Preset preset)
+    {
+        const string prefix = "{dir}/{name}";
+        var group = preset.Id.Split('/')[0];
+        return preset.FileNameTemplate.StartsWith(prefix, StringComparison.Ordinal)
+               && Strings.ResourceManager.GetString("FileName_" + group, Strings.Culture) is { } suffix
+            ? preset with { FileNameTemplate = prefix + suffix }
+            : preset;
+    }
 }

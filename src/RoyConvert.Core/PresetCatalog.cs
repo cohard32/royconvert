@@ -10,6 +10,9 @@ public static class PresetCatalog
     private static readonly IReadOnlySet<string> VideoSources = Union(Formats.VideoInputs, ["gif"]);
     private static readonly IReadOnlySet<string> AudioSources = Union(Formats.AudioInputs, Formats.VideoInputs);
 
+    /// <summary>Image formats that PDF pages can be exported to.</summary>
+    private static readonly OutputFormat[] PdfPageOutputs = [OutputFormat.Png, OutputFormat.Jpg, OutputFormat.Webp];
+
     public static IReadOnlyList<Preset> Default { get; } = CreateDefault();
 
     public static Preset? Find(IEnumerable<Preset> presets, string id) =>
@@ -42,8 +45,13 @@ public static class PresetCatalog
 
         foreach (var format in ImageOutputs)
         {
-            presets.Add(Make(format, image, Formats.ImageInputs));
+            var sources = PdfPageOutputs.Contains(format) ? Union(Formats.ImageInputs, ["pdf"]) : Formats.ImageInputs;
+            presets.Add(Make(format, image, sources));
         }
+
+        presets.Add(Make(OutputFormat.Pdf, image, Union(Formats.OfficeInputs, Formats.ImageInputs)));
+        presets.Add(new Preset("combine-pdf", "PDF (one file)", OutputFormat.Pdf, Formats.ImageInputs, image,
+            "{dir}/{name} (combined)", CombinesInputs: true));
 
         AddGroup(presets, "scale75", "Scale 75%", video with { Scale = Scale.ByFactor(0.75) }, image with { Scale = Scale.ByFactor(0.75) }, "-75%");
         AddGroup(presets, "scale50", "Scale 50%", video with { Scale = Scale.ByFactor(0.5) }, image with { Scale = Scale.ByFactor(0.5) }, "-50%");

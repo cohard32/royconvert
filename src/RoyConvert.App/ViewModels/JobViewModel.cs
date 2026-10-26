@@ -33,7 +33,9 @@ public partial class JobViewModel : ViewModelBase
 
     public ConversionJob Job { get; }
 
-    public string FileName => Path.GetFileName(Job.Input);
+    public string FileName => Job.Inputs.Count == 1
+        ? Path.GetFileName(Job.Input)
+        : string.Format(Strings.Job_MoreFiles, Path.GetFileName(Job.Input), Job.Inputs.Count - 1);
 
     public string PresetName => PresetNames.DisplayName(Job.Preset).Replace("/", " › ");
 

@@ -13,6 +13,7 @@ public partial class App : Application
 {
     private readonly IReadOnlyList<Preset> _presets = PresetCatalog.Default;
     private readonly string? _ffmpegPath = ToolLocator.FindFfmpeg();
+    private readonly string? _libreOfficePath = ToolLocator.FindLibreOffice();
 
     /// <summary>Set by <see cref="Program"/> before the app starts.</summary>
     public CommandLine Command { get; init; } = CommandLine.Parse([]);
@@ -55,7 +56,7 @@ public partial class App : Application
 
     private MainWindow CreateMainWindow(IReadOnlyList<string> files)
     {
-        var home = new HomeViewModel(_presets, _ffmpegPath, Settings.Language, ShowProgress, ChangeLanguage);
+        var home = new HomeViewModel(_presets, _ffmpegPath, _libreOfficePath, Settings.Language, ShowProgress, ChangeLanguage);
         if (files.Count > 0)
         {
             home.SetFiles(files);
@@ -110,5 +111,5 @@ public partial class App : Application
     }
 
     private ProgressViewModel CreateProgress() =>
-        new(ConversionRunner.CreateDefault(_ffmpegPath), _presets);
+        new(ConversionRunner.CreateDefault(_ffmpegPath, libreOfficePath: _libreOfficePath), _presets);
 }

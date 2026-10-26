@@ -57,5 +57,6 @@
         </StackPanel>
 
         <TextBlock Text="{Binding FfmpegStatus}" FontSize="12" Opacity="0.6" TextWrapping="Wrap" />
+        <TextBlock Text="{Binding LibreOfficeStatus}" FontSize="12" Opacity="0.6" TextWrapping="Wrap" />
     </StackPanel>
 </Window>

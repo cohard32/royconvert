@@ -9,17 +9,20 @@ Geliştirme aşamasında (v0.1 hedefi).
 ## v0.1 kapsamı
 - Video: mp4, mkv, webm, avi, gif (+ ölçekleme 25% / 75% / 720p / 1080p, döndürme)
 - Ses: mp3, ogg, flac, wav, aac
-- Resim: png, jpg, webp, avif, ico
+- Resim: png, jpg, webp, avif, ico, pdf (tek sayfa; uzun kenar en çok A4); "PDF (tek dosya)": seçili resimler doğal
+  sırayla tek PDF'te (`ilk-dosya (birleştirilmiş).pdf`)
+- Belge: Office (doc, docx, xls, xlsx, ppt, pptx, odt, ods, odp, rtf) → PDF (LibreOffice);
+  PDF → png, jpg, webp (her sayfa ayrı dosya: `belge-01.png`, `belge-02.png`…; 150 dpi)
 - Windows Explorer sağ tık menüsü
 - macOS Finder entegrasyonu (Quick Action)
 
-Sonraki sürümler: Office → PDF (LibreOffice), PDF → resim, DVD çıkarma.
+Sonraki sürümler: DVD çıkarma.
 
 ## Kullanım
 ```
 royconvert                                   ana pencere (dosya seç / sürükle-bırak, sağ tık menüsünü kur/kaldır)
 royconvert --preset 720p/mp4 a.mov b.mkv     dönüştür (ilerleme penceresi)
-royconvert --preset mp3 --input-list l.txt   dosya listesini metin dosyasından oku
+royconvert --preset mp3 --input-list l.txt   dosya listesini metin dosyasından oku (--temp-input-list: okuyup siler)
 royconvert --list-presets                    tüm preset kimlikleri
 royconvert --register-shell                  Windows sağ tık menüsünü kur (bu kullanıcı; Win 11 compact menü dahil)
 royconvert --unregister-shell                menüyü kaldır
@@ -52,14 +55,18 @@ Gereken: yukarıdakiler + [Inno Setup 6](https://jrsoftware.org/isinfo.php).
 ```
 powershell -ExecutionPolicy Bypass -File installer\build-installer.ps1
 ```
-`artifacts\royconvert-<sürüm>-setup.exe` üretir: .NET gerektirmeyen (self-contained) uygulama, sağ tık eklentisi ve
-ffmpeg (sürümü ve SHA-256'sı betikte sabit; indirilip doğrulanır). Kurulum varsayılan olarak Program Files'a yapılır;
+`artifacts\royconvert-<sürüm>-setup.exe` üretir: .NET gerektirmeyen (self-contained) uygulama, sağ tık eklentisi,
+ffmpeg ve LibreOffice (sürümleri ve SHA-256'ları betikte sabit; indirilip doğrulanır). LibreOffice MSI'ı kurulmadan
+açılır (`msiexec /a`) ve `tools\LibreOffice`'e konur; sisteme LibreOffice kurulmaz. Kurulum varsayılan olarak Program Files'a yapılır;
 `/CURRENTUSER` ile (ya da kurulumdaki seçimle) yönetici izni olmadan kullanıcı klasörüne kurulur. Kurulum sağ tık
 menüsünü kurar, kaldırma onu da kaldırır.
 
 ffmpeg GPLv3 lisanslıdır ve kurulumda ayrı bir program olarak bulunur; lisansı ve kaynak bilgisi `tools\` klasöründedir.
+LibreOffice MPL-2.0 lisanslıdır; lisans dosyaları `tools\LibreOffice\` içindedir.
 
 ## Kullanılan araçlar
 - [Avalonia UI](https://avaloniaui.net/)
 - [FFmpeg](https://ffmpeg.org/) (ayrı süreç olarak çalıştırılır)
 - [Magick.NET](https://github.com/dlemstra/Magick.NET)
+- [LibreOffice](https://www.libreoffice.org/) (Office → PDF; ayrı süreç olarak, `--headless`)
+- [Docnet.Core](https://github.com/GowenGit/docnet) / PDFium (PDF sayfalarını çizme)

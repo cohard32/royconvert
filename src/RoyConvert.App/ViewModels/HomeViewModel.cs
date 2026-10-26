@@ -32,13 +32,14 @@ public partial class HomeViewModel : ViewModelBase
     [ObservableProperty]
     private LanguageOption _selectedLanguage;
 
-    public HomeViewModel(IReadOnlyList<Preset> presets, string? ffmpegPath, string? language,
+    public HomeViewModel(IReadOnlyList<Preset> presets, string? ffmpegPath, string? libreOfficePath, string? language,
         Action<Preset, IReadOnlyList<string>> startConversion, Action<string?> changeLanguage)
     {
         _presets = presets;
         _startConversion = startConversion;
         _changeLanguage = changeLanguage;
         FfmpegStatus = ffmpegPath is null ? Strings.Ffmpeg_NotFound : $"ffmpeg: {ffmpegPath}";
+        LibreOfficeStatus = libreOfficePath is null ? Strings.LibreOffice_NotFound : $"LibreOffice: {libreOfficePath}";
         // Language names are written in their own language so they can be found whatever the current one is.
         Languages = [new(null, Strings.Language_System), new("en", "English"), new("tr", "Türkçe")];
         _selectedLanguage = Languages.FirstOrDefault(l => l.Code == language) ?? Languages[0];
@@ -52,6 +53,8 @@ public partial class HomeViewModel : ViewModelBase
     public IReadOnlyList<LanguageOption> Languages { get; }
 
     public string FfmpegStatus { get; }
+
+    public string LibreOfficeStatus { get; }
 
     public bool CanManageShellMenu => OperatingSystem.IsWindows();
 

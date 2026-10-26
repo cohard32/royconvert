@@ -16,8 +16,9 @@ public enum CommandKind
 /// <summary>
 /// Usage:
 ///   royconvert
-///   royconvert --preset &lt;id&gt; [--input-list &lt;file&gt;] [files...]
+///   royconvert --preset &lt;id&gt; [--input-list &lt;file&gt; | --temp-input-list &lt;file&gt;] [files...]
 ///   royconvert --list-presets
+/// Both list options read one path per line; --temp-input-list (used by the Explorer menu) also deletes the file.
 ///   royconvert --register-shell | --unregister-shell
 /// </summary>
 public sealed record CommandLine(CommandKind Kind, string? PresetId, IReadOnlyList<string> Files, string? Error = null)
@@ -45,15 +46,24 @@ public sealed record CommandLine(CommandKind Kind, string? PresetId, IReadOnlyLi
                 case "--preset" when i + 1 < args.Count:
                     presetId = args[++i];
                     break;
-                case "--input-list" when i + 1 < args.Count:
+                case "--input-list" or "--temp-input-list" when i + 1 < args.Count:
+                    var isTemporary = args[i] == "--temp-input-list";
                     var list = Path.GetFullPath(args[++i], workingDirectory);
                     try
                     {
                         files.AddRange(File.ReadAllLines(list).Where(line => !string.IsNullOrWhiteSpace(line)));
+                        if (isTemporary)
+                        {
+                            File.Delete(list);
+                        }
                     }
                     catch (Exception e) when (e is IOException or UnauthorizedAccessException)
                     {
-                        return Invalid(string.Format(Strings.Cli_InputListUnreadable, list, e.Message));
+                        // A temporary list that was read but could not be deleted is harmless.
+                        if (!isTemporary || files.Count == 0)
+                        {
+                            return Invalid(string.Format(Strings.Cli_InputListUnreadable, list, e.Message));
+                        }
                     }
 
                     break;

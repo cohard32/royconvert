@@ -32,6 +32,27 @@ public class LocalizationTests
         }
     }
 
+    [Theory]
+    [InlineData("en", "rotate-left/png", "{dir}/{name} (rotated)")]
+    [InlineData("tr", "rotate-right/mp4", "{dir}/{name} (döndürülmüş)")]
+    [InlineData("tr", "mp4-small", "{dir}/{name}-küçük")]
+    [InlineData("tr", "combine-pdf", "{dir}/{name} (birleştirilmiş)")]
+    [InlineData("tr", "scale50/png", "{dir}/{name}-50%")]
+    [InlineData("tr", "png", "{dir}/{name}")]
+    public void OutputFileNames_UseTheUiLanguage(string language, string id, string expected)
+    {
+        var previous = Strings.Culture;
+        try
+        {
+            Strings.Culture = CultureInfo.GetCultureInfo(language);
+            Assert.Equal(expected, PresetNames.WithLocalizedFileName(Preset(id)).FileNameTemplate);
+        }
+        finally
+        {
+            Strings.Culture = previous;
+        }
+    }
+
     [Fact]
     public void Translations_HaveTheSameKeysAndPlaceholders()
     {

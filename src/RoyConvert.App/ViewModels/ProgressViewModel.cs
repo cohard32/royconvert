@@ -58,9 +58,13 @@ public partial class ProgressViewModel : ViewModelBase, IDisposable
 
     public void Add(Preset preset, IEnumerable<string> files)
     {
-        foreach (var file in files)
+        preset = PresetNames.WithLocalizedFileName(preset);
+        IEnumerable<ConversionJob> jobs = preset.CombinesInputs
+            ? [new ConversionJob(files.Order(NaturalComparer.Instance).ToList(), preset)]
+            : files.Select(file => new ConversionJob(file, preset));
+
+        foreach (var job in jobs)
         {
-            var job = new ConversionJob(file, preset);
             var item = new JobViewModel(job);
             item.PropertyChanged += (_, e) =>
             {

@@ -9,15 +9,37 @@ public enum JobState
     Canceled,
 }
 
-/// <summary>One input file converted with one preset. <see cref="Changed"/> fires on worker threads.</summary>
-public sealed class ConversionJob(string input, Preset preset)
+/// <summary>
+/// One input file converted with one preset, or several inputs combined into one output when the preset
+/// <see cref="Preset.CombinesInputs"/>. <see cref="Changed"/> fires on worker threads.
+/// </summary>
+public sealed class ConversionJob
 {
     private readonly CancellationTokenSource _cancel = new();
     private readonly TaskCompletionSource _completion = new(TaskCreationOptions.RunContinuationsAsynchronously);
 
-    public string Input { get; } = input;
+    public ConversionJob(string input, Preset preset)
+        : this([input], preset)
+    {
+    }
 
-    public Preset Preset { get; } = preset;
+    public ConversionJob(IReadOnlyList<string> inputs, Preset preset)
+    {
+        if (inputs.Count == 0 || (inputs.Count > 1 && !preset.CombinesInputs))
+        {
+            throw new ArgumentException("Only presets that combine inputs take more than one file.", nameof(inputs));
+        }
+
+        Inputs = inputs;
+        Preset = preset;
+    }
+
+    /// <summary>The first input; it also names the output.</summary>
+    public string Input => Inputs[0];
+
+    public IReadOnlyList<string> Inputs { get; }
+
+    public Preset Preset { get; }
 
     /// <summary>Chosen when the job starts, so files created by earlier jobs are taken into account.</summary>
     public string? Output { get; private set; }
@@ -48,7 +70,10 @@ public sealed class ConversionJob(string input, Preset preset)
             Output = chooseOutput(this);
             Update(JobState.Running, 0);
             var progress = new SyncProgress(value => Update(JobState.Running, value));
-            await converterFor(Preset).ConvertAsync(Input, Output, Preset, progress, token);
+            var converter = converterFor(Preset);
+            await (Preset.CombinesInputs
+                ? converter.CombineAsync(Inputs, Output, Preset, progress, token)
+                : converter.ConvertAsync(Input, Output, Preset, progress, token));
             Update(JobState.Done, 1);
         }
         catch (OperationCanceledException) when (token.IsCancellationRequested)

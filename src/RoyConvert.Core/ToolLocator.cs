@@ -9,6 +9,35 @@ public static class ToolLocator
     /// </summary>
     public static string? FindFfmpeg() => Find("ffmpeg", "ROYCONVERT_FFMPEG");
 
+    /// <summary>
+    /// Looks for LibreOffice's soffice in: the ROYCONVERT_SOFFICE environment variable, the copy bundled by the
+    /// installer (tools/LibreOffice), the usual install folders (Program Files on Windows, /Applications on macOS),
+    /// then the app folders and PATH like <see cref="Find"/>.
+    /// </summary>
+    public static string? FindLibreOffice()
+    {
+        if (Environment.GetEnvironmentVariable("ROYCONVERT_SOFFICE") is { Length: > 0 } fromEnv)
+        {
+            return File.Exists(fromEnv) ? fromEnv : null;
+        }
+
+        var installed = new List<string>();
+        if (OperatingSystem.IsWindows())
+        {
+            installed.Add(Path.Combine(AppContext.BaseDirectory, "tools", "LibreOffice", "program", "soffice.exe"));
+            foreach (var folder in new[] { Environment.SpecialFolder.ProgramFiles, Environment.SpecialFolder.ProgramFilesX86 })
+            {
+                installed.Add(Path.Combine(Environment.GetFolderPath(folder), "LibreOffice", "program", "soffice.exe"));
+            }
+        }
+        else if (OperatingSystem.IsMacOS())
+        {
+            installed.Add("/Applications/LibreOffice.app/Contents/MacOS/soffice");
+        }
+
+        return installed.FirstOrDefault(File.Exists) ?? Find("soffice");
+    }
+
     public static string? Find(string tool, string? environmentVariable = null)
     {
         if (environmentVariable is not null && Environment.GetEnvironmentVariable(environmentVariable) is { Length: > 0 } fromEnv)

@@ -1,6 +1,6 @@
 ﻿; royconvert Windows installer (Inno Setup 6). Built by build-installer.ps1, which passes:
 ;   AppVersion  version from src\RoyConvert.App\RoyConvert.App.csproj
-;   PublishDir  self-contained publish output, with ffmpeg in tools\
+;   PublishDir  self-contained publish output, with ffmpeg and LibreOffice in tools\
 ;   OutputDir   where the setup .exe is written
 ; Installs for all users (Program Files) by default; /CURRENTUSER or the dialog installs for the current user without
 ; administrator rights.

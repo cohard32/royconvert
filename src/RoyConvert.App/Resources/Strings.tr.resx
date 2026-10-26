@@ -28,6 +28,7 @@
   <data name="Shell_PackageNeedsAdmin" xml:space="preserve"><value>Windows 11 menüsü için yönetici izni gerekiyor.</value></data>
   <data name="Shell_PackageRemoveFailed" xml:space="preserve"><value>Windows 11 menü paketi kaldırılamadı.</value></data>
   <data name="Ffmpeg_NotFound" xml:space="preserve"><value>ffmpeg bulunamadı: video ve ses dönüştürme kullanılamıyor.</value></data>
+  <data name="LibreOffice_NotFound" xml:space="preserve"><value>LibreOffice bulunamadı: Office belgelerini PDF'e dönüştürmek için libreoffice.org'dan kurun.</value></data>
   <data name="Progress_CancelAll" xml:space="preserve"><value>Tümünü iptal et</value></data>
   <data name="Progress_Cancel" xml:space="preserve"><value>İptal</value></data>
   <data name="Progress_Show" xml:space="preserve"><value>Göster</value></data>
@@ -46,6 +47,12 @@
   <data name="Preset_scale25" xml:space="preserve"><value>%25 küçült</value></data>
   <data name="Preset_rotate-left" xml:space="preserve"><value>Sola döndür</value></data>
   <data name="Preset_rotate-right" xml:space="preserve"><value>Sağa döndür</value></data>
+  <data name="Preset_combine-pdf" xml:space="preserve"><value>PDF (tek dosya)</value></data>
+  <data name="FileName_mp4-small" xml:space="preserve"><value>-küçük</value></data>
+  <data name="FileName_rotate-left" xml:space="preserve"><value> (döndürülmüş)</value></data>
+  <data name="FileName_rotate-right" xml:space="preserve"><value> (döndürülmüş)</value></data>
+  <data name="FileName_combine-pdf" xml:space="preserve"><value> (birleştirilmiş)</value></data>
+  <data name="Job_MoreFiles" xml:space="preserve"><value>{0} ve {1} dosya daha</value></data>
   <data name="Cli_InputListUnreadable" xml:space="preserve"><value>Dosya listesi okunamadı {0}: {1}</value></data>
   <data name="Cli_UnknownOption" xml:space="preserve"><value>Bilinmeyen veya eksik seçenek: {0}</value></data>
   <data name="Cli_MissingPreset" xml:space="preserve"><value>--preset &lt;kimlik&gt; eksik.</value></data>

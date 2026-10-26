@@ -41,7 +41,7 @@ namespace
 {
     HMODULE g_module = nullptr;
 
-    // Longer command lines go through a temporary --input-list file (CreateProcess allows 32767 characters).
+    // Longer command lines go through a --temp-input-list file (CreateProcess allows 32767 characters).
     constexpr size_t MaxCommandLine = 30000;
 
     struct Preset
@@ -235,7 +235,7 @@ namespace
         }
         else
         {
-            // royconvert reads the list while parsing its arguments; the file stays in %TEMP%.
+            // royconvert reads the list while parsing its arguments, then deletes it.
             wchar_t directory[MAX_PATH];
             wchar_t listPath[MAX_PATH];
             if (GetTempPathW(MAX_PATH, directory) == 0 || GetTempFileNameW(directory, L"rcv", 0, listPath) == 0)
@@ -252,7 +252,7 @@ namespace
                 list << utf8 << "\r\n";
             }
 
-            commandLine += L" --input-list " + Quote(listPath);
+            commandLine += L" --temp-input-list " + Quote(listPath);
         }
 
         STARTUPINFOW startup{sizeof(startup)};

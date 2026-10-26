@@ -125,6 +125,202 @@ public sealed class ConversionIntegrationTests : IDisposable
     }
 
     [Fact]
+    public async Task MultiPagePdf_BecomesOneImagePerPage()
+    {
+        var input = Path.Combine(_dir, "document.pdf");
+        CreatePdf(input, (144, 72), (72, 144), (72, 72));
+        var job = new ConversionJob(input, PresetCatalog.Find(PresetCatalog.Default, "png")!);
+
+        using var runner = ConversionRunner.CreateDefault(null, 1);
+        await runner.RunAsync([job]);
+
+        Assert.True(job.State == JobState.Done, job.Error);
+        Assert.False(File.Exists(job.Output));
+        // 150 dpi: a 72 pt (one inch) side becomes 150 px.
+        (string Name, uint Width, uint Height)[] expected =
+            [("document-01.png", 300, 150), ("document-02.png", 150, 300), ("document-03.png", 150, 150)];
+        foreach (var (name, width, height) in expected)
+        {
+            using var page = new MagickImage(Path.Combine(_dir, name));
+            Assert.Equal(width, page.Width);
+            Assert.Equal(height, page.Height);
+        }
+    }
+
+    [Fact]
+    public async Task SinglePagePdf_IsWrittenToTheOutput()
+    {
+        var input = Path.Combine(_dir, "page.pdf");
+        CreatePdf(input, (72, 72));
+        var job = new ConversionJob(input, PresetCatalog.Find(PresetCatalog.Default, "jpg")!);
+
+        using var runner = ConversionRunner.CreateDefault(null, 1);
+        await runner.RunAsync([job]);
+
+        Assert.True(job.State == JobState.Done, job.Error);
+        using var result = new MagickImage(job.Output!);
+        Assert.Equal(150u, result.Width);
+    }
+
+    [Fact]
+    public async Task DamagedPdf_Fails()
+    {
+        var input = Path.Combine(_dir, "broken.pdf");
+        File.WriteAllText(input, "not a pdf");
+        var job = new ConversionJob(input, PresetCatalog.Find(PresetCatalog.Default, "png")!);
+
+        using var runner = ConversionRunner.CreateDefault(null, 1);
+        await runner.RunAsync([job]);
+
+        Assert.Equal(JobState.Failed, job.State);
+        Assert.Empty(Directory.GetFiles(_dir, "*.png"));
+    }
+
+    [Fact]
+    public async Task OfficeToPdf_WithoutLibreOffice_FailsWithHint()
+    {
+        var input = Path.Combine(_dir, "letter.rtf");
+        CreateRtf(input);
+        var job = new ConversionJob(input, PresetCatalog.Find(PresetCatalog.Default, "pdf")!);
+
+        using var runner = ConversionRunner.CreateDefault(null, 1);
+        await runner.RunAsync([job]);
+
+        Assert.Equal(JobState.Failed, job.State);
+        Assert.Contains("LibreOffice", job.Error);
+    }
+
+    [Fact]
+    public async Task OfficeToPdf_WithLibreOffice_CreatesPdf()
+    {
+        if (ToolLocator.FindLibreOffice() is not { } soffice)
+        {
+            return;
+        }
+
+        var input = Path.Combine(_dir, "mektup ğüş.rtf");
+        CreateRtf(input);
+        var pdf = PresetCatalog.Find(PresetCatalog.Default, "pdf")!;
+        ConversionJob[] jobs = [new(input, pdf), new(input, pdf)];
+
+        using var runner = ConversionRunner.CreateDefault(null, 2, soffice);
+        await runner.RunAsync(jobs);
+
+        Assert.All(jobs, j => Assert.True(j.State == JobState.Done, j.Error));
+        Assert.Contains(Path.Combine(_dir, "mektup ğüş.pdf"), jobs.Select(j => j.Output));
+        Assert.All(jobs, j => Assert.StartsWith("%PDF", File.ReadAllText(j.Output!)));
+    }
+
+    [Theory]
+    // A4 at 300 dpi becomes an A4 page (842 x 595 pt); a small 72 dpi image keeps its size.
+    [InlineData("scan.png", 3508, 2480, 842, 595)]
+    [InlineData("photo.jpg", 3508, 2480, 842, 595)]
+    [InlineData("icon.png", 200, 100, 200, 100)]
+    public async Task ImageToPdf_FitsTheLongerSideToA4(string name, int width, int height, int pageWidth, int pageHeight)
+    {
+        var input = Path.Combine(_dir, name);
+        CreateImage(input, width, height);
+        var job = new ConversionJob(input, PresetCatalog.Find(PresetCatalog.Default, "pdf")!);
+
+        using var runner = ConversionRunner.CreateDefault(null, 1);
+        await runner.RunAsync([job]);
+
+        Assert.True(job.State == JobState.Done, job.Error);
+        using var document = Docnet.Core.DocLib.Instance.GetDocReader(job.Output!, new Docnet.Core.Models.PageDimensions(1.0));
+        Assert.Equal(1, document.GetPageCount());
+        using var page = document.GetPageReader(0);
+        Assert.InRange(page.GetPageWidth(), pageWidth - 1, pageWidth + 1);
+        Assert.InRange(page.GetPageHeight(), pageHeight - 1, pageHeight + 1);
+    }
+
+    [Fact]
+    public async Task CombinedPdf_HasOnePagePerImage_InTheGivenOrder()
+    {
+        string[] inputs = [Path.Combine(_dir, "wide.png"), Path.Combine(_dir, "tall.jpg"), Path.Combine(_dir, "square.webp")];
+        CreateImage(inputs[0], 200, 100);
+        CreateImage(inputs[1], 100, 200);
+        CreateImage(inputs[2], 150, 150);
+        var job = new ConversionJob(inputs, PresetCatalog.Find(PresetCatalog.Default, "combine-pdf")!);
+
+        using var runner = ConversionRunner.CreateDefault(null, 1);
+        await runner.RunAsync([job]);
+
+        Assert.True(job.State == JobState.Done, job.Error);
+        Assert.Equal(Path.Combine(_dir, "wide (combined).pdf"), job.Output);
+        using var document = Docnet.Core.DocLib.Instance.GetDocReader(job.Output!, new Docnet.Core.Models.PageDimensions(1.0));
+        Assert.Equal(3, document.GetPageCount());
+        (int Width, int Height)[] expected = [(200, 100), (100, 200), (150, 150)];
+        for (var i = 0; i < expected.Length; i++)
+        {
+            using var page = document.GetPageReader(i);
+            Assert.InRange(page.GetPageWidth(), expected[i].Width - 1, expected[i].Width + 1);
+            Assert.InRange(page.GetPageHeight(), expected[i].Height - 1, expected[i].Height + 1);
+        }
+    }
+
+    [Fact]
+    public async Task CombinedPdf_WithAnUnreadableImage_FailsWithoutOutput()
+    {
+        var good = Path.Combine(_dir, "good.png");
+        var bad = Path.Combine(_dir, "bad.png");
+        CreateImage(good, 10, 10);
+        File.WriteAllText(bad, "not an image");
+        var job = new ConversionJob([good, bad], PresetCatalog.Find(PresetCatalog.Default, "combine-pdf")!);
+
+        using var runner = ConversionRunner.CreateDefault(null, 1);
+        await runner.RunAsync([job]);
+
+        Assert.Equal(JobState.Failed, job.State);
+        Assert.Empty(Directory.GetFiles(_dir, "*.pdf"));
+    }
+
+    [Fact]
+    public void SeveralInputs_NeedACombiningPreset()
+    {
+        Assert.Throws<ArgumentException>(() =>
+            new ConversionJob(["a.png", "b.png"], PresetCatalog.Find(PresetCatalog.Default, "pdf")!));
+    }
+
+    [Fact]
+    public async Task PdfPreset_MixedSelection_ConvertsImagesWithoutLibreOffice()
+    {
+        var image = Path.Combine(_dir, "photo.png");
+        var letter = Path.Combine(_dir, "letter.rtf");
+        CreateImage(image, 100, 100);
+        CreateRtf(letter);
+        var pdf = PresetCatalog.Find(PresetCatalog.Default, "pdf")!;
+        ConversionJob[] jobs = [new(image, pdf), new(letter, pdf)];
+
+        using var runner = ConversionRunner.CreateDefault(null, 1);
+        await runner.RunAsync(jobs);
+
+        Assert.True(jobs[0].State == JobState.Done, jobs[0].Error);
+        Assert.Equal(JobState.Failed, jobs[1].State);
+        Assert.Contains("LibreOffice", jobs[1].Error);
+    }
+
+    [Fact]
+    public async Task OfficeToPdf_GivesUpAfterTheTimeout()
+    {
+        if (ToolLocator.FindLibreOffice() is not { } soffice)
+        {
+            return;
+        }
+
+        var input = Path.Combine(_dir, "letter.rtf");
+        CreateRtf(input);
+        var converter = new Office.OfficeConverter(soffice, TimeSpan.FromSeconds(1));
+        var output = Path.Combine(_dir, "letter.pdf");
+
+        // Starting LibreOffice with a fresh profile takes longer than a second.
+        var e = await Assert.ThrowsAsync<ConversionException>(() => converter.ConvertAsync(
+            input, output, PresetCatalog.Find(PresetCatalog.Default, "pdf")!, new Progress<double?>(), CancellationToken.None));
+
+        Assert.Contains("did not finish", e.Message);
+        Assert.False(File.Exists(output));
+    }
+
+    [Fact]
     public async Task CanceledBeforeStart_IsCanceled()
     {
         var input = Path.Combine(_dir, "image.png");
@@ -143,6 +339,21 @@ public sealed class ConversionIntegrationTests : IDisposable
         using var image = new MagickImage(MagickColors.CornflowerBlue, (uint)width, (uint)height);
         image.Write(path);
     }
+
+    /// <summary>Writes a PDF with one page per size, in points (72 per inch).</summary>
+    private static void CreatePdf(string path, params (int Width, int Height)[] pages)
+    {
+        using var images = new MagickImageCollection();
+        foreach (var (width, height) in pages)
+        {
+            images.Add(new MagickImage(MagickColors.CornflowerBlue, (uint)width, (uint)height) { Density = new Density(72) });
+        }
+
+        images.Write(path, MagickFormat.Pdf);
+    }
+
+    private static void CreateRtf(string path) =>
+        File.WriteAllText(path, @"{\rtf1\ansi{\fonttbl\f0 Arial;}\f0\fs24 Hello from royconvert.\par}");
 
     private static void GenerateSampleVideo(string path) =>
         Run(Ffmpeg!, "-hide_banner", "-y", "-f", "lavfi", "-i", "testsrc=duration=3:size=320x240:rate=25",

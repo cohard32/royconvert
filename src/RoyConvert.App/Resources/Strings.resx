@@ -28,6 +28,7 @@
   <data name="Shell_PackageNeedsAdmin" xml:space="preserve"><value>Administrator permission is needed for the Windows 11 menu.</value></data>
   <data name="Shell_PackageRemoveFailed" xml:space="preserve"><value>Could not remove the Windows 11 menu package.</value></data>
   <data name="Ffmpeg_NotFound" xml:space="preserve"><value>ffmpeg not found: video and audio conversions are unavailable.</value></data>
+  <data name="LibreOffice_NotFound" xml:space="preserve"><value>LibreOffice not found: install it from libreoffice.org to convert Office documents to PDF.</value></data>
   <data name="Progress_CancelAll" xml:space="preserve"><value>Cancel all</value></data>
   <data name="Progress_Cancel" xml:space="preserve"><value>Cancel</value></data>
   <data name="Progress_Show" xml:space="preserve"><value>Show</value></data>
@@ -46,6 +47,12 @@
   <data name="Preset_scale25" xml:space="preserve"><value>Scale 25%</value></data>
   <data name="Preset_rotate-left" xml:space="preserve"><value>Rotate left</value></data>
   <data name="Preset_rotate-right" xml:space="preserve"><value>Rotate right</value></data>
+  <data name="Preset_combine-pdf" xml:space="preserve"><value>PDF (one file)</value></data>
+  <data name="FileName_mp4-small" xml:space="preserve"><value>-small</value></data>
+  <data name="FileName_rotate-left" xml:space="preserve"><value> (rotated)</value></data>
+  <data name="FileName_rotate-right" xml:space="preserve"><value> (rotated)</value></data>
+  <data name="FileName_combine-pdf" xml:space="preserve"><value> (combined)</value></data>
+  <data name="Job_MoreFiles" xml:space="preserve"><value>{0} and {1} more</value></data>
   <data name="Cli_InputListUnreadable" xml:space="preserve"><value>Cannot read input list {0}: {1}</value></data>
   <data name="Cli_UnknownOption" xml:space="preserve"><value>Unknown or incomplete option: {0}</value></data>
   <data name="Cli_MissingPreset" xml:space="preserve"><value>Missing --preset &lt;id&gt;.</value></data>
