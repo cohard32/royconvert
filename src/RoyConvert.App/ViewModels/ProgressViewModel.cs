@@ -13,6 +13,9 @@ public partial class ProgressViewModel : ViewModelBase, IDisposable
     private readonly IReadOnlyList<Preset> _presets;
     private readonly AppSettings _settings;
 
+    // Arguments received from another process but not added yet (posted to the UI thread).
+    private int _incoming;
+
     [ObservableProperty]
     private string _summary = string.Empty;
 
@@ -35,6 +38,30 @@ public partial class ProgressViewModel : ViewModelBase, IDisposable
 
     /// <summary>Raised when every job finished successfully, so the window can close itself.</summary>
     public event Action? Completed;
+
+    /// <summary>
+    /// Every job finished successfully and nothing received from another process is still waiting to be added:
+    /// the window may close.
+    /// </summary>
+    public bool IsComplete =>
+        Volatile.Read(ref _incoming) == 0 && Messages.Count == 0 && Jobs.All(j => j.IsDone);
+
+    /// <summary>Thread-safe: arguments from another process, added on the UI thread.</summary>
+    public void Receive(string[] args)
+    {
+        Interlocked.Increment(ref _incoming);
+        Dispatcher.UIThread.Post(() =>
+        {
+            try
+            {
+                Add(CommandLine.Parse(args));
+            }
+            finally
+            {
+                Interlocked.Decrement(ref _incoming);
+            }
+        });
+    }
 
     public void Add(CommandLine command)
     {
@@ -102,7 +129,7 @@ public partial class ProgressViewModel : ViewModelBase, IDisposable
     {
         UpdateSummary();
         // Idle is posted from a worker; more jobs may have been added in between.
-        if (AllFinished && Messages.Count == 0 && Jobs.All(j => j.IsDone))
+        if (AllFinished && IsComplete)
         {
             Completed?.Invoke();
         }

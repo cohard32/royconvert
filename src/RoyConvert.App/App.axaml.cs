@@ -44,11 +44,11 @@ public partial class App : Application
                 progress.Add(Command);
                 if (Instance is not null)
                 {
-                    Instance.Listen(args => Dispatcher.UIThread.Post(() => progress.Add(CommandLine.Parse(args))));
+                    Instance.Listen(progress.Receive);
                     desktop.Exit += (_, _) => Instance.Dispose();
                 }
 
-                desktop.MainWindow = new ProgressWindow(progress);
+                desktop.MainWindow = new ProgressWindow(progress, Instance);
             }
         }
 
