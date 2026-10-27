@@ -74,4 +74,6 @@
   <data name="Settings_Cancel" xml:space="preserve"><value>Cancel</value></data>
   <data name="Settings_Reset" xml:space="preserve"><value>Defaults</value></data>
   <data name="Settings_SaveFailed" xml:space="preserve"><value>The settings could not be saved: {0}</value></data>
+  <data name="Home_ChooseDvd" xml:space="preserve"><value>DVD…</value></data>
+  <data name="Home_ChooseDvdTitle" xml:space="preserve"><value>Choose a DVD drive or a folder with VIDEO_TS</value></data>
 </root>

@@ -74,4 +74,6 @@
   <data name="Settings_Cancel" xml:space="preserve"><value>İptal</value></data>
   <data name="Settings_Reset" xml:space="preserve"><value>Varsayılanlar</value></data>
   <data name="Settings_SaveFailed" xml:space="preserve"><value>Ayarlar kaydedilemedi: {0}</value></data>
+  <data name="Home_ChooseDvd" xml:space="preserve"><value>DVD…</value></data>
+  <data name="Home_ChooseDvdTitle" xml:space="preserve"><value>DVD sürücüsünü ya da VIDEO_TS içeren klasörü seçin</value></data>
 </root>

@@ -98,7 +98,8 @@ public sealed class ConversionRunner : IDisposable
     {
         lock (_reserved)
         {
-            var path = OutputPath.Build(job.Input, job.Preset.FileNameTemplate, job.Preset.Output,
+            var input = job.Preset.ReadsDvd && Dvd.DvdDisc.Open(job.Input) is { } disc ? disc.NamingPath : job.Input;
+            var path = OutputPath.Build(input, job.Preset.FileNameTemplate, job.Preset.Output,
                 candidate => _reserved.Contains(candidate) || File.Exists(candidate));
             _reserved.Add(path);
             return path;

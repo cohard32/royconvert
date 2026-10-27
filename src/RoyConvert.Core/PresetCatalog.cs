@@ -55,6 +55,13 @@ public static class PresetCatalog
         presets.Add(new Preset("split-pdf", "PDF (split pages)", OutputFormat.Pdf, Union([], ["pdf"]), image,
             "{dir}/{name}-page", SplitsPages: true));
 
+        foreach (var format in (OutputFormat[])[OutputFormat.Mp4, OutputFormat.Mkv])
+        {
+            var label = Formats.Extension(format).ToUpperInvariant();
+            presets.Add(new Preset("dvd/" + Formats.Extension(format), "DVD/" + label, format, new HashSet<string>(), video,
+                ReadsDvd: true));
+        }
+
         AddGroup(presets, "scale75", "Scale 75%", video with { Scale = Scale.ByFactor(0.75) }, image with { Scale = Scale.ByFactor(0.75) }, "-75%");
         AddGroup(presets, "scale50", "Scale 50%", video with { Scale = Scale.ByFactor(0.5) }, image with { Scale = Scale.ByFactor(0.5) }, "-50%");
         AddGroup(presets, "scale25", "Scale 25%", video with { Scale = Scale.ByFactor(0.25) }, image with { Scale = Scale.ByFactor(0.25) }, "-25%");

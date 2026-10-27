@@ -33,7 +33,9 @@ public partial class JobViewModel : ViewModelBase
 
     public ConversionJob Job { get; }
 
-    public string FileName => Job.Inputs.Count == 1
+    public string FileName => Job.Preset.ReadsDvd
+        ? Core.Dvd.DvdDisc.Open(Job.Input)?.Name ?? Job.Input
+        : Job.Inputs.Count == 1
         ? Path.GetFileName(Job.Input)
         : string.Format(Strings.Job_MoreFiles, Path.GetFileName(Job.Input), Job.Inputs.Count - 1);
 

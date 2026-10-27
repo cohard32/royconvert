@@ -18,9 +18,10 @@
         <Border BorderBrush="{DynamicResource SystemControlForegroundBaseLowBrush}" BorderThickness="1"
                 CornerRadius="6" Padding="12">
             <StackPanel Spacing="10">
-                <Grid ColumnDefinitions="*,Auto">
+                <Grid ColumnDefinitions="*,Auto,Auto">
                     <TextBlock Text="{Binding FilesText}" VerticalAlignment="Center" TextTrimming="CharacterEllipsis" />
                     <Button Grid.Column="1" Content="{x:Static res:Strings.Home_ChooseFiles}" Click="ChooseFiles_Click" Margin="8,0,0,0" />
+                    <Button Grid.Column="2" Content="{x:Static res:Strings.Home_ChooseDvd}" Click="ChooseDvd_Click" Margin="8,0,0,0" />
                 </Grid>
                 <Grid ColumnDefinitions="*,Auto">
                     <ComboBox ItemsSource="{Binding AvailablePresets}" SelectedItem="{Binding SelectedPreset}"

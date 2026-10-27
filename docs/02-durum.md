@@ -120,7 +120,24 @@ Son güncelleme: 2026-10-25
     `mp4-small` CRF 28) dokunmaz. Sağ tık süreçleri ayarları açılışta okur
   - Doğrulama: ekran görüntüsü (UI Automation ile düğmeye basıldı); `PdfDpi: 300` ile uygulamadan PDF → PNG genişliği
     1275 → 2550
-- Testler: 153/153 (Core 113; App 40). Dil kültürüne dokunan testler ortak, paralel çalışmayan koleksiyonda (`UiCultureCollection`)
+- **DVD → MP4/MKV** (2026-10-27, gerçek diskle denenmedi; kullanıcının şu an DVD'si yok): `Dvd\DvdDisc` sürücü kökü,
+  VIDEO_TS'i içeren klasör ya da VIDEO_TS'in kendisini açar. Ana başlık = `VTS_nn_1..9.VOB` toplamı en büyük başlık seti
+  (`VTS_nn_0` menü, `VIDEO_TS.VOB` atlanır). ffmpeg `concat:` ile parçaları tek akış okur; `-analyzeduration/-probesize 100M`,
+  `-fflags +genpts`, `-map 0:v:0 -map 0:a?` (tüm ses dilleri, altyazı yok), `bwdif=mode=send_frame:deint=interlaced`
+  - Presetler `dvd/mp4`, `dvd/mkv` (`Preset.ReadsDvd`; `Accepts` klasörde DVD arar). Sağ tık menü dosyasına girmez (yalnız
+    dosyalar); ana penceredeki "DVD…" (klasör seçici) ya da klasör/sürücü sürükle-bırak, komut satırı `--preset dvd/mp4 <klasör>`
+  - Çıktı: optik sürücüdeyse Videolar klasörüne `<birim etiketi>.mp4`; diske kopyalanmış klasörse yanına `<klasör adı>.mp4`
+  - CSS korumalı ticari DVD'ler çözülmez (ffmpeg hata verir ya da bozuk görüntü). Ev/kamera kayıtları hedef
+  - Doğrulama: sahte disk (ffmpeg `-target pal-dvd`, taramalı, 16:9, iki ses dili, iki parçaya sektör sınırında bölünmüş +
+    menü + kısa ikinci başlık): 6 sn tam süre, 2 ses, progressive, 25 fps, DAR 16:9; bozuk VOB → hata, çıktı yok.
+    Uygulamadan `--preset dvd/mp4` ile 8 sn'lik sahte disk dönüştü
+- Testler: 160/160 (Core 120; App 40).
+
+## Gerçek DVD denemesi (DVD bulununca)
+1. Diski tak; royconvert'i aç → "DVD…" → DVD sürücüsünü seç → "DVD › MP4" → Dönüştür
+2. Videolar klasöründe `<disk adı>.mp4` oluştu mu; süre filmin tamamı mı (menü/fragman değil), ses ve görüntü eş mi
+3. Birden fazla ses dili varsa oynatıcıda seçilebiliyor mu; 4:3 / 16:9 görüntü basık ya da uzamış mı
+4. Hata olursa ilerleme penceresindeki mesajı kopyala (CSS korumalı disk olabilir) Dil kültürüne dokunan testler ortak, paralel çalışmayan koleksiyonda (`UiCultureCollection`)
 
 ## Açık konular
 1. **Win 11'de gerçek deneme yapılmadı** (kullanıcının Win 11 PC'si). Sınanamayanlar: `-AllowUnsigned` kurulumu (Win 10'da bu
