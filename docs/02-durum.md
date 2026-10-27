@@ -131,7 +131,7 @@ Son güncelleme: 2026-10-27
   - Doğrulama: sahte disk (ffmpeg `-target pal-dvd`, taramalı, 16:9, iki ses dili, iki parçaya sektör sınırında bölünmüş +
     menü + kısa ikinci başlık): 6 sn tam süre, 2 ses, progressive, 25 fps, DAR 16:9; bozuk VOB → hata, çıktı yok.
     Uygulamadan `--preset dvd/mp4` ile 8 sn'lik sahte disk dönüştü
-- Testler: 160/160 (Core 120; App 40).
+- Testler: 165/165 (Core 120; App 45).
 
 ## Gerçek DVD denemesi (DVD bulununca)
 1. Diski tak; royconvert'i aç → "DVD…" → DVD sürücüsünü seç → "DVD › MP4" → Dönüştür
@@ -148,7 +148,12 @@ Son güncelleme: 2026-10-27
 3. DLL Explorer tarafından yüklüyken yeniden derlenirse kopyalama uyarı verir; eski DLL kalır (Explorer'ı yeniden başlatınca düzelir).
 4. Menü şu an Debug derlemesini gösteriyor (`src\RoyConvert.App\bin\Debug\net8.0\`). Kaldırmak için: `royconvert --unregister-shell`.
 5. ~~`--input-list` geçici dosyaları %TEMP%'te kalıyor~~ → `--temp-input-list` ile çözüldü (2026-10-26).
-6. Pencere kapanırken gelen dosya çok dar bir aralıkta kaybolabilir.
+6. ~~Pencere kapanırken gelen dosya çok dar bir aralıkta kaybolabilir~~ → çözüldü (2026-10-27): `SingleInstance` her
+   mesaja onay/ret baytıyla cevap verir (uzunluk önekli JSON; gönderen onay almadan çıkmaz). Pencere kapanma kararını
+   `TryStopAccepting` ile kabulü durduran kilidin içinde verir; o anda yolda olan (`ProgressViewModel.Receive` ile UI'a
+   gönderilmiş ama eklenmemiş) dosya varsa kapanmaz. Kapanırken gelen dosya reddedilir, gönderen 10 sn boyunca yeniden
+   dener ve mutex boşalınca kendi penceresini açar. Doğrulama: 6 test (testler ayrı boru adı kullanır, açık royconvert
+   bozmaz) ve 3 tur × 20 süreç (0–2,6 sn rastgele aralıkla, 2 sn kapanma beklemesine denk gelecek şekilde) → 60/60 dönüştü
 7. **Sparse paket kaydı klasör izinlerini değiştiriyor:** Win 10'daki geliştirici modu testinde `-ExternalLocation` olarak verilen
    `bin\Debug\net8.0`'ın izinleri korumalı hale geldi, paket kaldırılınca geri gelmedi ve derleme yeni alt klasöre (`tr\`)
    yazamadı. `icacls … /grant "<kullanıcı>:(OI)(CI)F" /T` ile düzeltildi. Win 11'de Debug klasöründen `--register-shell` aynı
