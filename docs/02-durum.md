@@ -185,7 +185,20 @@ Son güncelleme: 2026-10-27
   menü dosyasını ve kayıtları sildi; menü yeniden Debug'a bağlandı. Program Files (yönetici) kurulumu denenmedi
 - Bu oturumda yapılanlar sırasıyla: Microsoft Office ile PDF, PDF birleştirme/bölme, ayarlar penceresi, DVD (sahte diskle)
 - Win 11 / Mac denemeleri: kullanıcı kendisi söyleyince yapılacak, hatırlatılmayacak. DVD denemesi disk bulununca
-- Sıradaki öneri: aşağıdaki listeden kullanıcıya seçenek sun
+- Ardından: açık konu 6 (pencere kapanırken dosya kaybı) PR #4 ile çözüldü (main 392a6b9)
+- **Yarım kalan: PDF → Word (DOCX), `pdf-word` dalı (main'e birleştirilmedi, PR açılmadı).** `docx` preseti (yalnız PDF
+  girişi), `MicrosoftOfficeConverter` Word'de PDF'i açıp `SaveAs2(wdFormatXMLDocument)`; `IDocumentConverter.Priority`
+  artık çıktı biçimini de alır; `AvailablePresets` Word yoksa preseti ana pencereden ve sağ tık menüsünden çıkarır.
+  Aynı dalda hata düzeltmesi: Office açarken hata verip belgeyi açık bırakırsa (`CloseInput`) Word görünür kalmaz
+  - **Bu PC'de çalışmadı:** Word otomasyonla PDF açınca "Word PDF Files dönüştürücüsünü başlatamıyor" (gizli ve görünür
+    Word'de aynı). `PDFREFLOW.EXE` var, CLSID `{A5C79653-FC73-46ee-AD3E-B64C01268DAA}` → Office16\PDFREFLOW.EXE doğru;
+    WOW6432Node'da eski Office15 kaydı var; Word'de bekleyen Office güncellemesi var; olay günlüğünde iz yok
+  - **Sıradaki adım (kullanıcı sonra yapacak):** Word'de elle Dosya → Aç → bir PDF. Elle de açamıyorsa sorun Office
+    kurulumunda (güncelleme/onarım denenebilir); elle açıyorsa sorun yalnız otomasyonda. Çalışırsa
+    `PdfToWord_MakesAnEditableDocument_AndLeavesThePdfUnchanged` testi geçmeli → PR aç. Çalışmazsa özellik bırakılabilir
+    ama `CloseInput` düzeltmesi ayrıca main'e alınmalı
+  - Bu dalda testler: 170'ten 169 geçiyor (yalnız yukarıdaki PDF → Word testi bu PC'de başarısız)
+- Sıradaki öneri: önce PDF → Word denemesi; sonra aşağıdaki listeden kullanıcıya seçenek sun
 
 ## Win 11 denemesi (kullanıcı söyleyince)
 - En güncel test kurulumu: https://github.com/cohard32/royconvert/releases/tag/v0.1.0-test3
