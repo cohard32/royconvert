@@ -11,10 +11,15 @@ namespace RoyConvert.App;
 
 public partial class App : Application
 {
-    private readonly IReadOnlyList<Preset> _presets = PresetCatalog.Default;
     private readonly string? _ffmpegPath = ToolLocator.FindFfmpeg();
     private readonly string? _libreOfficePath = ToolLocator.FindLibreOffice();
-    private readonly (IDocumentConverter? Converter, string? Apps) _microsoftOffice = FindMicrosoftOffice();
+    private readonly (IDocumentConverter? Converter, string? Apps, bool HasWord) _microsoftOffice = FindMicrosoftOffice();
+    private readonly IReadOnlyList<Preset> _presets;
+
+    public App()
+    {
+        _presets = AvailablePresets.For(_microsoftOffice.HasWord);
+    }
 
     /// <summary>Set by <see cref="Program"/> before the app starts.</summary>
     public CommandLine Command { get; init; } = CommandLine.Parse([]);
@@ -117,13 +122,13 @@ public partial class App : Application
             _presets, Settings);
 
     /// <summary>Word, Excel and PowerPoint export Office documents best; only on Windows.</summary>
-    private static (IDocumentConverter? Converter, string? Apps) FindMicrosoftOffice()
+    private static (IDocumentConverter? Converter, string? Apps, bool HasWord) FindMicrosoftOffice()
     {
         if (!OperatingSystem.IsWindows() || Core.Office.MicrosoftOfficeConverter.FindInstalled() is not { } office)
         {
-            return (null, null);
+            return (null, null, false);
         }
 
-        return (office, string.Join(", ", office.Installed.Order()));
+        return (office, string.Join(", ", office.Installed.Order()), office.Installed.Contains(Core.Office.OfficeApp.Word));
     }
 }

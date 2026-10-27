@@ -76,4 +76,5 @@
   <data name="Settings_SaveFailed" xml:space="preserve"><value>The settings could not be saved: {0}</value></data>
   <data name="Home_ChooseDvd" xml:space="preserve"><value>DVD…</value></data>
   <data name="Home_ChooseDvdTitle" xml:space="preserve"><value>Choose a DVD drive or a folder with VIDEO_TS</value></data>
+  <data name="Preset_docx" xml:space="preserve"><value>Word document (DOCX)</value></data>
 </root>

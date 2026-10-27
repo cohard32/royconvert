@@ -76,4 +76,5 @@
   <data name="Settings_SaveFailed" xml:space="preserve"><value>Ayarlar kaydedilemedi: {0}</value></data>
   <data name="Home_ChooseDvd" xml:space="preserve"><value>DVD…</value></data>
   <data name="Home_ChooseDvdTitle" xml:space="preserve"><value>DVD sürücüsünü ya da VIDEO_TS içeren klasörü seçin</value></data>
+  <data name="Preset_docx" xml:space="preserve"><value>Word belgesi (DOCX)</value></data>
 </root>

@@ -77,7 +77,7 @@ public class PresetCatalogTests
     {
         var offered = PresetCatalog.ForFiles(Presets, ["report.PDF"]).Select(p => p.Id).Order();
 
-        Assert.Equal(["combine-pdf", "jpg", "png", "split-pdf", "webp"], offered);
+        Assert.Equal(["combine-pdf", "docx", "jpg", "png", "split-pdf", "webp"], offered);
     }
 
     [Fact]
