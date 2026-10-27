@@ -82,12 +82,15 @@ public sealed class MicrosoftOfficeTests : IDisposable
     }
 
     [Theory]
-    [InlineData("a.docx", 0)]
-    [InlineData("a.XLSX", 0)]
-    [InlineData("a.ppt", 0)]
-    [InlineData("a.odt", 2)]
-    [InlineData("a.png", null)]
-    public void Priority_PrefersMicrosoftFormats(string input, int? expected)
+    [InlineData("a.docx", OutputFormat.Pdf, 0)]
+    [InlineData("a.XLSX", OutputFormat.Pdf, 0)]
+    [InlineData("a.ppt", OutputFormat.Pdf, 0)]
+    [InlineData("a.odt", OutputFormat.Pdf, 2)]
+    [InlineData("a.png", OutputFormat.Pdf, null)]
+    [InlineData("a.pdf", OutputFormat.Pdf, null)]
+    [InlineData("a.pdf", OutputFormat.Docx, 0)]
+    [InlineData("a.docx", OutputFormat.Docx, null)]
+    public void Priority_PrefersMicrosoftFormats(string input, OutputFormat output, int? expected)
     {
         if (!OperatingSystem.IsWindows())
         {
@@ -95,7 +98,7 @@ public sealed class MicrosoftOfficeTests : IDisposable
         }
 
         var converter = new MicrosoftOfficeConverter(Enum.GetValues<OfficeApp>().ToHashSet());
-        Assert.Equal(expected, converter.Priority(input));
+        Assert.Equal(expected, converter.Priority(input, output));
     }
 
     [Fact]
@@ -107,8 +110,73 @@ public sealed class MicrosoftOfficeTests : IDisposable
         }
 
         var wordOnly = new MicrosoftOfficeConverter(new HashSet<OfficeApp> { OfficeApp.Word });
-        Assert.Equal(0, wordOnly.Priority("a.docx"));
-        Assert.Null(wordOnly.Priority("a.xlsx"));
+        Assert.Equal(0, wordOnly.Priority("a.docx", OutputFormat.Pdf));
+        Assert.Null(wordOnly.Priority("a.xlsx", OutputFormat.Pdf));
+        var excelOnly = new MicrosoftOfficeConverter(new HashSet<OfficeApp> { OfficeApp.Excel });
+        Assert.Null(excelOnly.Priority("a.pdf", OutputFormat.Docx));
+    }
+
+    [Fact]
+    public async Task PdfToWord_MakesAnEditableDocument_AndLeavesThePdfUnchanged()
+    {
+        if (!OperatingSystem.IsWindows() || Office is null || !Office.Installed.Contains(OfficeApp.Word))
+        {
+            return;
+        }
+
+        // A real PDF made by Word from a document with Turkish text.
+        var source = Path.Combine(_dir, "kaynak.docx");
+        var running = Running(OfficeApp.Word);
+        await CreateDocument(OfficeApp.Word, source);
+        await AssertOfficeExited(OfficeApp.Word, running);
+        var pdfJob = new ConversionJob(source, PresetCatalog.Find(PresetCatalog.Default, "pdf")!);
+        using (var runner = ConversionRunner.CreateDefault(null, 1, microsoftOffice: Office))
+        {
+            await runner.RunAsync([pdfJob]);
+        }
+
+        Assert.True(pdfJob.State == JobState.Done, pdfJob.Error);
+        var pdf = Path.Combine(_dir, "rapor ğüş.pdf");
+        File.Move(pdfJob.Output!, pdf);
+        File.Delete(source);
+        var hash = SHA256.HashData(File.ReadAllBytes(pdf));
+        var job = new ConversionJob(pdf, PresetCatalog.Find(PresetCatalog.Default, "docx")!);
+
+        using (var runner = ConversionRunner.CreateDefault(null, 1, microsoftOffice: Office))
+        {
+            await runner.RunAsync([job]);
+        }
+
+        Assert.True(job.State == JobState.Done, job.Error);
+        Assert.Equal(Path.Combine(_dir, "rapor ğüş.docx"), job.Output);
+        Assert.Contains("Merhaba royconvert: ğüşıöç ĞÜŞİÖÇ", DocxText(job.Output!));
+        Assert.Equal(hash, SHA256.HashData(File.ReadAllBytes(pdf)));
+        Assert.Empty(Directory.GetFiles(_dir, "~$*"));
+        await AssertOfficeExited(OfficeApp.Word, running);
+    }
+
+    [Fact]
+    public async Task PdfToWord_WithoutWord_SaysSo()
+    {
+        var pdf = Path.Combine(_dir, "a.pdf");
+        File.WriteAllText(pdf, "%PDF");
+        var job = new ConversionJob(pdf, PresetCatalog.Find(PresetCatalog.Default, "docx")!);
+
+        using var runner = ConversionRunner.CreateDefault(null, 1, libreOfficePath: "soffice.exe");
+        await runner.RunAsync([job]);
+
+        Assert.Equal(JobState.Failed, job.State);
+        Assert.Contains("Microsoft Word", job.Error);
+    }
+
+    /// <summary>The text of a DOCX (paragraph runs of word/document.xml).</summary>
+    private static string DocxText(string path)
+    {
+        using var zip = System.IO.Compression.ZipFile.OpenRead(path);
+        using var stream = zip.GetEntry("word/document.xml")!.Open();
+        var xml = System.Xml.Linq.XDocument.Load(stream);
+        System.Xml.Linq.XNamespace w = "http://schemas.openxmlformats.org/wordprocessingml/2006/main";
+        return string.Concat(xml.Descendants(w + "t").Select(t => t.Value));
     }
 
     [Fact]
@@ -146,7 +214,7 @@ public sealed class MicrosoftOfficeTests : IDisposable
     {
         public string Name => name;
 
-        public int? Priority(string input) => priority;
+        public int? Priority(string input, OutputFormat output) => priority;
 
         public Task ConvertAsync(string input, string output, Preset preset, IProgress<double?> progress, CancellationToken cancellationToken)
         {

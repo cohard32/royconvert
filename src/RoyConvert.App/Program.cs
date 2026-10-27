@@ -21,7 +21,7 @@ sealed class Program
         switch (command.Kind)
         {
             case CommandKind.ListPresets:
-                foreach (var preset in PresetCatalog.Default)
+                foreach (var preset in AvailablePresets.For(AvailablePresets.HasWord()))
                 {
                     Console.WriteLine($"{preset.Id,-24} {preset.Name}");
                 }
@@ -29,7 +29,7 @@ sealed class Program
                 return 0;
 
             case CommandKind.RegisterShell when OperatingSystem.IsWindows():
-                var registration = WindowsShellMenu.Register(Environment.ProcessPath!, PresetCatalog.Default);
+                var registration = WindowsShellMenu.Register(Environment.ProcessPath!, AvailablePresets.For(AvailablePresets.HasWord()));
                 if (registration.ModernMenuError is { } registerError)
                 {
                     Console.Error.WriteLine(registerError);
