@@ -1,6 +1,7 @@
 using System.Threading.Channels;
 using RoyConvert.Core.Ffmpeg;
 using RoyConvert.Core.Imaging;
+using RoyConvert.Core.Office;
 
 namespace RoyConvert.Core;
 
@@ -28,15 +29,35 @@ public sealed class ConversionRunner : IDisposable
     /// <summary>Raised on a worker thread when the last queued job finishes.</summary>
     public event Action? Idle;
 
-    /// <summary>Uses ffmpeg for audio/video and Magick.NET for images.</summary>
-    public static ConversionRunner CreateDefault(string? ffmpegPath, int? maxParallelism = null)
+    /// <summary>
+    /// Uses ffmpeg for audio/video, Magick.NET for images (also PDF pages and image → PDF) and Microsoft Office
+    /// (<paramref name="microsoftOffice"/>, see <see cref="MicrosoftOfficeConverter.FindInstalled"/>) or LibreOffice for
+    /// office documents → PDF.
+    /// </summary>
+    public static ConversionRunner CreateDefault(string? ffmpegPath, int? maxParallelism = null, string? libreOfficePath = null,
+        IDocumentConverter? microsoftOffice = null)
     {
         var image = new ImageConverter();
         IConverter? ffmpeg = ffmpegPath is null ? null : new FfmpegConverter(ffmpegPath);
+        var documents = new List<IDocumentConverter>();
+        if (microsoftOffice is not null)
+        {
+            documents.Add(microsoftOffice);
+        }
+
+        if (libreOfficePath is not null)
+        {
+            documents.Add(new OfficeConverter(libreOfficePath));
+        }
+
+        var pdf = new PdfConverter(image, documents);
         return new ConversionRunner(
-            preset => Formats.KindOf(preset.Output) == MediaKind.Image
-                ? image
-                : ffmpeg ?? throw new ConversionException("ffmpeg was not found."),
+            preset => Formats.KindOf(preset.Output) switch
+            {
+                MediaKind.Image => image,
+                MediaKind.Document => pdf,
+                _ => ffmpeg ?? throw new ConversionException("ffmpeg was not found."),
+            },
             maxParallelism ?? DefaultParallelism);
     }
 
@@ -77,7 +98,8 @@ public sealed class ConversionRunner : IDisposable
     {
         lock (_reserved)
         {
-            var path = OutputPath.Build(job.Input, job.Preset.FileNameTemplate, job.Preset.Output,
+            var input = job.Preset.ReadsDvd && Dvd.DvdDisc.Open(job.Input) is { } disc ? disc.NamingPath : job.Input;
+            var path = OutputPath.Build(input, job.Preset.FileNameTemplate, job.Preset.Output,
                 candidate => _reserved.Contains(candidate) || File.Exists(candidate));
             _reserved.Add(path);
             return path;

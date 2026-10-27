@@ -100,9 +100,11 @@ public static class WindowsShellMenu
     /// <summary>
     /// One line per preset: id, menu label (from <paramref name="label"/>) and input extensions, tab separated.
     /// Presets without a submenu come first, then the submenus in catalog order; the handler keeps this order.
+    /// The menu is for files, so DVD presets (folders and drives) are left out.
     /// </summary>
     public static string BuildMenuFile(IReadOnlyList<Preset> presets, Func<Preset, string> label)
     {
+        presets = presets.Where(p => !p.ReadsDvd).ToList();
         var ordered = presets.Where(p => !p.Name.Contains('/'))
             .Concat(presets.Where(p => p.Name.Contains('/')).GroupBy(p => p.Name[..p.Name.IndexOf('/')]).SelectMany(g => g));
         var text = new StringBuilder();

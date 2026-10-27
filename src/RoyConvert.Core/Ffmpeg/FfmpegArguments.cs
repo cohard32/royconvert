@@ -6,20 +6,48 @@ namespace RoyConvert.Core.Ffmpeg;
 /// <summary>Builds the ffmpeg argument list for a preset. Arguments are returned unquoted, for ProcessStartInfo.ArgumentList.</summary>
 public static class FfmpegArguments
 {
-    public static IReadOnlyList<string> Build(string input, string output, OutputFormat format, ConversionSettings s)
+    public static IReadOnlyList<string> Build(string input, string output, OutputFormat format, ConversionSettings s) =>
+        Build(input, output, format, s, dvd: false);
+
+    /// <summary>
+    /// The main title of a DVD as MP4 or MKV: the VOB parts are read as one stream, interlaced frames are deinterlaced
+    /// and every audio track (language) is kept; DVD subtitles are left out.
+    /// </summary>
+    public static IReadOnlyList<string> BuildDvd(Dvd.DvdDisc disc, string output, OutputFormat format, ConversionSettings s)
+    {
+        if (format is not (OutputFormat.Mp4 or OutputFormat.Mkv))
+        {
+            throw new ArgumentOutOfRangeException(nameof(format), format, "DVDs are converted to MP4 or MKV.");
+        }
+
+        return Build(disc.FfmpegInput, output, format, s, dvd: true);
+    }
+
+    private static IReadOnlyList<string> Build(string input, string output, OutputFormat format, ConversionSettings s, bool dvd)
     {
         if (Formats.KindOf(format) == MediaKind.Image)
         {
             throw new ArgumentException($"{format} is an image format and is not produced by ffmpeg.", nameof(format));
         }
 
-        var args = new List<string> { "-hide_banner", "-nostdin", "-n", "-progress", "pipe:1", "-nostats", "-i", input };
+        var args = new List<string> { "-hide_banner", "-nostdin", "-n", "-progress", "pipe:1", "-nostats" };
+        if (dvd)
+        {
+            // Audio streams of a VOB can start late; VOB timestamps restart at cell boundaries.
+            args.AddRange(["-analyzeduration", "100M", "-probesize", "100M", "-fflags", "+genpts"]);
+        }
+
+        args.AddRange(["-i", input]);
+        if (dvd)
+        {
+            args.AddRange(["-map", "0:v:0", "-map", "0:a?"]);
+        }
 
         switch (format)
         {
             case OutputFormat.Mp4:
             case OutputFormat.Mkv:
-                AddVideoFilters(args, s);
+                AddVideoFilters(args, s, dvd ? DeinterlaceFilter : null);
                 args.AddRange(["-c:v", "libx264", "-preset", SpeedName(s.EncodingSpeed), "-crf", Num(Clamp(s.VideoQuality, 0, 51)), "-pix_fmt", "yuv420p"]);
                 AddAudio(args, s, "aac", lossy: true);
                 if (format == OutputFormat.Mp4)
@@ -156,9 +184,16 @@ public static class FfmpegArguments
         }
     }
 
-    private static void AddVideoFilters(List<string> args, ConversionSettings s)
+    /// <summary>
+    /// Deinterlaces only frames flagged as interlaced, so progressive DVDs pass unchanged. One frame per frame keeps
+    /// the source rate (25 fps for PAL) instead of doubling it.
+    /// </summary>
+    private const string DeinterlaceFilter = "bwdif=mode=send_frame:deint=interlaced";
+
+    private static void AddVideoFilters(List<string> args, ConversionSettings s, string? first = null)
     {
-        if (VideoFilter(s) is { } filter)
+        var filter = string.Join(",", new[] { first, VideoFilter(s) }.OfType<string>());
+        if (filter.Length > 0)
         {
             args.AddRange(["-vf", filter]);
         }

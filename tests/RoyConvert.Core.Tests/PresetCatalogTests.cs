@@ -73,6 +73,30 @@ public class PresetCatalogTests
     }
 
     [Fact]
+    public void Pdf_OffersPageImages()
+    {
+        var offered = PresetCatalog.ForFiles(Presets, ["report.PDF"]).Select(p => p.Id).Order();
+
+        Assert.Equal(["combine-pdf", "jpg", "png", "split-pdf", "webp"], offered);
+    }
+
+    [Fact]
+    public void OfficeDocuments_OfferPdf()
+    {
+        var offered = PresetCatalog.ForFiles(Presets, ["a.docx", "b.xlsx", "c.pptx", "d.odt"]).Select(p => p.Id);
+
+        Assert.Equal(["pdf"], offered);
+    }
+
+    [Fact]
+    public void ImagesAndDocuments_ShareThePdfPreset()
+    {
+        Assert.Contains(PresetCatalog.ForFiles(Presets, ["a.jpg", "b.heic"]), p => p.Id == "pdf");
+        Assert.Contains(PresetCatalog.ForFiles(Presets, ["a.jpg", "b.docx"]), p => p.Id == "pdf");
+        Assert.DoesNotContain(PresetCatalog.ForFiles(Presets, ["a.pdf"]), p => p.Id == "pdf");
+    }
+
+    [Fact]
     public void EmptySelection_OffersNothing()
     {
         Assert.Empty(PresetCatalog.ForFiles(Presets, []));

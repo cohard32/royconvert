@@ -62,6 +62,9 @@ public sealed record ConversionSettings
     /// <summary>Images larger than this (on either side) are shrunk to fit. Null disables the limit.</summary>
     public int? ImageMaxSize { get; init; }
 
+    /// <summary>Resolution PDF pages are rendered at when converted to images.</summary>
+    public int PdfDpi { get; init; } = 150;
+
     /// <summary>Extra ffmpeg output arguments appended after the generated ones.</summary>
     public string? CustomFfmpegArguments { get; init; }
 }

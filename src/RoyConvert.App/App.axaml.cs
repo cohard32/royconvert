@@ -13,6 +13,8 @@ public partial class App : Application
 {
     private readonly IReadOnlyList<Preset> _presets = PresetCatalog.Default;
     private readonly string? _ffmpegPath = ToolLocator.FindFfmpeg();
+    private readonly string? _libreOfficePath = ToolLocator.FindLibreOffice();
+    private readonly (IDocumentConverter? Converter, string? Apps) _microsoftOffice = FindMicrosoftOffice();
 
     /// <summary>Set by <see cref="Program"/> before the app starts.</summary>
     public CommandLine Command { get; init; } = CommandLine.Parse([]);
@@ -55,7 +57,8 @@ public partial class App : Application
 
     private MainWindow CreateMainWindow(IReadOnlyList<string> files)
     {
-        var home = new HomeViewModel(_presets, _ffmpegPath, Settings.Language, ShowProgress, ChangeLanguage);
+        var home = new HomeViewModel(_presets, _ffmpegPath, _libreOfficePath, _microsoftOffice.Apps, Settings.Language,
+            ShowProgress, ChangeLanguage, () => new SettingsViewModel(Settings, () => Settings.Save()));
         if (files.Count > 0)
         {
             home.SetFiles(files);
@@ -110,5 +113,17 @@ public partial class App : Application
     }
 
     private ProgressViewModel CreateProgress() =>
-        new(ConversionRunner.CreateDefault(_ffmpegPath), _presets);
+        new(ConversionRunner.CreateDefault(_ffmpegPath, Settings.MaxParallelism, _libreOfficePath, _microsoftOffice.Converter),
+            _presets, Settings);
+
+    /// <summary>Word, Excel and PowerPoint export Office documents best; only on Windows.</summary>
+    private static (IDocumentConverter? Converter, string? Apps) FindMicrosoftOffice()
+    {
+        if (!OperatingSystem.IsWindows() || Core.Office.MicrosoftOfficeConverter.FindInstalled() is not { } office)
+        {
+            return (null, null);
+        }
+
+        return (office, string.Join(", ", office.Installed.Order()));
+    }
 }

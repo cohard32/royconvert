@@ -15,7 +15,11 @@ public sealed class FfmpegConverter(string ffmpegPath) : IConverter
             UseShellExecute = false,
             CreateNoWindow = true,
         };
-        foreach (var arg in FfmpegArguments.Build(input, output, preset.Output, preset.Settings))
+        var args = preset.ReadsDvd
+            ? FfmpegArguments.BuildDvd(Dvd.DvdDisc.Open(input) ?? throw new ConversionException("No DVD video was found there."),
+                output, preset.Output, preset.Settings)
+            : FfmpegArguments.Build(input, output, preset.Output, preset.Settings);
+        foreach (var arg in args)
         {
             startInfo.ArgumentList.Add(arg);
         }

@@ -42,6 +42,27 @@ public class CommandLineTests
     }
 
     [Theory]
+    [InlineData("--input-list", true)]
+    [InlineData("--temp-input-list", false)]
+    public void TemporaryInputList_IsDeletedAfterReading(string option, bool kept)
+    {
+        var list = Path.GetTempFileName();
+        try
+        {
+            File.WriteAllLines(list, [@"C:\x\1.mp4"]);
+            var command = CommandLine.Parse(["--preset", "mkv", option, list], Cwd);
+
+            Assert.Equal(CommandKind.Convert, command.Kind);
+            Assert.Single(command.Files);
+            Assert.Equal(kept, File.Exists(list));
+        }
+        finally
+        {
+            File.Delete(list);
+        }
+    }
+
+    [Theory]
     [InlineData(new[] { "a.mov" }, nameof(Strings.Cli_MissingPreset))]
     [InlineData(new[] { "--preset", "mp4" }, nameof(Strings.Cli_NoFiles))]
     [InlineData(new[] { "--preset" }, nameof(Strings.Cli_UnknownOption))]

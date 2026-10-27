@@ -32,13 +32,23 @@ public partial class HomeViewModel : ViewModelBase
     [ObservableProperty]
     private LanguageOption _selectedLanguage;
 
-    public HomeViewModel(IReadOnlyList<Preset> presets, string? ffmpegPath, string? language,
-        Action<Preset, IReadOnlyList<string>> startConversion, Action<string?> changeLanguage)
+    /// <param name="microsoftOfficeApps">The installed Office apps used for documents, e.g. "Word, Excel"; null when none.</param>
+    /// <param name="createSettings">Makes the view model of the settings window; null hides the settings button.</param>
+    public HomeViewModel(IReadOnlyList<Preset> presets, string? ffmpegPath, string? libreOfficePath, string? microsoftOfficeApps,
+        string? language, Action<Preset, IReadOnlyList<string>> startConversion, Action<string?> changeLanguage,
+        Func<SettingsViewModel>? createSettings = null)
     {
         _presets = presets;
         _startConversion = startConversion;
         _changeLanguage = changeLanguage;
+        CreateSettings = createSettings;
         FfmpegStatus = ffmpegPath is null ? Strings.Ffmpeg_NotFound : $"ffmpeg: {ffmpegPath}";
+        string[] office =
+        [
+            .. microsoftOfficeApps is null ? [] : new[] { $"Microsoft Office: {microsoftOfficeApps}" },
+            .. libreOfficePath is null ? [] : new[] { $"LibreOffice: {libreOfficePath}" },
+        ];
+        LibreOfficeStatus = office.Length == 0 ? Strings.LibreOffice_NotFound : string.Join(Environment.NewLine, office);
         // Language names are written in their own language so they can be found whatever the current one is.
         Languages = [new(null, Strings.Language_System), new("en", "English"), new("tr", "Türkçe")];
         _selectedLanguage = Languages.FirstOrDefault(l => l.Code == language) ?? Languages[0];
@@ -53,7 +63,11 @@ public partial class HomeViewModel : ViewModelBase
 
     public string FfmpegStatus { get; }
 
+    public string LibreOfficeStatus { get; }
+
     public bool CanManageShellMenu => OperatingSystem.IsWindows();
+
+    public Func<SettingsViewModel>? CreateSettings { get; }
 
     public void SetFiles(IReadOnlyList<string> files)
     {

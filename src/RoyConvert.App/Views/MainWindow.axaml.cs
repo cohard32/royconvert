@@ -27,11 +27,29 @@ public partial class MainWindow : Window
         SetFiles(files);
     }
 
+    private async void ChooseDvd_Click(object? sender, RoutedEventArgs e)
+    {
+        var folders = await StorageProvider.OpenFolderPickerAsync(new FolderPickerOpenOptions
+        {
+            Title = Strings.Home_ChooseDvdTitle,
+        });
+        SetFiles(folders);
+    }
+
+    private async void Settings_Click(object? sender, RoutedEventArgs e)
+    {
+        if (ViewModel?.CreateSettings is { } create)
+        {
+            await new SettingsWindow { DataContext = create() }.ShowDialog(this);
+        }
+    }
+
     private void OnDrop(object? sender, DragEventArgs e) => SetFiles(e.DataTransfer.TryGetFiles() ?? []);
 
+    /// <summary>Files, or folders and drives (a DVD is one).</summary>
     private void SetFiles(IEnumerable<IStorageItem> items)
     {
-        var paths = items.OfType<IStorageFile>()
+        var paths = items
             .Select(f => f.TryGetLocalPath())
             .OfType<string>()
             .ToList();

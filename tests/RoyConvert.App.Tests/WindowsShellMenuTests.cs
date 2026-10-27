@@ -12,7 +12,7 @@ public class WindowsShellMenuTests
     [Fact]
     public void MenuFile_HasOneLinePerPreset_WithIdLabelAndExtensions()
     {
-        Assert.Equal(PresetCatalog.Default.Count, Lines.Length);
+        Assert.Equal(PresetCatalog.Default.Count(p => !p.ReadsDvd), Lines.Length);
         foreach (var line in Lines)
         {
             var fields = line.Split('\t');

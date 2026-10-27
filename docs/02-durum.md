@@ -55,7 +55,89 @@ Son güncelleme: 2026-10-25
   - Doğrulama: core testleri paketteki ffmpeg 9.0.2 ile 71/71; `/CURRENTUSER /VERYSILENT` kurulum → menü kurulu DLL'e bağlı,
     döküm ve çalıştırma tamam, uygulama `tools\ffmpeg.exe`'yi kullanıyor → sessiz kaldırma: klasör, kayıt defteri ve menü dosyası
     temizlendi. Program Files (yönetici) kurulumu ve Win 11 denenmedi
-- Testler: 95/95 (Core 71; App 24). Dil kültürüne dokunan testler ortak, paralel çalışmayan koleksiyonda (`UiCultureCollection`)
+- Belge dönüştürme (2026-10-26, `belge-donusturme` dalı)
+  - **Office → PDF**: `Office\OfficeConverter` — `soffice --headless --convert-to pdf`; her iş kendi geçici profilini
+    (`-env:UserInstallation`) ve çıktı klasörünü kullanır (aynı profille iki soffice çalışamaz), sonra `%TEMP%\royconvert-office-*`
+    silinir. Girişler: doc, docx, xls, xlsx, ppt, pptx, odt, ods, odp, rtf (preset `pdf`). soffice bazen hata vermek yerine
+    takılıyor (ör. rtf → pptx) → 10 dk zaman aşımı, süreç ağacı öldürülür
+  - `ToolLocator.FindLibreOffice`: `ROYCONVERT_SOFFICE` → `tools\LibreOffice\program\soffice.exe` (pakettekini) →
+    Program Files / `/Applications` → PATH. Bulunamazsa ana pencerede uyarı, işte "LibreOffice was not found…" hatası
+  - **PDF → resim**: `ImageConverter` PDF girişini Docnet.Core (PDFium, MIT; win/linux/osx-x64/arm64 yerel dosyalarıyla) ile
+    150 dpi (`PdfDpi`) çizer, beyaz zemine yapıştırır, sonra Magick.NET ile yazar. png/jpg/webp presetleri pdf'i de kabul eder.
+    Tek sayfa → `belge.png`; çok sayfa → `belge-01.png`, `belge-02.png`… (`ImageConverter.PagePaths`, ≥2 hane, var olanın
+    üzerine yazmaz). Hata/iptalde yazılan sayfalar silinir. "Göster" çıktı yoksa klasörü açar
+  - Kurulum paketi LibreOffice 26.8.1.1'i gömer: betik MSI'ı (downloadarchive, SHA-256 sabit) indirir, `msiexec /a` ile
+    kurmadan açar; VC++ DLL'leri (`System64`) `program\`'a, yazı tipleri (`Fonts`) `share\fonts\truetype`'a taşınır;
+    `share\extensions` (58 eklenti, çoğu sözlük) silinir — **yeni profilde bu eklentileri kaydederken soffice takılıyordu**
+    (eklentisiz 9 sn'de dönüştürdü). Açılmış hali ~1,6 GB
+  - Doğrulama: sistemdeki LibreOffice (winget ile bu PC'ye kuruldu, 26.8.1.1) ve açılmış paket kopyasıyla Office testleri;
+    uygulamanın komut satırından docx/xlsx/pptx → PDF ve bu PDF'ler → PNG (2 sayfalı rapor `rapor-01/02.png`), Türkçe
+    karakterler doğru. `--register-shell` sonrası `.pdf`/`.docx` vb. menü kayıtları var
+- **Resim → PDF** (2026-10-26): `pdf` preseti hem Office hem resim girişlerini kabul eder; `PdfConverter` girişe göre
+  Magick.NET'e (resim) ya da LibreOffice'e (belge) yönlendirir, LibreOffice yoksa yalnız belgeler başarısız olur. Her resim
+  ayrı bir tek sayfalı PDF olur. Sayfa boyutu = piksel / dpi; dpi yoksa 72 varsayılır ve uzun kenar A4'ü (297 mm) aşarsa dpi
+  yükseltilir (piksel yeniden örneklenmez). JPEG girişler PDF içinde JPEG kalır (21 KB jpg → 24 KB pdf), diğerleri Zip
+- `--temp-input-list` (2026-10-26): sağ tık eklentisi uzun seçimlerde listeyi bununla verir; uygulama okuyup siler
+  (eski açık konu 5). `--input-list` dosyası silinmez. Explorer üzerinden uzun seçimle uçtan uca denenmedi (DLL derlendi)
+- **Resimleri tek PDF'te birleştirme** (2026-10-26): `combine-pdf` preseti ("PDF (tek dosya)", `Preset.CombinesInputs`).
+  `ProgressViewModel.Add` seçili tüm dosyalardan tek `ConversionJob(inputs, preset)` yapar, dosyalar doğal sırada
+  (`NaturalComparer`: sayfa2 < sayfa10). `IConverter.CombineAsync` (varsayılanı NotSupported) → `ImageConverter` her resmi
+  tek PDF'e sayfa yapar (sayfa boyutu/JPEG kuralları tek resimdeki gibi; tüm resimler bellekte açılır). Çıktı ilk dosyanın
+  adıyla: `sayfa1 (birleştirilmiş).pdf`. İlerleme penceresinde "sayfa1.png ve 3 dosya daha". Menü tek seçimde de gösteriyor
+  (sağ tık eklentisi yalnızca uzantıya bakıyor). Explorer daha sonra açılan ikinci bir seçimi ayrı iş olarak ekler
+- **Çıktı adı ekleri arayüz dilinde** (eski açık konu 8): `PresetNames.WithLocalizedFileName`, iş oluşturulurken
+  `FileName_<grup id>` kaynağıyla: "-küçük", " (döndürülmüş)", " (birleştirilmiş)"; %/720p ekleri aynı kalır
+- **Microsoft Office ile PDF** (2026-10-27, `ms-office-pdf` dalı): kullanıcı günlük işte Word kullanıyor.
+  `Office\MicrosoftOfficeConverter` kurulu Word/Excel/PowerPoint'i COM (geç bağlama, `dynamic`) ile STA iş parçacığında
+  sürer. Dosya salt okunur açılır, makrolar kapalı (`AutomationSecurity = 3`), kaydetmeden kapatılır; son kullanılanlara
+  eklenmez. Şifreli dosyaya sahte şifre verilir → istem çıkmadan hemen hata (PowerPoint: `dosya::şifre::`). Aynı anda tek
+  belge (`Gate`). Yalnız kendi başlattığı Office sürecini kapatır (öncesi/sonrası süreç listesi); PowerPoint kullanıcının
+  açık örneği olabilir, ona dokunmaz. Zaman aşımında kendi sürecini öldürür
+  - `IDocumentConverter.Priority`: doc/docx/rtf/xls/xlsx/ppt/pptx → önce Microsoft Office (0), sonra LibreOffice (1);
+    odt/ods/odp → önce LibreOffice. `PdfConverter` biri hata verirse sıradakini dener, hepsi hata verirse hepsinin mesajı
+  - Ana pencere "Microsoft Office: Word, Excel, PowerPoint" ve LibreOffice satırlarını gösterir; ikisi de yoksa uyarı
+  - Bu PC'de PowerShell'in `New-Object -ComObject Word.Application`'ı tür kitaplığı hatası veriyor (`0x80029C4A`, CurVer
+    `.12` kalıntısı); uygulamanın IDispatch yolu etkilenmiyor
+  - Doğrulama: docx/xlsx/pptx (Türkçe adlarla) → PDF, kaynak SHA-256 ve yazma zamanı aynı, `~$` dosyası yok, Office süreci
+    kapanıyor; üçünde de şifreli dosya ~10 sn'de hata. Uygulamadan rtf → PDF 9 sn, PDF üreticisi "Microsoft Word 2019"
+  - Ön sürüm: https://github.com/cohard32/royconvert/releases/tag/v0.1.0-test2 (9e15473'ten, 312 MB,
+    SHA-256 `daa5b5fe28fdf479d14a88521b54c3dafc50f68e71263dd6d299df9d89e0b752`). Bu setup kurulup denenmedi
+- **PDF birleştirme ve bölme** (2026-10-27): `PdfPages` (Docnet/PDFium; sayfalar resme çevrilmeden kopyalanır, yazı
+  seçilebilir kalır)
+  - "PDF (tek dosya)" (`combine-pdf`) artık PDF de kabul eder: resim + PDF karışık seçim doğal sırada tek PDF. Yalnız
+    resimse eski Magick yolu; değilse her resim geçici tek sayfalı PDF olur, sonra hepsi birleştirilir
+  - PDFium sayfaları ilk belgeye aktarıyor ve bazı geçerli dosyaları hedef olarak reddediyor ("failed to merge files");
+    ilk belge önce PDFium'un kendi yazdığı kopyaya çevriliyor (`Split(0..n-1)`), sonra birleştiriliyor
+  - "PDF (sayfalara böl)" (`split-pdf`, `Preset.SplitsPages`): `belge-sayfa-01.pdf`, `-02`… (EN `-page`). Tek sayfalı
+    PDF'te hata ("nothing to split"); hata/iptalde yazılanlar silinir
+  - Doğrulama: uygulamadan Word PDF'i + PNG + PDF → birleştir → böl: Word sayfalarında gömülü yazı tipi, resim sayfasında
+    resim var
+- **Ayarlar penceresi** (2026-10-27): ana penceredeki "Ayarlar…" → `SettingsWindow` / `SettingsViewModel`. Resim kalitesi
+  (10–100, kaydırıcı), video kalitesi (Yüksek CRF 18 / Normal 23 / Küçük dosya 28), PDF → resim dpi (96/150/200/300), aynı
+  anda dönüşüm sayısı (Otomatik = çekirdek/2 ya da 1…çekirdek). `AppSettings`'e (`settings.json`) yazılır; varsayılan değerler
+  null saklanır. Elle yazılmış aralık dışı değerler yüklenirken sınırlanır, listede olmayan değer seçenek olarak eklenir
+  - `AppSettings.ApplyTo`: `ProgressViewModel.Add` her işe uygular; preset'in kendi değeri varsayılandan farklıysa (ör.
+    `mp4-small` CRF 28) dokunmaz. Sağ tık süreçleri ayarları açılışta okur
+  - Doğrulama: ekran görüntüsü (UI Automation ile düğmeye basıldı); `PdfDpi: 300` ile uygulamadan PDF → PNG genişliği
+    1275 → 2550
+- **DVD → MP4/MKV** (2026-10-27, gerçek diskle denenmedi; kullanıcının şu an DVD'si yok): `Dvd\DvdDisc` sürücü kökü,
+  VIDEO_TS'i içeren klasör ya da VIDEO_TS'in kendisini açar. Ana başlık = `VTS_nn_1..9.VOB` toplamı en büyük başlık seti
+  (`VTS_nn_0` menü, `VIDEO_TS.VOB` atlanır). ffmpeg `concat:` ile parçaları tek akış okur; `-analyzeduration/-probesize 100M`,
+  `-fflags +genpts`, `-map 0:v:0 -map 0:a?` (tüm ses dilleri, altyazı yok), `bwdif=mode=send_frame:deint=interlaced`
+  - Presetler `dvd/mp4`, `dvd/mkv` (`Preset.ReadsDvd`; `Accepts` klasörde DVD arar). Sağ tık menü dosyasına girmez (yalnız
+    dosyalar); ana penceredeki "DVD…" (klasör seçici) ya da klasör/sürücü sürükle-bırak, komut satırı `--preset dvd/mp4 <klasör>`
+  - Çıktı: optik sürücüdeyse Videolar klasörüne `<birim etiketi>.mp4`; diske kopyalanmış klasörse yanına `<klasör adı>.mp4`
+  - CSS korumalı ticari DVD'ler çözülmez (ffmpeg hata verir ya da bozuk görüntü). Ev/kamera kayıtları hedef
+  - Doğrulama: sahte disk (ffmpeg `-target pal-dvd`, taramalı, 16:9, iki ses dili, iki parçaya sektör sınırında bölünmüş +
+    menü + kısa ikinci başlık): 6 sn tam süre, 2 ses, progressive, 25 fps, DAR 16:9; bozuk VOB → hata, çıktı yok.
+    Uygulamadan `--preset dvd/mp4` ile 8 sn'lik sahte disk dönüştü
+- Testler: 160/160 (Core 120; App 40).
+
+## Gerçek DVD denemesi (DVD bulununca)
+1. Diski tak; royconvert'i aç → "DVD…" → DVD sürücüsünü seç → "DVD › MP4" → Dönüştür
+2. Videolar klasöründe `<disk adı>.mp4` oluştu mu; süre filmin tamamı mı (menü/fragman değil), ses ve görüntü eş mi
+3. Birden fazla ses dili varsa oynatıcıda seçilebiliyor mu; 4:3 / 16:9 görüntü basık ya da uzamış mı
+4. Hata olursa ilerleme penceresindeki mesajı kopyala (CSS korumalı disk olabilir) Dil kültürüne dokunan testler ortak, paralel çalışmayan koleksiyonda (`UiCultureCollection`)
 
 ## Açık konular
 1. **Win 11'de gerçek deneme yapılmadı** (kullanıcının Win 11 PC'si). Sınanamayanlar: `-AllowUnsigned` kurulumu (Win 10'da bu
@@ -65,18 +147,37 @@ Son güncelleme: 2026-10-25
 2. Explorer menüsü hemen değişmezse: `taskkill /f /im explorer.exe & start explorer`.
 3. DLL Explorer tarafından yüklüyken yeniden derlenirse kopyalama uyarı verir; eski DLL kalır (Explorer'ı yeniden başlatınca düzelir).
 4. Menü şu an Debug derlemesini gösteriyor (`src\RoyConvert.App\bin\Debug\net8.0\`). Kaldırmak için: `royconvert --unregister-shell`.
-5. `--input-list` geçici dosyaları %TEMP%'te kalıyor.
+5. ~~`--input-list` geçici dosyaları %TEMP%'te kalıyor~~ → `--temp-input-list` ile çözüldü (2026-10-26).
 6. Pencere kapanırken gelen dosya çok dar bir aralıkta kaybolabilir.
 7. **Sparse paket kaydı klasör izinlerini değiştiriyor:** Win 10'daki geliştirici modu testinde `-ExternalLocation` olarak verilen
    `bin\Debug\net8.0`'ın izinleri korumalı hale geldi, paket kaldırılınca geri gelmedi ve derleme yeni alt klasöre (`tr\`)
    yazamadı. `icacls … /grant "<kullanıcı>:(OI)(CI)F" /T` ile düzeltildi. Win 11'de Debug klasöründen `--register-shell` aynı
    sorunu çıkarabilir; kurulum paketi Program Files'a kurulacağı için orada sorun olmaması beklenir (denenmedi).
-8. Çıktı dosya adı ekleri ("(rotated)", "-small" vb.) İngilizce kalıyor; istenirse çevrilebilir.
+8. ~~Çıktı dosya adı ekleri İngilizce kalıyor~~ → arayüz diline çevriliyor (2026-10-26).
 9. Program Files kurulumu yönetici olmayan bir hesapta başka bir yöneticinin şifresiyle yapılırsa, kaldırma menü kaydını kurulumu
    yapan hesap yerine yönetici hesabından silmeye çalışır (Inno'da kaldırma adımı "asıl kullanıcı olarak" çalıştırılamıyor).
 10. Kurulum dosyası imzasız: Windows SmartScreen "tanınmayan uygulama" uyarısı verir (kod imzalama sertifikasıyla çözülür).
+11. LibreOffice'li kurulum paketi (2026-10-26): `build-installer.ps1`'i kullanıcı çalıştırdı (Claude'a `-ExecutionPolicy Bypass`
+    izni otomatik denetimde reddediliyor; Git Bash'te `!` ile yol `E:/royconvert/...` yazılmalı). `royconvert-0.1.0-setup.exe`
+    **312 MB**. `/CURRENTUSER /VERYSILENT` kurulum → kurulu uygulama docx/pptx → PDF'i paketteki
+    `tools\LibreOffice\program\soffice.bin` ile yaptı → sessiz kaldırma klasörü sildi; menü yeniden Debug'a bağlandı.
+    Sınanmayanlar: VC++ kurulu olmayan makinede `program\` yanındaki DLL'lerin yetmesi, gömülü yazı tiplerinin
+    `share\fonts\truetype`'tan yüklenmesi (bu PC'de ikisi de sistemde var), Program Files kurulumu. GitHub ön sürümü güncellenmedi
+    (v0.1.0-test1 hâlâ LibreOffice'siz)
+12. Office dönüşümü yeni profille ~4,5 sn (ilk/soğuk çalıştırmada ~9 sn). **Profil yeniden kullanılamıyor:** aynı profille ya da
+    ilk çalıştırmadan kalan profilin kopyasıyla soffice (26.8.1.1, `--nolockcheck --norestore` dahil) ~1 sn CPU sonra
+    sonsuza dek bekliyor (2026-10-26 ölçüldü). Bu yüzden her iş yeni profil kullanıyor; hızlandırma denemesi bırakıldı
+13. macOS'ta LibreOffice gömülü değil; `/Applications/LibreOffice.app` aranıyor
 
-## Kaldığımız yer (2026-10-25)
+## Kaldığımız yer (2026-10-26)
+- Win 11 ve Mac denemeleri sonraya kaldı (kullanıcı şimdilik yapamıyor). Bu arada belge dönüştürme yapıldı (`belge-donusturme`
+  dalı, `kurulum-paketi`nden açıldı), LibreOffice'li kurulum üretilip denendi (açık konu 11); ardından resim → PDF,
+  resimleri tek PDF'te birleştirme, Türkçe çıktı ekleri ve `--temp-input-list`. Hepsi commit edilip GitHub'a gönderildi.
+  Kullanıcı "sonra devam edeceğiz" dedi; sıradaki adım için aşağıdaki listeden kullanıcıya seçenek sun
+- Yeni bir ön sürüm (LibreOffice'li setup, 312 MB) GitHub'a yüklenmedi; Win 11 denemesinden önce yüklemeyi öner
+- Dallar: `main` = a0e262d ← `kurulum-paketi` (birleştirilmedi, onay bekliyor) ← `belge-donusturme`
+
+## Win 11 denemesi (2026-10-25'ten bekliyor)
 - Kullanıcı Win 11 PC'ye geçip deneyecek. Test kurulumu GitHub'da private ön sürüm olarak:
   https://github.com/cohard32/royconvert/releases/tag/v0.1.0-test1 (`royconvert-0.1.0-setup.exe`,
   SHA-256 `b2e241088735bc2552930ec667fea689738a2856b58ece397911b6fffb72b0c0`, `kurulum-paketi` dalı da57586'dan)
@@ -92,6 +193,7 @@ Son güncelleme: 2026-10-25
   7. Kaldır → menü ve paket gitti mi (`Get-AppxPackage royconvert.ContextMenu` boş olmalı)
 
 ## Sıradaki adımlar (öneri sırası)
-1. Win 11 PC'de kurulum dosyasıyla dene (compact menü + Program Files kurulumu) — yukarıdaki sıra
-2. macOS (Finder Quick Action / Finder Sync) — Mac gerekiyor
-3. Sonraki sürüm özellikleri: Office → PDF (LibreOffice), PDF → resim
+1. `belge-donusturme`yi commit/push; istenirse yeni ön sürüm (LibreOffice'li setup) yükle
+2. Win 11 PC'de kurulum dosyasıyla dene (compact menü + Program Files kurulumu) — yukarıdaki sıra
+3. macOS (Finder Quick Action / Finder Sync) — Mac gerekiyor
+4. Sonraki özellik adayları: PDF'leri birleştirme/bölme, ayarlar penceresi (kalite, dpi), DVD çıkarma
