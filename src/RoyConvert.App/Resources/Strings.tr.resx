@@ -28,7 +28,7 @@
   <data name="Shell_PackageNeedsAdmin" xml:space="preserve"><value>Windows 11 menüsü için yönetici izni gerekiyor.</value></data>
   <data name="Shell_PackageRemoveFailed" xml:space="preserve"><value>Windows 11 menü paketi kaldırılamadı.</value></data>
   <data name="Ffmpeg_NotFound" xml:space="preserve"><value>ffmpeg bulunamadı: video ve ses dönüştürme kullanılamıyor.</value></data>
-  <data name="LibreOffice_NotFound" xml:space="preserve"><value>LibreOffice bulunamadı: Office belgelerini PDF'e dönüştürmek için libreoffice.org'dan kurun.</value></data>
+  <data name="LibreOffice_NotFound" xml:space="preserve"><value>Microsoft Office ya da LibreOffice bulunamadı: Office belgelerini PDF'e dönüştürmek için birini kurun (LibreOffice ücretsiz: libreoffice.org).</value></data>
   <data name="Progress_CancelAll" xml:space="preserve"><value>Tümünü iptal et</value></data>
   <data name="Progress_Cancel" xml:space="preserve"><value>İptal</value></data>
   <data name="Progress_Show" xml:space="preserve"><value>Göster</value></data>

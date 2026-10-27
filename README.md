@@ -11,7 +11,8 @@ Geliştirme aşamasında (v0.1 hedefi).
 - Ses: mp3, ogg, flac, wav, aac
 - Resim: png, jpg, webp, avif, ico, pdf (tek sayfa; uzun kenar en çok A4); "PDF (tek dosya)": seçili resimler doğal
   sırayla tek PDF'te (`ilk-dosya (birleştirilmiş).pdf`)
-- Belge: Office (doc, docx, xls, xlsx, ppt, pptx, odt, ods, odp, rtf) → PDF (LibreOffice);
+- Belge: Office (doc, docx, xls, xlsx, ppt, pptx, odt, ods, odp, rtf) → PDF (Windows'ta kuruluysa Microsoft Word/Excel/PowerPoint,
+  yoksa ya da hata verirse LibreOffice);
   PDF → png, jpg, webp (her sayfa ayrı dosya: `belge-01.png`, `belge-02.png`…; 150 dpi)
 - Windows Explorer sağ tık menüsü
 - macOS Finder entegrasyonu (Quick Action)

@@ -28,7 +28,7 @@
   <data name="Shell_PackageNeedsAdmin" xml:space="preserve"><value>Administrator permission is needed for the Windows 11 menu.</value></data>
   <data name="Shell_PackageRemoveFailed" xml:space="preserve"><value>Could not remove the Windows 11 menu package.</value></data>
   <data name="Ffmpeg_NotFound" xml:space="preserve"><value>ffmpeg not found: video and audio conversions are unavailable.</value></data>
-  <data name="LibreOffice_NotFound" xml:space="preserve"><value>LibreOffice not found: install it from libreoffice.org to convert Office documents to PDF.</value></data>
+  <data name="LibreOffice_NotFound" xml:space="preserve"><value>Neither Microsoft Office nor LibreOffice found: install one of them to convert Office documents to PDF (LibreOffice is free: libreoffice.org).</value></data>
   <data name="Progress_CancelAll" xml:space="preserve"><value>Cancel all</value></data>
   <data name="Progress_Cancel" xml:space="preserve"><value>Cancel</value></data>
   <data name="Progress_Show" xml:space="preserve"><value>Show</value></data>

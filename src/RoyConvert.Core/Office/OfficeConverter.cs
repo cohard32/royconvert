@@ -7,13 +7,18 @@ namespace RoyConvert.Core.Office;
 /// soffice can hang instead of failing (e.g. on an export it does not support), so it is killed after this long.
 /// Defaults to <see cref="DefaultTimeout"/>.
 /// </param>
-public sealed class OfficeConverter(string sofficePath, TimeSpan? timeout = null) : IConverter
+public sealed class OfficeConverter(string sofficePath, TimeSpan? timeout = null) : IDocumentConverter
 {
     public static readonly TimeSpan DefaultTimeout = TimeSpan.FromMinutes(10);
 
     private const int ErrorTailLines = 20;
 
     private readonly TimeSpan _timeout = timeout ?? DefaultTimeout;
+
+    public string Name => "LibreOffice";
+
+    /// <summary>After Microsoft Office for its own formats, before it for OpenDocument files.</summary>
+    public int? Priority(string input) => Formats.OfficeInputs.Contains(Formats.ExtensionOf(input)) ? 1 : null;
 
     public async Task ConvertAsync(string input, string output, Preset preset, IProgress<double?> progress, CancellationToken cancellationToken)
     {

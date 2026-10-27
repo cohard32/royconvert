@@ -30,14 +30,27 @@ public sealed class ConversionRunner : IDisposable
     public event Action? Idle;
 
     /// <summary>
-    /// Uses ffmpeg for audio/video, Magick.NET for images (also PDF pages and image → PDF) and LibreOffice for
+    /// Uses ffmpeg for audio/video, Magick.NET for images (also PDF pages and image → PDF) and Microsoft Office
+    /// (<paramref name="microsoftOffice"/>, see <see cref="MicrosoftOfficeConverter.FindInstalled"/>) or LibreOffice for
     /// office documents → PDF.
     /// </summary>
-    public static ConversionRunner CreateDefault(string? ffmpegPath, int? maxParallelism = null, string? libreOfficePath = null)
+    public static ConversionRunner CreateDefault(string? ffmpegPath, int? maxParallelism = null, string? libreOfficePath = null,
+        IDocumentConverter? microsoftOffice = null)
     {
         var image = new ImageConverter();
         IConverter? ffmpeg = ffmpegPath is null ? null : new FfmpegConverter(ffmpegPath);
-        var pdf = new PdfConverter(image, libreOfficePath is null ? null : new OfficeConverter(libreOfficePath));
+        var documents = new List<IDocumentConverter>();
+        if (microsoftOffice is not null)
+        {
+            documents.Add(microsoftOffice);
+        }
+
+        if (libreOfficePath is not null)
+        {
+            documents.Add(new OfficeConverter(libreOfficePath));
+        }
+
+        var pdf = new PdfConverter(image, documents);
         return new ConversionRunner(
             preset => Formats.KindOf(preset.Output) switch
             {

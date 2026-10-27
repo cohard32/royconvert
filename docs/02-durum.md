@@ -87,7 +87,20 @@ Son güncelleme: 2026-10-25
   (sağ tık eklentisi yalnızca uzantıya bakıyor). Explorer daha sonra açılan ikinci bir seçimi ayrı iş olarak ekler
 - **Çıktı adı ekleri arayüz dilinde** (eski açık konu 8): `PresetNames.WithLocalizedFileName`, iş oluşturulurken
   `FileName_<grup id>` kaynağıyla: "-küçük", " (döndürülmüş)", " (birleştirilmiş)"; %/720p ekleri aynı kalır
-- Testler: 126/126 (Core 94; App 32). Dil kültürüne dokunan testler ortak, paralel çalışmayan koleksiyonda (`UiCultureCollection`)
+- **Microsoft Office ile PDF** (2026-10-27, `ms-office-pdf` dalı): kullanıcı günlük işte Word kullanıyor.
+  `Office\MicrosoftOfficeConverter` kurulu Word/Excel/PowerPoint'i COM (geç bağlama, `dynamic`) ile STA iş parçacığında
+  sürer. Dosya salt okunur açılır, makrolar kapalı (`AutomationSecurity = 3`), kaydetmeden kapatılır; son kullanılanlara
+  eklenmez. Şifreli dosyaya sahte şifre verilir → istem çıkmadan hemen hata (PowerPoint: `dosya::şifre::`). Aynı anda tek
+  belge (`Gate`). Yalnız kendi başlattığı Office sürecini kapatır (öncesi/sonrası süreç listesi); PowerPoint kullanıcının
+  açık örneği olabilir, ona dokunmaz. Zaman aşımında kendi sürecini öldürür
+  - `IDocumentConverter.Priority`: doc/docx/rtf/xls/xlsx/ppt/pptx → önce Microsoft Office (0), sonra LibreOffice (1);
+    odt/ods/odp → önce LibreOffice. `PdfConverter` biri hata verirse sıradakini dener, hepsi hata verirse hepsinin mesajı
+  - Ana pencere "Microsoft Office: Word, Excel, PowerPoint" ve LibreOffice satırlarını gösterir; ikisi de yoksa uyarı
+  - Bu PC'de PowerShell'in `New-Object -ComObject Word.Application`'ı tür kitaplığı hatası veriyor (`0x80029C4A`, CurVer
+    `.12` kalıntısı); uygulamanın IDispatch yolu etkilenmiyor
+  - Doğrulama: docx/xlsx/pptx (Türkçe adlarla) → PDF, kaynak SHA-256 ve yazma zamanı aynı, `~$` dosyası yok, Office süreci
+    kapanıyor; üçünde de şifreli dosya ~10 sn'de hata. Uygulamadan rtf → PDF 9 sn, PDF üreticisi "Microsoft Word 2019"
+- Testler: 140/140 (Core 108; App 32). Dil kültürüne dokunan testler ortak, paralel çalışmayan koleksiyonda (`UiCultureCollection`)
 
 ## Açık konular
 1. **Win 11'de gerçek deneme yapılmadı** (kullanıcının Win 11 PC'si). Sınanamayanlar: `-AllowUnsigned` kurulumu (Win 10'da bu
