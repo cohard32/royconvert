@@ -1,6 +1,6 @@
 # Durum ve sonraki adımlar
 
-Son güncelleme: 2026-10-25
+Son güncelleme: 2026-10-27
 
 ## Tamamlananlar
 - REA ile File Converter v2.2 analizi → `01-analiz-file-converter.md`; sağ tık eklentisi analizi → `03-analiz-fc-kabuk-eklentisi.md`
@@ -169,19 +169,21 @@ Son güncelleme: 2026-10-25
     sonsuza dek bekliyor (2026-10-26 ölçüldü). Bu yüzden her iş yeni profil kullanıyor; hızlandırma denemesi bırakıldı
 13. macOS'ta LibreOffice gömülü değil; `/Applications/LibreOffice.app` aranıyor
 
-## Kaldığımız yer (2026-10-26)
-- Win 11 ve Mac denemeleri sonraya kaldı (kullanıcı şimdilik yapamıyor). Bu arada belge dönüştürme yapıldı (`belge-donusturme`
-  dalı, `kurulum-paketi`nden açıldı), LibreOffice'li kurulum üretilip denendi (açık konu 11); ardından resim → PDF,
-  resimleri tek PDF'te birleştirme, Türkçe çıktı ekleri ve `--temp-input-list`. Hepsi commit edilip GitHub'a gönderildi.
-  Kullanıcı "sonra devam edeceğiz" dedi; sıradaki adım için aşağıdaki listeden kullanıcıya seçenek sun
-- Yeni bir ön sürüm (LibreOffice'li setup, 312 MB) GitHub'a yüklenmedi; Win 11 denemesinden önce yüklemeyi öner
-- Dallar: `main` = a0e262d ← `kurulum-paketi` (birleştirilmedi, onay bekliyor) ← `belge-donusturme`
+## Kaldığımız yer (2026-10-27)
+- Tüm işler `main`'de: `kurulum-paketi` PR #1 (2026-10-25, kullanıcı birleştirdi), `belge-donusturme` + `ms-office-pdf`
+  PR #2 (2026-10-27, 2bcb7d8). PR'ı Claude açar, birleştirmeyi kullanıcı yapar (otomatik denetim "incelemesiz birleştirme"yi
+  reddediyor)
+- Ön sürüm `v0.1.0-test3` (main 2bcb7d8'den; Office/Word → PDF, PDF birleştir/böl, ayarlar, DVD) GitHub'a yüklendi,
+  SHA-256 `b65085199a499616c8610c8ecc89d39df5d2f4c1c70da5a5689744dd52d620da`. Bu PC'de `/CURRENTUSER /VERYSILENT` kurulum:
+  menü kurulu DLL'e bağlandı, menü dosyasında yeni seçenekler var; kurulu uygulamayla rtf → PDF (Word 2019, 9,6 sn),
+  PDF bölme, resim + PDF birleştirme, sahte DVD → MP4 çalıştı, arkada Office süreci kalmadı. Sessiz kaldırma klasörü,
+  menü dosyasını ve kayıtları sildi; menü yeniden Debug'a bağlandı. Program Files (yönetici) kurulumu denenmedi
+- Bu oturumda yapılanlar sırasıyla: Microsoft Office ile PDF, PDF birleştirme/bölme, ayarlar penceresi, DVD (sahte diskle)
+- Win 11 / Mac denemeleri: kullanıcı kendisi söyleyince yapılacak, hatırlatılmayacak. DVD denemesi disk bulununca
+- Sıradaki öneri: aşağıdaki listeden kullanıcıya seçenek sun
 
-## Win 11 denemesi (2026-10-25'ten bekliyor)
-- Kullanıcı Win 11 PC'ye geçip deneyecek. Test kurulumu GitHub'da private ön sürüm olarak:
-  https://github.com/cohard32/royconvert/releases/tag/v0.1.0-test1 (`royconvert-0.1.0-setup.exe`,
-  SHA-256 `b2e241088735bc2552930ec667fea689738a2856b58ece397911b6fffb72b0c0`, `kurulum-paketi` dalı da57586'dan)
-- `kurulum-paketi` dalı henüz `main`'e birleştirilmedi (kullanıcı onayı bekleniyor); `main` = a0e262d (dil + ikon)
+## Win 11 denemesi (kullanıcı söyleyince)
+- En güncel test kurulumu: https://github.com/cohard32/royconvert/releases/tag/v0.1.0-test3
 - Win 11 denemesinde talimatlar **tek tek** verilecek (kullanıcı tercihi). Önerilen sıra:
   1. Ön sürüm sayfasından setup'ı indir (SmartScreen: "Ek bilgi" → "Yine de çalıştır")
   2. Varsayılan (Program Files, yönetici) kurulum, "Sağ tık menüsünü kur" işaretli
@@ -193,7 +195,6 @@ Son güncelleme: 2026-10-25
   7. Kaldır → menü ve paket gitti mi (`Get-AppxPackage royconvert.ContextMenu` boş olmalı)
 
 ## Sıradaki adımlar (öneri sırası)
-1. `belge-donusturme`yi commit/push; istenirse yeni ön sürüm (LibreOffice'li setup) yükle
-2. Win 11 PC'de kurulum dosyasıyla dene (compact menü + Program Files kurulumu) — yukarıdaki sıra
-3. macOS (Finder Quick Action / Finder Sync) — Mac gerekiyor
-4. Sonraki özellik adayları: PDF'leri birleştirme/bölme, ayarlar penceresi (kalite, dpi), DVD çıkarma
+1. DVD'ler için sağ tık menüsü (klasör/sürücü) — gerçek diskle denedikten sonra
+2. Kullanıcı söyleyince: Win 11 PC denemesi (yukarıdaki sıra), macOS (Finder Quick Action / Finder Sync)
+3. Proje herkese açılmadan önce: kod imzalama sertifikası (SmartScreen ve Win 11 imzasız paket uyarıları)
