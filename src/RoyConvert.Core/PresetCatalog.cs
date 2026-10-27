@@ -50,8 +50,10 @@ public static class PresetCatalog
         }
 
         presets.Add(Make(OutputFormat.Pdf, image, Union(Formats.OfficeInputs, Formats.ImageInputs)));
-        presets.Add(new Preset("combine-pdf", "PDF (one file)", OutputFormat.Pdf, Formats.ImageInputs, image,
+        presets.Add(new Preset("combine-pdf", "PDF (one file)", OutputFormat.Pdf, Union(Formats.ImageInputs, ["pdf"]), image,
             "{dir}/{name} (combined)", CombinesInputs: true));
+        presets.Add(new Preset("split-pdf", "PDF (split pages)", OutputFormat.Pdf, Union([], ["pdf"]), image,
+            "{dir}/{name}-page", SplitsPages: true));
 
         AddGroup(presets, "scale75", "Scale 75%", video with { Scale = Scale.ByFactor(0.75) }, image with { Scale = Scale.ByFactor(0.75) }, "-75%");
         AddGroup(presets, "scale50", "Scale 50%", video with { Scale = Scale.ByFactor(0.5) }, image with { Scale = Scale.ByFactor(0.5) }, "-50%");

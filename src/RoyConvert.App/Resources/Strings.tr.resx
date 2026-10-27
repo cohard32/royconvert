@@ -52,6 +52,8 @@
   <data name="FileName_rotate-left" xml:space="preserve"><value> (döndürülmüş)</value></data>
   <data name="FileName_rotate-right" xml:space="preserve"><value> (döndürülmüş)</value></data>
   <data name="FileName_combine-pdf" xml:space="preserve"><value> (birleştirilmiş)</value></data>
+  <data name="Preset_split-pdf" xml:space="preserve"><value>PDF (sayfalara böl)</value></data>
+  <data name="FileName_split-pdf" xml:space="preserve"><value>-sayfa</value></data>
   <data name="Job_MoreFiles" xml:space="preserve"><value>{0} ve {1} dosya daha</value></data>
   <data name="Cli_InputListUnreadable" xml:space="preserve"><value>Dosya listesi okunamadı {0}: {1}</value></data>
   <data name="Cli_UnknownOption" xml:space="preserve"><value>Bilinmeyen veya eksik seçenek: {0}</value></data>

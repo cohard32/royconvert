@@ -52,6 +52,8 @@
   <data name="FileName_rotate-left" xml:space="preserve"><value> (rotated)</value></data>
   <data name="FileName_rotate-right" xml:space="preserve"><value> (rotated)</value></data>
   <data name="FileName_combine-pdf" xml:space="preserve"><value> (combined)</value></data>
+  <data name="Preset_split-pdf" xml:space="preserve"><value>PDF (split pages)</value></data>
+  <data name="FileName_split-pdf" xml:space="preserve"><value>-page</value></data>
   <data name="Job_MoreFiles" xml:space="preserve"><value>{0} and {1} more</value></data>
   <data name="Cli_InputListUnreadable" xml:space="preserve"><value>Cannot read input list {0}: {1}</value></data>
   <data name="Cli_UnknownOption" xml:space="preserve"><value>Unknown or incomplete option: {0}</value></data>

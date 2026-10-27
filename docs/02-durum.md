@@ -100,7 +100,19 @@ Son güncelleme: 2026-10-25
     `.12` kalıntısı); uygulamanın IDispatch yolu etkilenmiyor
   - Doğrulama: docx/xlsx/pptx (Türkçe adlarla) → PDF, kaynak SHA-256 ve yazma zamanı aynı, `~$` dosyası yok, Office süreci
     kapanıyor; üçünde de şifreli dosya ~10 sn'de hata. Uygulamadan rtf → PDF 9 sn, PDF üreticisi "Microsoft Word 2019"
-- Testler: 140/140 (Core 108; App 32). Dil kültürüne dokunan testler ortak, paralel çalışmayan koleksiyonda (`UiCultureCollection`)
+  - Ön sürüm: https://github.com/cohard32/royconvert/releases/tag/v0.1.0-test2 (9e15473'ten, 312 MB,
+    SHA-256 `daa5b5fe28fdf479d14a88521b54c3dafc50f68e71263dd6d299df9d89e0b752`). Bu setup kurulup denenmedi
+- **PDF birleştirme ve bölme** (2026-10-27): `PdfPages` (Docnet/PDFium; sayfalar resme çevrilmeden kopyalanır, yazı
+  seçilebilir kalır)
+  - "PDF (tek dosya)" (`combine-pdf`) artık PDF de kabul eder: resim + PDF karışık seçim doğal sırada tek PDF. Yalnız
+    resimse eski Magick yolu; değilse her resim geçici tek sayfalı PDF olur, sonra hepsi birleştirilir
+  - PDFium sayfaları ilk belgeye aktarıyor ve bazı geçerli dosyaları hedef olarak reddediyor ("failed to merge files");
+    ilk belge önce PDFium'un kendi yazdığı kopyaya çevriliyor (`Split(0..n-1)`), sonra birleştiriliyor
+  - "PDF (sayfalara böl)" (`split-pdf`, `Preset.SplitsPages`): `belge-sayfa-01.pdf`, `-02`… (EN `-page`). Tek sayfalı
+    PDF'te hata ("nothing to split"); hata/iptalde yazılanlar silinir
+  - Doğrulama: uygulamadan Word PDF'i + PNG + PDF → birleştir → böl: Word sayfalarında gömülü yazı tipi, resim sayfasında
+    resim var
+- Testler: 145/145 (Core 113; App 32). Dil kültürüne dokunan testler ortak, paralel çalışmayan koleksiyonda (`UiCultureCollection`)
 
 ## Açık konular
 1. **Win 11'de gerçek deneme yapılmadı** (kullanıcının Win 11 PC'si). Sınanamayanlar: `-AllowUnsigned` kurulumu (Win 10'da bu
