@@ -27,6 +27,14 @@ public partial class MainWindow : Window
         SetFiles(files);
     }
 
+    private async void Settings_Click(object? sender, RoutedEventArgs e)
+    {
+        if (ViewModel?.CreateSettings is { } create)
+        {
+            await new SettingsWindow { DataContext = create() }.ShowDialog(this);
+        }
+    }
+
     private void OnDrop(object? sender, DragEventArgs e) => SetFiles(e.DataTransfer.TryGetFiles() ?? []);
 
     private void SetFiles(IEnumerable<IStorageItem> items)

@@ -112,7 +112,15 @@ Son güncelleme: 2026-10-25
     PDF'te hata ("nothing to split"); hata/iptalde yazılanlar silinir
   - Doğrulama: uygulamadan Word PDF'i + PNG + PDF → birleştir → böl: Word sayfalarında gömülü yazı tipi, resim sayfasında
     resim var
-- Testler: 145/145 (Core 113; App 32). Dil kültürüne dokunan testler ortak, paralel çalışmayan koleksiyonda (`UiCultureCollection`)
+- **Ayarlar penceresi** (2026-10-27): ana penceredeki "Ayarlar…" → `SettingsWindow` / `SettingsViewModel`. Resim kalitesi
+  (10–100, kaydırıcı), video kalitesi (Yüksek CRF 18 / Normal 23 / Küçük dosya 28), PDF → resim dpi (96/150/200/300), aynı
+  anda dönüşüm sayısı (Otomatik = çekirdek/2 ya da 1…çekirdek). `AppSettings`'e (`settings.json`) yazılır; varsayılan değerler
+  null saklanır. Elle yazılmış aralık dışı değerler yüklenirken sınırlanır, listede olmayan değer seçenek olarak eklenir
+  - `AppSettings.ApplyTo`: `ProgressViewModel.Add` her işe uygular; preset'in kendi değeri varsayılandan farklıysa (ör.
+    `mp4-small` CRF 28) dokunmaz. Sağ tık süreçleri ayarları açılışta okur
+  - Doğrulama: ekran görüntüsü (UI Automation ile düğmeye basıldı); `PdfDpi: 300` ile uygulamadan PDF → PNG genişliği
+    1275 → 2550
+- Testler: 153/153 (Core 113; App 40). Dil kültürüne dokunan testler ortak, paralel çalışmayan koleksiyonda (`UiCultureCollection`)
 
 ## Açık konular
 1. **Win 11'de gerçek deneme yapılmadı** (kullanıcının Win 11 PC'si). Sınanamayanlar: `-AllowUnsigned` kurulumu (Win 10'da bu

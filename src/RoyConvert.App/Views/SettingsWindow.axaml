@@ -1,0 +1,53 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:vm="using:RoyConvert.App.ViewModels"
+        xmlns:res="using:RoyConvert.App.Resources"
+        x:Class="RoyConvert.App.Views.SettingsWindow"
+        x:DataType="vm:SettingsViewModel"
+        Title="{x:Static res:Strings.Settings_Title}"
+        Icon="/Assets/royconvert.ico"
+        Width="460" SizeToContent="Height" CanResize="False"
+        WindowStartupLocation="CenterOwner"
+        ShowInTaskbar="False">
+
+    <Window.DataTemplates>
+        <DataTemplate x:DataType="vm:SettingOption">
+            <TextBlock Text="{Binding Name}" />
+        </DataTemplate>
+    </Window.DataTemplates>
+
+    <StackPanel Margin="20" Spacing="14">
+        <StackPanel Spacing="4">
+            <Grid ColumnDefinitions="*,Auto">
+                <TextBlock Text="{x:Static res:Strings.Settings_ImageQuality}" />
+                <TextBlock Grid.Column="1" Text="{Binding ImageQuality, StringFormat={}{0:0}}" FontWeight="SemiBold" />
+            </Grid>
+            <Slider Minimum="10" Maximum="100" TickFrequency="5" IsSnapToTickEnabled="True" Value="{Binding ImageQuality}" />
+        </StackPanel>
+
+        <StackPanel Spacing="4">
+            <TextBlock Text="{x:Static res:Strings.Settings_VideoQuality}" />
+            <ComboBox ItemsSource="{Binding VideoQualities}" SelectedItem="{Binding SelectedVideoQuality}" HorizontalAlignment="Stretch" />
+        </StackPanel>
+
+        <StackPanel Spacing="4">
+            <TextBlock Text="{x:Static res:Strings.Settings_PdfDpi}" />
+            <ComboBox ItemsSource="{Binding PdfDpis}" SelectedItem="{Binding SelectedPdfDpi}" HorizontalAlignment="Stretch" />
+        </StackPanel>
+
+        <StackPanel Spacing="4">
+            <TextBlock Text="{x:Static res:Strings.Settings_Parallelism}" />
+            <ComboBox ItemsSource="{Binding Parallelisms}" SelectedItem="{Binding SelectedParallelism}" HorizontalAlignment="Stretch" />
+        </StackPanel>
+
+        <TextBlock Text="{x:Static res:Strings.Settings_Note}" FontSize="12" Opacity="0.6" TextWrapping="Wrap" />
+        <TextBlock Text="{Binding Status}" TextWrapping="Wrap" Foreground="{DynamicResource SystemControlErrorTextForegroundBrush}"
+                   IsVisible="{Binding Status, Converter={x:Static StringConverters.IsNotNullOrEmpty}}" />
+
+        <Grid ColumnDefinitions="Auto,*,Auto,Auto">
+            <Button Content="{x:Static res:Strings.Settings_Reset}" Command="{Binding ResetCommand}" />
+            <Button Grid.Column="2" Content="{x:Static res:Strings.Settings_Cancel}" Command="{Binding CancelCommand}" Margin="0,0,8,0" />
+            <Button Grid.Column="3" Content="{x:Static res:Strings.Settings_Save}" Command="{Binding SaveCommand}" Classes="accent" IsDefault="True" />
+        </Grid>
+    </StackPanel>
+</Window>

@@ -58,7 +58,7 @@ public partial class App : Application
     private MainWindow CreateMainWindow(IReadOnlyList<string> files)
     {
         var home = new HomeViewModel(_presets, _ffmpegPath, _libreOfficePath, _microsoftOffice.Apps, Settings.Language,
-            ShowProgress, ChangeLanguage);
+            ShowProgress, ChangeLanguage, () => new SettingsViewModel(Settings, () => Settings.Save()));
         if (files.Count > 0)
         {
             home.SetFiles(files);
@@ -113,8 +113,8 @@ public partial class App : Application
     }
 
     private ProgressViewModel CreateProgress() =>
-        new(ConversionRunner.CreateDefault(_ffmpegPath, libreOfficePath: _libreOfficePath,
-            microsoftOffice: _microsoftOffice.Converter), _presets);
+        new(ConversionRunner.CreateDefault(_ffmpegPath, Settings.MaxParallelism, _libreOfficePath, _microsoftOffice.Converter),
+            _presets, Settings);
 
     /// <summary>Word, Excel and PowerPoint export Office documents best; only on Windows.</summary>
     private static (IDocumentConverter? Converter, string? Apps) FindMicrosoftOffice()

@@ -59,4 +59,19 @@
   <data name="Cli_UnknownOption" xml:space="preserve"><value>Bilinmeyen veya eksik seçenek: {0}</value></data>
   <data name="Cli_MissingPreset" xml:space="preserve"><value>--preset &lt;kimlik&gt; eksik.</value></data>
   <data name="Cli_NoFiles" xml:space="preserve"><value>Dönüştürülecek dosya yok.</value></data>
+  <data name="Home_Settings" xml:space="preserve"><value>Ayarlar…</value></data>
+  <data name="Settings_Title" xml:space="preserve"><value>Ayarlar</value></data>
+  <data name="Settings_ImageQuality" xml:space="preserve"><value>Resim kalitesi (JPG, WebP, AVIF)</value></data>
+  <data name="Settings_VideoQuality" xml:space="preserve"><value>Video kalitesi</value></data>
+  <data name="Settings_VideoHigh" xml:space="preserve"><value>Yüksek (büyük dosya)</value></data>
+  <data name="Settings_VideoNormal" xml:space="preserve"><value>Normal</value></data>
+  <data name="Settings_VideoSmall" xml:space="preserve"><value>Küçük dosya</value></data>
+  <data name="Settings_PdfDpi" xml:space="preserve"><value>PDF → resim çözünürlüğü (dpi)</value></data>
+  <data name="Settings_Parallelism" xml:space="preserve"><value>Aynı anda dönüşüm sayısı</value></data>
+  <data name="Settings_Automatic" xml:space="preserve"><value>Otomatik ({0})</value></data>
+  <data name="Settings_Note" xml:space="preserve"><value>Yeni dönüşümlerde geçerli. MP4 (küçük) gibi kendi kalitesi olan seçenekler değişmez.</value></data>
+  <data name="Settings_Save" xml:space="preserve"><value>Kaydet</value></data>
+  <data name="Settings_Cancel" xml:space="preserve"><value>İptal</value></data>
+  <data name="Settings_Reset" xml:space="preserve"><value>Varsayılanlar</value></data>
+  <data name="Settings_SaveFailed" xml:space="preserve"><value>Ayarlar kaydedilemedi: {0}</value></data>
 </root>

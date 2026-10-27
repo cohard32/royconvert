@@ -33,12 +33,15 @@ public partial class HomeViewModel : ViewModelBase
     private LanguageOption _selectedLanguage;
 
     /// <param name="microsoftOfficeApps">The installed Office apps used for documents, e.g. "Word, Excel"; null when none.</param>
+    /// <param name="createSettings">Makes the view model of the settings window; null hides the settings button.</param>
     public HomeViewModel(IReadOnlyList<Preset> presets, string? ffmpegPath, string? libreOfficePath, string? microsoftOfficeApps,
-        string? language, Action<Preset, IReadOnlyList<string>> startConversion, Action<string?> changeLanguage)
+        string? language, Action<Preset, IReadOnlyList<string>> startConversion, Action<string?> changeLanguage,
+        Func<SettingsViewModel>? createSettings = null)
     {
         _presets = presets;
         _startConversion = startConversion;
         _changeLanguage = changeLanguage;
+        CreateSettings = createSettings;
         FfmpegStatus = ffmpegPath is null ? Strings.Ffmpeg_NotFound : $"ffmpeg: {ffmpegPath}";
         string[] office =
         [
@@ -63,6 +66,8 @@ public partial class HomeViewModel : ViewModelBase
     public string LibreOfficeStatus { get; }
 
     public bool CanManageShellMenu => OperatingSystem.IsWindows();
+
+    public Func<SettingsViewModel>? CreateSettings { get; }
 
     public void SetFiles(IReadOnlyList<string> files)
     {

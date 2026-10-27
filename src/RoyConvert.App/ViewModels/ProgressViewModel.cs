@@ -11,6 +11,7 @@ public partial class ProgressViewModel : ViewModelBase, IDisposable
 {
     private readonly ConversionRunner _runner;
     private readonly IReadOnlyList<Preset> _presets;
+    private readonly AppSettings _settings;
 
     [ObservableProperty]
     private string _summary = string.Empty;
@@ -18,10 +19,12 @@ public partial class ProgressViewModel : ViewModelBase, IDisposable
     [ObservableProperty]
     private bool _allFinished;
 
-    public ProgressViewModel(ConversionRunner runner, IReadOnlyList<Preset> presets)
+    /// <param name="settings">The user's quality choices, applied to every job.</param>
+    public ProgressViewModel(ConversionRunner runner, IReadOnlyList<Preset> presets, AppSettings? settings = null)
     {
         _runner = runner;
         _presets = presets;
+        _settings = settings ?? new AppSettings();
         _runner.Idle += () => Dispatcher.UIThread.Post(OnIdle);
     }
 
@@ -58,7 +61,7 @@ public partial class ProgressViewModel : ViewModelBase, IDisposable
 
     public void Add(Preset preset, IEnumerable<string> files)
     {
-        preset = PresetNames.WithLocalizedFileName(preset);
+        preset = PresetNames.WithLocalizedFileName(preset) with { Settings = _settings.ApplyTo(preset.Settings) };
         IEnumerable<ConversionJob> jobs = preset.CombinesInputs
             ? [new ConversionJob(files.Order(NaturalComparer.Instance).ToList(), preset)]
             : files.Select(file => new ConversionJob(file, preset));
