@@ -200,7 +200,23 @@ public sealed class ImageConverter : IConverter
             image.Resize(new MagickGeometry((uint)max, (uint)max) { Greater = true });
         }
 
-        image.Quality = (uint)Math.Clamp(s.ImageQuality, 1, 100);
+        if (s.StripMetadata)
+        {
+            var colors = image.GetColorProfile();
+            image.Strip();
+            if (colors is not null)
+            {
+                image.SetProfile(colors);
+            }
+        }
+
+        // Removing metadata from a JPEG keeps its own quality, so the picture loses as little as possible.
+        var keepQuality = s.StripMetadata && format == OutputFormat.Jpg && image.Format == MagickFormat.Jpeg && image.Quality > 0;
+        if (!keepQuality)
+        {
+            image.Quality = (uint)Math.Clamp(s.ImageQuality, 1, 100);
+        }
+
         if (format == OutputFormat.Jpg)
         {
             // JPEG has no alpha channel; flatten onto white instead of black.

@@ -52,6 +52,8 @@
   <data name="FileName_rotate-left" xml:space="preserve"><value> (rotated)</value></data>
   <data name="FileName_rotate-right" xml:space="preserve"><value> (rotated)</value></data>
   <data name="FileName_combine-pdf" xml:space="preserve"><value> (combined)</value></data>
+  <data name="Preset_strip-metadata" xml:space="preserve"><value>Remove metadata (EXIF, location)</value></data>
+  <data name="FileName_strip-metadata" xml:space="preserve"><value> (no metadata)</value></data>
   <data name="Preset_split-pdf" xml:space="preserve"><value>PDF (split pages)</value></data>
   <data name="FileName_split-pdf" xml:space="preserve"><value>-page</value></data>
   <data name="Job_MoreFiles" xml:space="preserve"><value>{0} and {1} more</value></data>

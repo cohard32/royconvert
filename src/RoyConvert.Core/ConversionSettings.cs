@@ -59,6 +59,12 @@ public sealed record ConversionSettings
     /// <summary>Lossy image quality, 1-100.</summary>
     public int ImageQuality { get; init; } = 90;
 
+    /// <summary>
+    /// Removes EXIF (camera, GPS location, date), XMP, IPTC and comments from images; the colour profile is kept.
+    /// The orientation is applied to the pixels first, so the picture still looks the same way up.
+    /// </summary>
+    public bool StripMetadata { get; init; }
+
     /// <summary>Images larger than this (on either side) are shrunk to fit. Null disables the limit.</summary>
     public int? ImageMaxSize { get; init; }
 

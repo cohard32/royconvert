@@ -78,6 +78,42 @@ public static class PdfPages
         }
     }
 
+    /// <summary>
+    /// Turns every page by <paramref name="rotation"/> (clockwise) on top of its own rotation, with PDFsharp: only the
+    /// pages' /Rotate entries change, the content stays as it is.
+    /// </summary>
+    public static void Rotate(string input, string output, Rotation rotation, IProgress<double?> progress, CancellationToken cancellationToken)
+    {
+        // PDFium names a damaged or protected file clearly; PDFsharp throws whatever its parser hits.
+        PageCount(File.ReadAllBytes(input), input);
+        progress.Report(null);
+        try
+        {
+            using var document = PdfSharp.Pdf.IO.PdfReader.Open(input, PdfSharp.Pdf.IO.PdfDocumentOpenMode.Modify);
+            foreach (var page in document.Pages)
+            {
+                cancellationToken.ThrowIfCancellationRequested();
+                page.Rotate = ((page.Rotate + (int)rotation) % 360 + 360) % 360;
+            }
+
+            cancellationToken.ThrowIfCancellationRequested();
+            document.Save(output);
+        }
+        catch (Exception e) when (e is not (OperationCanceledException or IOException or UnauthorizedAccessException))
+        {
+            DeleteQuietly(output);
+            throw new ConversionException(
+                $"{Path.GetFileName(input)} could not be rotated. It may be damaged or password protected. ({e.Message})", e);
+        }
+        catch
+        {
+            DeleteQuietly(output);
+            throw;
+        }
+
+        progress.Report(1);
+    }
+
     /// <summary>Also checks that PDFium can open the file, naming it in the error otherwise.</summary>
     private static int PageCount(byte[] bytes, string path)
     {

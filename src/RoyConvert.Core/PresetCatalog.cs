@@ -69,6 +69,11 @@ public static class PresetCatalog
         AddGroup(presets, "1080p", "1080p", video with { Scale = Scale.ToHeight(1080) }, null, " (1080p)");
         AddGroup(presets, "rotate-left", "Rotate left", video with { Rotation = Rotation.Left }, image with { Rotation = Rotation.Left }, " (rotated)");
         AddGroup(presets, "rotate-right", "Rotate right", video with { Rotation = Rotation.Right }, image with { Rotation = Rotation.Right }, " (rotated)");
+        foreach (var format in ImageOutputs.Where(f => f != OutputFormat.Ico))
+        {
+            presets.Add(Make(format, image with { StripMetadata = true }, Formats.ImageInputs, "strip-metadata", "Remove metadata",
+                "{dir}/{name} (no metadata)"));
+        }
 
         return presets;
     }
@@ -91,6 +96,12 @@ public static class PresetCatalog
         foreach (var format in ImageOutputs.Where(f => f != OutputFormat.Ico))
         {
             presets.Add(Make(format, image, Formats.ImageInputs, id, name, template));
+        }
+
+        if (image.Rotation != Rotation.None)
+        {
+            // Rotating a PDF turns its pages; nothing is rendered.
+            presets.Add(Make(OutputFormat.Pdf, image, Union([], ["pdf"]), id, name, template));
         }
     }
 

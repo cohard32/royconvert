@@ -96,6 +96,65 @@ public sealed class PdfPagesTests : IDisposable
         Assert.True(PresetCatalog.Find(PresetCatalog.Default, "combine-pdf")!.Accepts("x.pdf"));
     }
 
+    [Fact]
+    public async Task Rotate_TurnsEveryPage_KeepsTheText_AndLeavesTheSourceUnchanged()
+    {
+        var input = Path.Combine(_dir, "tarama.pdf");
+        CreateTextPdf(input, "Page one", "Page two");
+        var source = File.ReadAllBytes(input);
+        var right = new ConversionJob(input, PresetCatalog.Find(PresetCatalog.Default, "rotate-right/pdf")!);
+
+        using (var runner = ConversionRunner.CreateDefault(null, 1))
+        {
+            await runner.RunAsync([right]);
+        }
+
+        Assert.True(right.State == JobState.Done, right.Error);
+        Assert.Equal(Path.Combine(_dir, "tarama (rotated).pdf"), right.Output);
+        Assert.Equal([90, 90], Rotations(right.Output!));
+        Assert.Equal(["Page one", "Page two"], Texts(right.Output!));
+        Assert.Equal(source, File.ReadAllBytes(input));
+
+        // Rotating again adds to the page's own rotation: right then left is upright again.
+        var left = new ConversionJob(right.Output!, PresetCatalog.Find(PresetCatalog.Default, "rotate-left/pdf")!);
+        using (var runner = ConversionRunner.CreateDefault(null, 1))
+        {
+            await runner.RunAsync([left]);
+        }
+
+        Assert.True(left.State == JobState.Done, left.Error);
+        Assert.Equal([0, 0], Rotations(left.Output!));
+    }
+
+    [Fact]
+    public async Task Rotate_WithADamagedPdf_FailsWithoutOutput()
+    {
+        var input = Path.Combine(_dir, "bozuk.pdf");
+        File.WriteAllText(input, "%PDF-1.4 not really");
+        var job = new ConversionJob(input, PresetCatalog.Find(PresetCatalog.Default, "rotate-left/pdf")!);
+
+        using var runner = ConversionRunner.CreateDefault(null, 1);
+        await runner.RunAsync([job]);
+
+        Assert.Equal(JobState.Failed, job.State);
+        Assert.Contains("bozuk.pdf", job.Error);
+        Assert.Equal(["bozuk.pdf"], Directory.GetFiles(_dir).Select(Path.GetFileName));
+    }
+
+    [Fact]
+    public void RotatePdfPresets_AreOnlyOfferedForPdfs()
+    {
+        Assert.True(PresetCatalog.Find(PresetCatalog.Default, "rotate-left/pdf")!.Accepts("x.pdf"));
+        Assert.False(PresetCatalog.Find(PresetCatalog.Default, "rotate-right/pdf")!.Accepts("x.png"));
+        Assert.Null(PresetCatalog.Find(PresetCatalog.Default, "scale50/pdf"));
+    }
+
+    private static int[] Rotations(string path)
+    {
+        using var document = PdfSharp.Pdf.IO.PdfReader.Open(path, PdfSharp.Pdf.IO.PdfDocumentOpenMode.Import);
+        return document.Pages.Cast<PdfSharp.Pdf.PdfPage>().Select(p => p.Rotate).ToArray();
+    }
+
     private static string[] Texts(string path)
     {
         using var document = DocLib.Instance.GetDocReader(path, new PageDimensions(1.0));
