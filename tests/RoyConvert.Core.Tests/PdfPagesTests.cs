@@ -1,6 +1,4 @@
 using System.Text;
-using Docnet.Core;
-using Docnet.Core.Models;
 using ImageMagick;
 
 namespace RoyConvert.Core.Tests;
@@ -65,9 +63,8 @@ public sealed class PdfPagesTests : IDisposable
         Assert.True(job.State == JobState.Done, job.Error);
         Assert.Equal(Path.Combine(_dir, "a (combined).pdf"), job.Output);
         Assert.Equal(["A1", "A2", "", "B1"], Texts(job.Output!));
-        using var document = DocLib.Instance.GetDocReader(job.Output!, new PageDimensions(1.0));
-        using var imagePage = document.GetPageReader(2);
-        Assert.InRange(imagePage.GetPageWidth(), 199, 201);
+        using var document = PdfiumDocument.Open(job.Output!);
+        Assert.InRange(document.PageSize(2).Width, 199, 201);
     }
 
     [Fact]
@@ -85,6 +82,43 @@ public sealed class PdfPagesTests : IDisposable
         Assert.Equal(JobState.Failed, job.State);
         Assert.Contains("bad.pdf", job.Error);
         Assert.Equal(["bad.pdf", "good.pdf"], Directory.GetFiles(_dir).Select(Path.GetFileName).Order());
+    }
+
+    [Fact]
+    public async Task ManyPdfsAtOnce_WhileTheGarbageCollectorRuns_DoNotCrash()
+    {
+        // The app crashed like this with Docnet (access violation when a document was closed); a guard for the lock.
+        var input = Path.Combine(_dir, "paralel.pdf");
+        CreateTextPdf(input, "Bir", "Iki");
+        using var stop = new CancellationTokenSource();
+        var collector = Task.Run(() =>
+        {
+            while (!stop.IsCancellationRequested)
+            {
+                GC.Collect();
+                GC.WaitForPendingFinalizers();
+            }
+        });
+
+        await Parallel.ForAsync(0, 64, new ParallelOptions { MaxDegreeOfParallelism = 8 }, async (i, _) =>
+        {
+            await Task.Yield();
+            using var document = PdfiumDocument.Open(input);
+            Assert.Equal(2, document.PageCount);
+            Assert.Equal(100 * 120 * 4, document.Render(i % 2, 100, 120).Length);
+            Assert.Equal(i % 2 == 0 ? "Bir" : "Iki", document.Text(i % 2).Trim());
+            using var copy = PdfiumDocument.Open(PdfiumDocument.Combine([(document, 1, 1)]));
+            Assert.Equal("Iki", copy.Text(0).Trim());
+        });
+
+        stop.Cancel();
+        await collector;
+    }
+
+    [Fact]
+    public void DamagedPdf_CannotBeOpened()
+    {
+        Assert.Throws<PdfiumException>(() => PdfiumDocument.Open("%PDF-1.4 not really"u8.ToArray()));
     }
 
     [Fact]
@@ -157,12 +191,8 @@ public sealed class PdfPagesTests : IDisposable
 
     private static string[] Texts(string path)
     {
-        using var document = DocLib.Instance.GetDocReader(path, new PageDimensions(1.0));
-        return Enumerable.Range(0, document.GetPageCount()).Select(i =>
-        {
-            using var page = document.GetPageReader(i);
-            return page.GetText().Trim();
-        }).ToArray();
+        using var document = PdfiumDocument.Open(path);
+        return Enumerable.Range(0, document.PageCount).Select(i => document.Text(i).Trim()).ToArray();
     }
 
     /// <summary>A minimal PDF with one line of real (selectable) text per page.</summary>

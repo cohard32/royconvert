@@ -1,6 +1,3 @@
-using Docnet.Core;
-using Docnet.Core.Exceptions;
-using Docnet.Core.Models;
 using ImageMagick;
 
 namespace RoyConvert.Core.Imaging;
@@ -104,26 +101,26 @@ public sealed class ImageConverter : IConverter
         var written = new List<string>();
         try
         {
-            using var document = DocLib.Instance.GetDocReader(input, new PageDimensions(s.PdfDpi / PdfPointsPerInch));
-            var pageCount = document.GetPageCount();
+            using var document = PdfPages.Open(input);
+            var pageCount = document.PageCount;
             if (pageCount == 0)
             {
                 throw new ConversionException("The PDF has no pages.");
             }
 
+            var scale = s.PdfDpi / PdfPointsPerInch;
             var paths = PagePaths(output, pageCount);
             for (var i = 0; i < pageCount; i++)
             {
                 cancellationToken.ThrowIfCancellationRequested();
-                using var page = document.GetPageReader(i);
-                var pixels = page.GetImage(RenderFlags.RenderAnnotations);
-                var read = new PixelReadSettings((uint)page.GetPageWidth(), (uint)page.GetPageHeight(), StorageType.Char, PixelMapping.BGRA);
+                var (pageWidth, pageHeight) = document.PageSize(i);
+                var width = Math.Max((int)(pageWidth * scale), 1);
+                var height = Math.Max((int)(pageHeight * scale), 1);
+                // Rendered on white: pages are meant to be seen on paper.
+                var pixels = document.Render(i, width, height);
                 using var image = new MagickImage();
-                image.ReadPixels(pixels, read);
-
-                // PDFium leaves unpainted areas transparent; pages are meant to be seen on white paper.
-                image.BackgroundColor = MagickColors.White;
-                image.Alpha(AlphaAction.Remove);
+                image.ReadPixels(pixels, new PixelReadSettings((uint)width, (uint)height, StorageType.Char, PixelMapping.BGRA));
+                image.Alpha(AlphaAction.Off);
                 image.Density = new Density(s.PdfDpi);
                 Process(image, format, s);
 
@@ -137,7 +134,7 @@ public sealed class ImageConverter : IConverter
             written.ForEach(DeleteQuietly);
             throw e switch
             {
-                DocnetException or MagickException => new ConversionException(e.Message, e),
+                PdfiumException or MagickException => new ConversionException(e.Message, e),
                 _ => e,
             };
         }

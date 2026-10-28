@@ -42,9 +42,9 @@ public sealed class MicrosoftOfficeTests : IDisposable
 
         Assert.True(job.State == JobState.Done, job.Error);
         Assert.Equal(Path.ChangeExtension(input, ".pdf"), job.Output);
-        using (var pdf = Docnet.Core.DocLib.Instance.GetDocReader(job.Output!, new Docnet.Core.Models.PageDimensions(1.0)))
+        using (var pdf = PdfiumDocument.Open(job.Output!))
         {
-            Assert.True(pdf.GetPageCount() >= 1);
+            Assert.True(pdf.PageCount >= 1);
         }
 
         Assert.Equal(hash, SHA256.HashData(File.ReadAllBytes(input)));

@@ -268,11 +268,11 @@ public sealed class ConversionIntegrationTests : IDisposable
         await runner.RunAsync([job]);
 
         Assert.True(job.State == JobState.Done, job.Error);
-        using var document = Docnet.Core.DocLib.Instance.GetDocReader(job.Output!, new Docnet.Core.Models.PageDimensions(1.0));
-        Assert.Equal(1, document.GetPageCount());
-        using var page = document.GetPageReader(0);
-        Assert.InRange(page.GetPageWidth(), pageWidth - 1, pageWidth + 1);
-        Assert.InRange(page.GetPageHeight(), pageHeight - 1, pageHeight + 1);
+        using var document = PdfiumDocument.Open(job.Output!);
+        Assert.Equal(1, document.PageCount);
+        var page = document.PageSize(0);
+        Assert.InRange(page.Width, pageWidth - 1, pageWidth + 1);
+        Assert.InRange(page.Height, pageHeight - 1, pageHeight + 1);
     }
 
     [Fact]
@@ -289,14 +289,14 @@ public sealed class ConversionIntegrationTests : IDisposable
 
         Assert.True(job.State == JobState.Done, job.Error);
         Assert.Equal(Path.Combine(_dir, "wide (combined).pdf"), job.Output);
-        using var document = Docnet.Core.DocLib.Instance.GetDocReader(job.Output!, new Docnet.Core.Models.PageDimensions(1.0));
-        Assert.Equal(3, document.GetPageCount());
+        using var document = PdfiumDocument.Open(job.Output!);
+        Assert.Equal(3, document.PageCount);
         (int Width, int Height)[] expected = [(200, 100), (100, 200), (150, 150)];
         for (var i = 0; i < expected.Length; i++)
         {
-            using var page = document.GetPageReader(i);
-            Assert.InRange(page.GetPageWidth(), expected[i].Width - 1, expected[i].Width + 1);
-            Assert.InRange(page.GetPageHeight(), expected[i].Height - 1, expected[i].Height + 1);
+            var (width, height) = document.PageSize(i);
+            Assert.InRange(width, expected[i].Width - 1, expected[i].Width + 1);
+            Assert.InRange(height, expected[i].Height - 1, expected[i].Height + 1);
         }
     }
 

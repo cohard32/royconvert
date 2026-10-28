@@ -1,6 +1,3 @@
-using Docnet.Core;
-using Docnet.Core.Exceptions;
-using Docnet.Core.Models;
 using RoyConvert.Core.Imaging;
 
 namespace RoyConvert.Core;
@@ -14,34 +11,28 @@ public static class PdfPages
     /// <summary>Writes the pages of all inputs, in order, to one PDF.</summary>
     public static void Merge(IReadOnlyList<string> inputs, string output, IProgress<double?> progress, CancellationToken cancellationToken)
     {
-        var documents = new List<byte[]>(inputs.Count);
-        var firstPageCount = 0;
-        foreach (var input in inputs)
-        {
-            cancellationToken.ThrowIfCancellationRequested();
-            var bytes = File.ReadAllBytes(input);
-            var pageCount = PageCount(bytes, input);
-            if (documents.Count == 0)
-            {
-                firstPageCount = pageCount;
-            }
-
-            documents.Add(bytes);
-        }
-
-        cancellationToken.ThrowIfCancellationRequested();
-        progress.Report(null);
+        var documents = new List<PdfiumDocument>(inputs.Count);
         try
         {
-            // The pages are imported into the first document, which PDFium refuses for some valid files;
-            // a copy written by PDFium itself always accepts them.
-            documents[0] = DocLib.Instance.Split(documents[0], 0, firstPageCount - 1);
-            File.WriteAllBytes(output, DocLib.Instance.Merge(documents));
+            foreach (var input in inputs)
+            {
+                cancellationToken.ThrowIfCancellationRequested();
+                documents.Add(Open(input));
+            }
+
+            cancellationToken.ThrowIfCancellationRequested();
+            progress.Report(null);
+            // The pages go into a new document, so no input has to accept them.
+            File.WriteAllBytes(output, PdfiumDocument.Combine(documents.Select(d => (d, 0, d.PageCount - 1))));
         }
-        catch (DocnetException e)
+        catch (PdfiumException e)
         {
             DeleteQuietly(output);
             throw new ConversionException("The PDFs could not be merged: " + e.Message, e);
+        }
+        finally
+        {
+            documents.ForEach(d => d.Dispose());
         }
     }
 
@@ -51,8 +42,8 @@ public static class PdfPages
     /// </summary>
     public static void Split(string input, string output, IProgress<double?> progress, CancellationToken cancellationToken)
     {
-        var bytes = File.ReadAllBytes(input);
-        var pageCount = PageCount(bytes, input);
+        using var document = Open(input);
+        var pageCount = document.PageCount;
         if (pageCount < 2)
         {
             throw new ConversionException("The PDF has only one page, so there is nothing to split.");
@@ -65,7 +56,7 @@ public static class PdfPages
             for (var i = 0; i < pageCount; i++)
             {
                 cancellationToken.ThrowIfCancellationRequested();
-                var page = DocLib.Instance.Split(bytes, i, i);
+                var page = PdfiumDocument.Combine([(document, i, i)]);
                 written.Add(paths[i]);
                 File.WriteAllBytes(paths[i], page);
                 progress.Report((i + 1.0) / pageCount);
@@ -74,7 +65,7 @@ public static class PdfPages
         catch (Exception e)
         {
             written.ForEach(DeleteQuietly);
-            throw e is DocnetException ? new ConversionException("The PDF could not be split: " + e.Message, e) : e;
+            throw e is PdfiumException ? new ConversionException("The PDF could not be split: " + e.Message, e) : e;
         }
     }
 
@@ -85,7 +76,7 @@ public static class PdfPages
     public static void Rotate(string input, string output, Rotation rotation, IProgress<double?> progress, CancellationToken cancellationToken)
     {
         // PDFium names a damaged or protected file clearly; PDFsharp throws whatever its parser hits.
-        PageCount(File.ReadAllBytes(input), input);
+        Open(input).Dispose();
         progress.Report(null);
         try
         {
@@ -114,15 +105,14 @@ public static class PdfPages
         progress.Report(1);
     }
 
-    /// <summary>Also checks that PDFium can open the file, naming it in the error otherwise.</summary>
-    private static int PageCount(byte[] bytes, string path)
+    /// <summary>Opens the PDF with PDFium, naming the file in the error if it cannot.</summary>
+    internal static PdfiumDocument Open(string path)
     {
         try
         {
-            using var document = DocLib.Instance.GetDocReader(bytes, new PageDimensions(1.0));
-            return document.GetPageCount();
+            return PdfiumDocument.Open(path);
         }
-        catch (DocnetException e)
+        catch (PdfiumException e)
         {
             throw new ConversionException(
                 $"{Path.GetFileName(path)} could not be read. It may be damaged or password protected.", e);
