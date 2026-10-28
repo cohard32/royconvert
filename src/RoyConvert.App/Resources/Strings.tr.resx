@@ -52,6 +52,8 @@
   <data name="FileName_rotate-left" xml:space="preserve"><value> (döndürülmüş)</value></data>
   <data name="FileName_rotate-right" xml:space="preserve"><value> (döndürülmüş)</value></data>
   <data name="FileName_combine-pdf" xml:space="preserve"><value> (birleştirilmiş)</value></data>
+  <data name="Preset_compress-pdf" xml:space="preserve"><value>PDF (küçült)</value></data>
+  <data name="FileName_compress-pdf" xml:space="preserve"><value> (küçültülmüş)</value></data>
   <data name="Preset_strip-metadata" xml:space="preserve"><value>Bilgileri sil (EXIF, konum)</value></data>
   <data name="FileName_strip-metadata" xml:space="preserve"><value> (bilgisiz)</value></data>
   <data name="Preset_split-pdf" xml:space="preserve"><value>PDF (sayfalara böl)</value></data>
