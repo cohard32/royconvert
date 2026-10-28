@@ -195,10 +195,26 @@ Son güncelleme: 2026-10-27
   menü dosyasını ve kayıtları sildi; menü yeniden Debug'a bağlandı. Program Files (yönetici) kurulumu denenmedi
 - Bu oturumda yapılanlar sırasıyla: Microsoft Office ile PDF, PDF birleştirme/bölme, ayarlar penceresi, DVD (sahte diskle)
 - Win 11 / Mac denemeleri: kullanıcı kendisi söyleyince yapılacak, hatırlatılmayacak. DVD denemesi disk bulununca
+
+## Kaldığımız yer (2026-10-28)
+- `main`'de ek olarak: PR #4 (pencere kapanırken dosya kaybı), PR #5 (DVD sağ tık menüsü, b959553)
+- **PDF → Word** `pdf-word` dalında bekliyor (PR yok): bu PC'nin Word'ü elle de PDF açamıyor, Office güncellemesi 17002
+  ile kurulamıyor; ayrıntı o daldaki bu dosyada
+- Ön sürüm **`v0.1.0-test4`** (main b959553), https://github.com/cohard32/royconvert/releases/tag/v0.1.0-test4,
+  SHA-256 `1619f472d6d16080066e7a903c8b8ace517c62887a28a8c81565e3eaf23ddbcf` (312 MB, yükleme ~25 dk)
+  - `/CURRENTUSER /VERYSILENT`: kurulum, sahte DVD klasörü menüsü → MP4, kaldırma (klasör/menü dosyası/Directory-Drive
+    kayıtları silindi) tamam
+  - **Program Files (yönetici, `/ALLUSERS`, UAC) ilk kez denendi:** kullanıcının 27 Ekim'deki test3 kurulumunun üzerine
+    yükseltme → dosyalar ve sağ tık DLL'i yerinde güncellendi, yeniden başlatma gerekmedi; menü kurulumu başlatan
+    kullanıcının HKCU'suna Program Files DLL'iyle kaydoldu. Menüden DVD → MP4, PNG → JPG ve **gömülü LibreOffice ile
+    ODT → PDF** (Producer "LibreOffice 26.8.1.1", Türkçe metin doğru) çalıştı. Yönetici kaldırma: klasör, menü dosyası,
+    tüm HKCU menü kayıtları ve Başlat kısayolu silindi. Ardından yeniden kuruldu
+  - **Bu PC'de menü şu an Program Files'taki test4'e bağlı** (Debug'a değil). Geliştirmede Debug'a bağlamak için
+    `src\RoyConvert.App\bin\Debug\net8.0\royconvert.exe --register-shell`
 - Sıradaki öneri: aşağıdaki listeden kullanıcıya seçenek sun
 
 ## Win 11 denemesi (kullanıcı söyleyince)
-- En güncel test kurulumu: https://github.com/cohard32/royconvert/releases/tag/v0.1.0-test3
+- En güncel test kurulumu: https://github.com/cohard32/royconvert/releases/tag/v0.1.0-test4
 - Win 11 denemesinde talimatlar **tek tek** verilecek (kullanıcı tercihi). Önerilen sıra:
   1. Ön sürüm sayfasından setup'ı indir (SmartScreen: "Ek bilgi" → "Yine de çalıştır")
   2. Varsayılan (Program Files, yönetici) kurulum, "Sağ tık menüsünü kur" işaretli
