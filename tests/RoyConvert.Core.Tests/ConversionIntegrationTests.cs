@@ -125,6 +125,48 @@ public sealed class ConversionIntegrationTests : IDisposable
     }
 
     [Fact]
+    public async Task RemoveMetadata_DropsExifAndLocation_KeepsOrientationColorsAndQuality()
+    {
+        // A phone photo: stored sideways with an orientation tag, GPS position, a comment and an sRGB profile.
+        var input = Path.Combine(_dir, "telefon.jpg");
+        using (var photo = new MagickImage(MagickColors.Orange, 400, 200))
+        {
+            var exif = new ExifProfile();
+            exif.SetValue(ExifTag.Orientation, (ushort)6); // display rotated 90° clockwise
+            exif.SetValue(ExifTag.Make, "Telefon");
+            exif.SetValue(ExifTag.GPSLatitude, [new Rational(41, 1), new Rational(0, 1), new Rational(0, 1)]);
+            exif.SetValue(ExifTag.GPSLatitudeRef, "N");
+            photo.SetProfile(exif);
+            photo.SetProfile(ColorProfiles.SRGB);
+            photo.Orientation = ImageMagick.Orientation.RightTop; // what Magick writes as the EXIF orientation
+            photo.Comment = "gizli";
+            photo.Quality = 80;
+            photo.Write(input);
+        }
+
+        using (var written = new MagickImage(input))
+        {
+            Assert.Equal(ImageMagick.Orientation.RightTop, written.Orientation);
+            Assert.NotNull(written.GetExifProfile()?.GetValue(ExifTag.GPSLatitude));
+        }
+
+        var job = new ConversionJob(input, PresetCatalog.Find(PresetCatalog.Default, "strip-metadata/jpg")!);
+        using var runner = ConversionRunner.CreateDefault(null, 1);
+        await runner.RunAsync([job]);
+
+        Assert.True(job.State == JobState.Done, job.Error);
+        Assert.Equal(Path.Combine(_dir, "telefon (no metadata).jpg"), job.Output);
+        using var result = new MagickImage(job.Output!);
+        Assert.Null(result.GetExifProfile());
+        Assert.Null(result.GetXmpProfile());
+        Assert.Null(result.GetIptcProfile());
+        Assert.True(string.IsNullOrEmpty(result.Comment));
+        Assert.NotNull(result.GetColorProfile());
+        Assert.Equal((200u, 400u), (result.Width, result.Height));
+        Assert.Equal(80u, result.Quality);
+    }
+
+    [Fact]
     public async Task MultiPagePdf_BecomesOneImagePerPage()
     {
         var input = Path.Combine(_dir, "document.pdf");

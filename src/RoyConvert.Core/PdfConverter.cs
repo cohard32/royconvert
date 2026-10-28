@@ -15,6 +15,12 @@ public sealed class PdfConverter(IConverter image, IReadOnlyList<IDocumentConver
             return;
         }
 
+        if (Formats.ExtensionOf(input) == "pdf" && preset.Settings.Rotation != Rotation.None)
+        {
+            await Task.Run(() => PdfPages.Rotate(input, output, preset.Settings.Rotation, progress, cancellationToken), cancellationToken);
+            return;
+        }
+
         if (IsImage(input))
         {
             await image.ConvertAsync(input, output, preset, progress, cancellationToken);

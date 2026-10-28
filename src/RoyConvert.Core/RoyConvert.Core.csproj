@@ -9,6 +9,8 @@
   <ItemGroup>
     <PackageReference Include="Docnet.Core" Version="2.6.0" />
     <PackageReference Include="Magick.NET-Q16-AnyCPU" Version="15.0.0" />
+    <!-- 6.2.4 is the last MIT release; 6.5.0 and later are AGPL-3.0. Do not upgrade without a licence decision. -->
+    <PackageReference Include="PDFsharp" Version="6.2.4" />
   </ItemGroup>
 
 </Project>

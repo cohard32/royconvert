@@ -140,7 +140,18 @@ Son güncelleme: 2026-10-27
   - Doğrulama: sahte disk (ffmpeg `-target pal-dvd`, taramalı, 16:9, iki ses dili, iki parçaya sektör sınırında bölünmüş +
     menü + kısa ikinci başlık): 6 sn tam süre, 2 ses, progressive, 25 fps, DAR 16:9; bozuk VOB → hata, çıktı yok.
     Uygulamadan `--preset dvd/mp4` ile 8 sn'lik sahte disk dönüştü
-- Testler: 166/166 (Core 120; App 46).
+- **Resimden bilgileri silme** (2026-10-28, `resim-pdf` dalı): "Bilgileri sil (EXIF, konum) › PNG/JPG/WEBP/AVIF"
+  (`strip-metadata/*`, `ConversionSettings.StripMetadata`). Önce `AutoOrient` (resim dik kalır), sonra `Strip()`; ICC renk
+  profili geri konur. JPEG → JPEG kaynağın kalitesiyle yazılır (kalite kaybı en az). Çıktı `<ad> (bilgisiz).jpg`
+- **PDF döndürme** (aynı dal): "Sola/Sağa döndür › PDF" (`rotate-left/pdf`, `rotate-right/pdf`). Yalnız sayfaların
+  `/Rotate` değeri değişir (metin ve içerik aynen kalır), mevcut dönüşün üstüne eklenir. Önce PDFium ile açılabilirlik
+  denetlenir (bozuk/şifreli → anlaşılır hata, çıktı yok)
+  - Kütüphane: **PDFsharp 6.2.4 (MIT)**. 6.5.0 ve sonrası **AGPL-3.0** → csproj'da sabitlendi, lisans kararı olmadan
+    yükseltilmez
+  - Canlı doğrulama (Debug menü kaydı, Explorer `IContextMenu`): GPS + yön 6 + yorum + sRGB'li 400×200 JPEG → menüden
+    Bilgileri sil › JPG → 200×400, EXIF/GPS/yorum yok, ICC var, kalite 80; LibreOffice'in yazdığı 2 sayfalık PDF → Sağa
+    döndür › PDF → sayfalar 90°, PNG'ye çevrilince 1753×1240 (yatay). Sonra menü Program Files test4'e geri bağlandı
+- Testler: 170/170 (Core 124; App 46).
 
 ## Gerçek DVD denemesi (DVD bulununca)
 1. Diski tak; Bu bilgisayar'da DVD sürücüsüne sağ tık → royconvert → DVD → MP4 (ya da royconvert'i aç → "DVD…" →
