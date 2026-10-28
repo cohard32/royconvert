@@ -10,6 +10,8 @@
 // The menu comes from %LOCALAPPDATA%\royconvert\shell-menu.txt (per user, in that user's language; the install folder
 // may not be writable), written by `royconvert --register-shell`:
 //   <preset id> TAB <label, "Group/Item" for a submenu> TAB <space separated input extensions>
+// DVD presets have "<dvd>" instead of extensions; they are offered when every selected item is a DVD folder or drive
+// (the classic menu is also registered for Directory and Drive).
 // Choosing an item starts royconvert.exe (also next to this DLL) once for the whole selection.
 
 #define NOMINMAX
@@ -43,6 +45,9 @@ namespace
 
     // Longer command lines go through a --temp-input-list file (CreateProcess allows 32767 characters).
     constexpr size_t MaxCommandLine = 30000;
+
+    // The "extension" of DVD presets in the menu file.
+    constexpr wchar_t DvdInput[] = L"<dvd>";
 
     struct Preset
     {
@@ -155,7 +160,50 @@ namespace
         return paths;
     }
 
-    /// Presets that accept every selected file, as a tree: "Scale 75%/PNG" goes under "Scale 75%".
+    bool IsDirectory(const std::wstring& path)
+    {
+        const DWORD attributes = GetFileAttributesW(path.c_str());
+        return attributes != INVALID_FILE_ATTRIBUTES && (attributes & FILE_ATTRIBUTE_DIRECTORY) != 0;
+    }
+
+    /// A DVD-Video folder, as royconvert's DvdDisc.Open finds it: a drive root or folder containing VIDEO_TS, or
+    /// VIDEO_TS itself, with at least one title VOB (VTS_nn_1..9.VOB; VTS_nn_0 is the menu).
+    bool IsDvd(std::wstring path)
+    {
+        // An empty floppy or card reader drive must not show "insert a disk".
+        const UINT previousMode = GetErrorMode();
+        SetThreadErrorMode(previousMode | SEM_FAILCRITICALERRORS, nullptr);
+
+        if (!path.empty() && path.back() == L'\\')
+        {
+            path.pop_back();
+        }
+
+        if (Lower(PathFindFileNameW(path.c_str())) != L"video_ts")
+        {
+            path += L"\\VIDEO_TS";
+        }
+
+        bool found = false;
+        WIN32_FIND_DATAW file;
+        HANDLE search = FindFirstFileExW((path + L"\\VTS_??_?.VOB").c_str(), FindExInfoBasic, &file, FindExSearchNameMatch, nullptr, 0);
+        if (search != INVALID_HANDLE_VALUE)
+        {
+            do
+            {
+                const std::wstring name = file.cFileName;
+                found = (file.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY) == 0 && name.size() == 12 && name[7] >= L'1' && name[7] <= L'9';
+            } while (!found && FindNextFileW(search, &file));
+
+            FindClose(search);
+        }
+
+        SetThreadErrorMode(previousMode, nullptr);
+        return found;
+    }
+
+    /// Presets that accept every selected item, as a tree: "Scale 75%/PNG" goes under "Scale 75%".
+    /// Files are matched by extension; folders and drives only by DVD presets, and only when each is a DVD.
     std::shared_ptr<MenuNode> BuildMenu(const std::vector<std::wstring>& paths)
     {
         auto root = std::make_shared<MenuNode>();
@@ -168,10 +216,21 @@ namespace
         std::set<std::wstring> extensions;
         for (const auto& path : paths)
         {
+            if (IsDirectory(path))
+            {
+                if (!IsDvd(path))
+                {
+                    return root;
+                }
+
+                extensions.insert(DvdInput);
+                continue;
+            }
+
             const wchar_t* extension = PathFindExtensionW(path.c_str());
             if (*extension != L'.')
             {
-                return root; // a folder or a file without extension
+                return root; // a file without extension
             }
 
             extensions.insert(Lower(extension + 1));
@@ -215,7 +274,12 @@ namespace
         return root;
     }
 
-    std::wstring Quote(const std::wstring& argument) { return L"\"" + argument + L"\""; }
+    std::wstring Quote(const std::wstring& argument)
+    {
+        // Backslashes before the closing quote must be doubled: "E:\" would be read as E:" (a drive root).
+        const size_t trailing = argument.size() - argument.find_last_not_of(L'\\') - 1;
+        return L"\"" + argument + std::wstring(trailing, L'\\') + L"\"";
+    }
 
     HRESULT StartConversion(const std::wstring& presetId, const std::vector<std::wstring>& paths)
     {

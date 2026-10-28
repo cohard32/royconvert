@@ -12,15 +12,26 @@ public class WindowsShellMenuTests
     [Fact]
     public void MenuFile_HasOneLinePerPreset_WithIdLabelAndExtensions()
     {
-        Assert.Equal(PresetCatalog.Default.Count(p => !p.ReadsDvd), Lines.Length);
+        Assert.Equal(PresetCatalog.Default.Count, Lines.Length);
         foreach (var line in Lines)
         {
             var fields = line.Split('\t');
             Assert.Equal(3, fields.Length);
             var preset = Assert.Single(PresetCatalog.Default, p => p.Id == fields[0]);
             Assert.Equal(preset.Name, fields[1]);
-            Assert.Equal(preset.InputExtensions.Order(StringComparer.OrdinalIgnoreCase), fields[2].Split(' '));
+            Assert.Equal(preset.ReadsDvd
+                ? [WindowsShellMenu.DvdInput]
+                : preset.InputExtensions.Order(StringComparer.OrdinalIgnoreCase), fields[2].Split(' '));
         }
+    }
+
+    [Fact]
+    public void MenuFile_MarksDvdPresets_SoTheHandlerOffersThemForDvdFolders()
+    {
+        var dvd = Lines.Where(line => line.EndsWith('\t' + WindowsShellMenu.DvdInput)).Select(line => line.Split('\t')[0]);
+
+        Assert.Equal(PresetCatalog.Default.Where(p => p.ReadsDvd).Select(p => p.Id), dvd);
+        Assert.NotEmpty(dvd);
     }
 
     [Fact]
