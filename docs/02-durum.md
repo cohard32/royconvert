@@ -124,17 +124,27 @@ Son güncelleme: 2026-10-27
   VIDEO_TS'i içeren klasör ya da VIDEO_TS'in kendisini açar. Ana başlık = `VTS_nn_1..9.VOB` toplamı en büyük başlık seti
   (`VTS_nn_0` menü, `VIDEO_TS.VOB` atlanır). ffmpeg `concat:` ile parçaları tek akış okur; `-analyzeduration/-probesize 100M`,
   `-fflags +genpts`, `-map 0:v:0 -map 0:a?` (tüm ses dilleri, altyazı yok), `bwdif=mode=send_frame:deint=interlaced`
-  - Presetler `dvd/mp4`, `dvd/mkv` (`Preset.ReadsDvd`; `Accepts` klasörde DVD arar). Sağ tık menü dosyasına girmez (yalnız
-    dosyalar); ana penceredeki "DVD…" (klasör seçici) ya da klasör/sürücü sürükle-bırak, komut satırı `--preset dvd/mp4 <klasör>`
+  - Presetler `dvd/mp4`, `dvd/mkv` (`Preset.ReadsDvd`; `Accepts` klasörde DVD arar). Ana penceredeki "DVD…" (klasör
+    seçici), klasör/sürücü sürükle-bırak, komut satırı `--preset dvd/mp4 <klasör>` ve sağ tık menüsü
+  - **Sağ tık (2026-10-28, `dvd-menu` dalı):** menü dosyasında DVD presetlerinin uzantısı yerine `<dvd>`; eklenti
+    `Directory` ve `Drive` için de kayıtlı (HKCU). Seçilen her öğe DVD klasörü/sürücüsüyse (`VIDEO_TS` ya da onu içeren
+    klasör/kök, içinde `VTS_nn_1..9.VOB`) "royconvert › DVD › MP4/MKV" görünür; başka klasörde, karışık seçimde menü
+    yok. Boş disket/kart okuyucuda "disk takın" çıkmasın diye `SEM_FAILCRITICALERRORS`. Sürücü kökü `"E:\"` komut
+    satırında `E:"` okunuyordu → `Quote` sondaki ters eğik çizgileri ikiler. Win 11 sparse paketine `Directory` eklendi
+    (Win 11'de denenmedi; sürücü kökü Win 11'de yalnız "Diğer seçenekler"de)
+  - Canlı doğrulama (Win 10, Debug menü kaydı, Explorer'ın `IContextMenu`'su ile): sahte DVD klasörü ve `VIDEO_TS` →
+    DVD › MP4/MKV; boş klasör, DVD + boş klasör, `C:\` → menü yok; VOB dosyası → normal video menüsü. Menüden
+    DVD › MP4 → yanına `Tatil DVD.mp4` (h264 + aac, 6 sn); `subst R:` ile sürücü kökü → DVD › MKV → Videolar\DVD.mkv
   - Çıktı: optik sürücüdeyse Videolar klasörüne `<birim etiketi>.mp4`; diske kopyalanmış klasörse yanına `<klasör adı>.mp4`
   - CSS korumalı ticari DVD'ler çözülmez (ffmpeg hata verir ya da bozuk görüntü). Ev/kamera kayıtları hedef
   - Doğrulama: sahte disk (ffmpeg `-target pal-dvd`, taramalı, 16:9, iki ses dili, iki parçaya sektör sınırında bölünmüş +
     menü + kısa ikinci başlık): 6 sn tam süre, 2 ses, progressive, 25 fps, DAR 16:9; bozuk VOB → hata, çıktı yok.
     Uygulamadan `--preset dvd/mp4` ile 8 sn'lik sahte disk dönüştü
-- Testler: 165/165 (Core 120; App 45).
+- Testler: 166/166 (Core 120; App 46).
 
 ## Gerçek DVD denemesi (DVD bulununca)
-1. Diski tak; royconvert'i aç → "DVD…" → DVD sürücüsünü seç → "DVD › MP4" → Dönüştür
+1. Diski tak; Bu bilgisayar'da DVD sürücüsüne sağ tık → royconvert → DVD → MP4 (ya da royconvert'i aç → "DVD…" →
+   DVD sürücüsünü seç → "DVD › MP4" → Dönüştür)
 2. Videolar klasöründe `<disk adı>.mp4` oluştu mu; süre filmin tamamı mı (menü/fragman değil), ses ve görüntü eş mi
 3. Birden fazla ses dili varsa oynatıcıda seçilebiliyor mu; 4:3 / 16:9 görüntü basık ya da uzamış mı
 4. Hata olursa ilerleme penceresindeki mesajı kopyala (CSS korumalı disk olabilir) Dil kültürüne dokunan testler ortak, paralel çalışmayan koleksiyonda (`UiCultureCollection`)
@@ -200,6 +210,6 @@ Son güncelleme: 2026-10-27
   7. Kaldır → menü ve paket gitti mi (`Get-AppxPackage royconvert.ContextMenu` boş olmalı)
 
 ## Sıradaki adımlar (öneri sırası)
-1. DVD'ler için sağ tık menüsü (klasör/sürücü) — gerçek diskle denedikten sonra
+1. ~~DVD'ler için sağ tık menüsü (klasör/sürücü)~~ → `dvd-menu` dalı (2026-10-28); gerçek diskle deneme yine bekliyor
 2. Kullanıcı söyleyince: Win 11 PC denemesi (yukarıdaki sıra), macOS (Finder Quick Action / Finder Sync)
 3. Proje herkese açılmadan önce: kod imzalama sertifikası (SmartScreen ve Win 11 imzasız paket uyarıları)
