@@ -193,12 +193,16 @@ Son güncelleme: 2026-10-27
   - **Bu PC'de çalışmadı:** Word otomasyonla PDF açınca "Word PDF Files dönüştürücüsünü başlatamıyor" (gizli ve görünür
     Word'de aynı). `PDFREFLOW.EXE` var, CLSID `{A5C79653-FC73-46ee-AD3E-B64C01268DAA}` → Office16\PDFREFLOW.EXE doğru;
     WOW6432Node'da eski Office15 kaydı var; Word'de bekleyen Office güncellemesi var; olay günlüğünde iz yok
-  - **Sıradaki adım (kullanıcı sonra yapacak):** Word'de elle Dosya → Aç → bir PDF. Elle de açamıyorsa sorun Office
-    kurulumunda (güncelleme/onarım denenebilir); elle açıyorsa sorun yalnız otomasyonda. Çalışırsa
-    `PdfToWord_MakesAnEditableDocument_AndLeavesThePdfUnchanged` testi geçmeli → PR aç. Çalışmazsa özellik bırakılabilir
-    ama `CloseInput` düzeltmesi ayrıca main'e alınmalı
+  - **2026-10-28 denemesi:** Word'de elle Dosya → Aç → PDF de aynı hatayı veriyor → sorun bizim kodda değil, bu PC'nin
+    Office 2019 (Click-to-Run, ProPlus2019Volume, 16.0.14332.21007) kurulumunda. Office güncellemesi (21010) indirilmiş
+    ama kurulamıyor: Word kapalıyken de güncelleme isteği `Result -1`, hata 17002 ile bitiyor. Hızlı Onarım denenmedi
+  - `CloseInput` main'e ayrı alınmaya değmez: main'de hatayı tetikleyen yol yok (PDF içerikli `.doc` Word → PDF'te
+    Word dosyayı düz metin açıp başarıyla çeviriyor, düzeltme olmadan da Word kapanıyor; canlı denendi). Hata yalnız
+    Word'e `.pdf` verilince, yani PDF → Word'de çıkıyor; düzeltme bu dalda kalıyor. Deneme `git stash` içinde
+  - **Sıradaki adım:** Word'ü PDF açabilen bir bilgisayarda `PdfToWord_MakesAnEditableDocument_AndLeavesThePdfUnchanged`
+    geçerse → PR aç. Ya da bu PC'de Office Hızlı Onarım sonrası yeniden dene
   - Bu dalda testler: 170'ten 169 geçiyor (yalnız yukarıdaki PDF → Word testi bu PC'de başarısız)
-- Sıradaki öneri: önce PDF → Word denemesi; sonra aşağıdaki listeden kullanıcıya seçenek sun
+- Sıradaki öneri: PDF → Word bekliyor; aşağıdaki listeden kullanıcıya seçenek sun
 
 ## Win 11 denemesi (kullanıcı söyleyince)
 - En güncel test kurulumu: https://github.com/cohard32/royconvert/releases/tag/v0.1.0-test3
