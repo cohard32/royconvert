@@ -30,6 +30,21 @@ public static class OutputPath
         return candidate;
     }
 
+    /// <summary>"{dir}/{name}{suffix}.{extension}" next to the input, numbered " (1)", " (2)"… if it exists.</summary>
+    public static string Beside(string inputPath, string suffix, string extension, Func<string, bool>? exists = null)
+    {
+        exists ??= Path.Exists;
+        var full = Path.GetFullPath(inputPath);
+        var stem = Path.Combine(Path.GetDirectoryName(full)!, Path.GetFileNameWithoutExtension(full) + suffix);
+        var candidate = $"{stem}.{extension}";
+        for (var i = 1; exists(candidate) || PathsEqual(candidate, full); i++)
+        {
+            candidate = $"{stem} ({i}).{extension}";
+        }
+
+        return candidate;
+    }
+
     private static bool PathsEqual(string a, string b) =>
         string.Equals(a, b, OperatingSystem.IsWindows() || OperatingSystem.IsMacOS()
             ? StringComparison.OrdinalIgnoreCase

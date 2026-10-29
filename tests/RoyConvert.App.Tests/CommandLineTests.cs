@@ -97,6 +97,7 @@ public class CommandLineTests
     [Theory]
     [InlineData("rename", CommandKind.Rename)]
     [InlineData("watermark", CommandKind.Watermark)]
+    [InlineData("trim", CommandKind.Trim)]
     public void ToolIds_OpenTheirWindow_WithTheFiles(string id, CommandKind kind)
     {
         var command = CommandLine.Parse(["--preset", id, "a.jpg", "b.pdf"], Cwd);

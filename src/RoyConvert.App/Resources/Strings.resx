@@ -56,6 +56,8 @@
   <data name="FileName_compress-pdf" xml:space="preserve"><value> (compressed)</value></data>
   <data name="Preset_strip-metadata" xml:space="preserve"><value>Remove metadata (EXIF, location)</value></data>
   <data name="FileName_strip-metadata" xml:space="preserve"><value> (no metadata)</value></data>
+  <data name="Preset_mute" xml:space="preserve"><value>Remove sound</value></data>
+  <data name="FileName_mute" xml:space="preserve"><value> (no sound)</value></data>
   <data name="Preset_split-pdf" xml:space="preserve"><value>PDF (split pages)</value></data>
   <data name="FileName_split-pdf" xml:space="preserve"><value>-page</value></data>
   <data name="Job_MoreFiles" xml:space="preserve"><value>{0} and {1} more</value></data>
@@ -112,4 +114,21 @@
   <data name="Watermark_Progress" xml:space="preserve"><value>{0} / {1}…</value></data>
   <data name="Watermark_Failed" xml:space="preserve"><value>{0} of {1} files could not be watermarked:</value></data>
   <data name="Watermark_NoFiles" xml:space="preserve"><value>No pictures or PDFs to watermark.</value></data>
+  <data name="Trim_Menu" xml:space="preserve"><value>Cut…</value></data>
+  <data name="Trim_Title" xml:space="preserve"><value>Cut {0} files</value></data>
+  <data name="Trim_Start" xml:space="preserve"><value>From</value></data>
+  <data name="Trim_End" xml:space="preserve"><value>To</value></data>
+  <data name="Trim_EndHint" xml:space="preserve"><value>end</value></data>
+  <data name="Trim_Hint" xml:space="preserve"><value>Times like 1:30 or 0:01:30.5. Leave "To" empty to keep everything after "From". The same part is cut from every selected file.</value></data>
+  <data name="Trim_Precise" xml:space="preserve"><value>Cut at the exact frame (encodes the video again; slower)</value></data>
+  <data name="Trim_PreciseNote" xml:space="preserve"><value>Without it the part is copied as it is: fast and without loss, but a video may start up to a few seconds earlier.</value></data>
+  <data name="Trim_Length" xml:space="preserve"><value>{0}: {1} long</value></data>
+  <data name="Trim_LengthUnknown" xml:space="preserve"><value>{0}: length unknown</value></data>
+  <data name="Trim_BadTime" xml:space="preserve"><value>Write the times like 1:30 or 0:01:30.</value></data>
+  <data name="Trim_EndBeforeStart" xml:space="preserve"><value>"To" must be after "From".</value></data>
+  <data name="Trim_Apply" xml:space="preserve"><value>Cut</value></data>
+  <data name="Trim_FileSuffix" xml:space="preserve"><value> (cut)</value></data>
+  <data name="Trim_Failed" xml:space="preserve"><value>{0} of {1} files could not be cut:</value></data>
+  <data name="Trim_NoFiles" xml:space="preserve"><value>No videos or sound files to cut.</value></data>
+  <data name="Trim_NoFfmpeg" xml:space="preserve"><value>ffmpeg was not found; reinstall royconvert.</value></data>
 </root>

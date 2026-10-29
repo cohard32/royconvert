@@ -41,21 +41,13 @@ public static class Watermark
     /// <summary>"{dir}/{name}{suffix}.{ext}", numbered if it exists; JPEG for pictures that are not kept as they are.</summary>
     public static string OutputPathFor(string input, string suffix, Func<string, bool>? exists = null)
     {
-        exists ??= Path.Exists;
         var extension = Formats.ExtensionOf(input);
         if (extension != "pdf" && !KeptImageFormats.Contains(extension))
         {
             extension = "jpg";
         }
 
-        var stem = Path.Combine(Path.GetDirectoryName(Path.GetFullPath(input))!, Path.GetFileNameWithoutExtension(input) + suffix);
-        var candidate = $"{stem}.{extension}";
-        for (var i = 1; exists(candidate); i++)
-        {
-            candidate = $"{stem} ({i}).{extension}";
-        }
-
-        return candidate;
+        return OutputPath.Beside(input, suffix, extension, exists);
     }
 
     /// <exception cref="ConversionException">The file cannot be read or written.</exception>

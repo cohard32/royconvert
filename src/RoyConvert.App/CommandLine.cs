@@ -11,6 +11,8 @@ public enum CommandKind
     Rename,
     /// <summary>"--preset watermark": the watermark window.</summary>
     Watermark,
+    /// <summary>"--preset trim": the window that cuts a part of videos and sound files.</summary>
+    Trim,
     ListPresets,
     RegisterShell,
     UnregisterShell,

@@ -239,7 +239,17 @@ Son güncelleme: 2026-10-27
   https://github.com/cohard32/royconvert/releases/tag/v0.1.0-test6, SHA-256
   `8ce1b542a54ee5a836822e068baa4ae821bdb74b9763171dcca1b3704b10d016`. Program Files'a test5 üzerine kuruldu; menüden
   döşeli filigran (2 JPG + PDF), yeniden adlandırma, PDF küçült, PDF → PNG tamam. **Bu PC'de menü Program Files test6'ya bağlı**
-- Sıradaki: ses/video seçenekleri
+- **Ses/video** (`ses-video` dalı): videodan ses çıkarma zaten vardı (MP3/AAC/FLAC…). Eklenenler:
+  - "Sesi kaldır" (`mute/*` ön ayarları, `EnableAudio = false`): kaynakla aynı tür ya da MKV ise video kopyalanır
+    (`FfmpegArguments.CanCopyVideo`, hızlı ve kayıpsız), değilse kodlanır
+  - "Kırp…" (`MenuTools.Trim`, video + ses): başlangıç/bitiş (`MediaTrim.ParseTime`: 75, 1:15, 0:01:15.5, virgül
+    de olur), bitiş boşsa sonuna kadar, aynı bölüm her dosyadan. Varsayılan akış kopyası (`-ss` + `-c copy`; video
+    önceki ana kareden başlayabilir); "tam karesinden kes" videoyu normal dönüşüm ayarlarıyla yeniden kodlar
+    (royconvert'in yazmadığı türler, ör. MOV → MP4). Ses hep kopyalanır. Süre `ffmpeg -i` çıktısından okunuyor
+    (`FfmpegConverter.ProbeDurationAsync`); ilerleme kesilen bölüme göre
+  - Canlı (Debug, menüden): sesi kaldır MP4 (h264 kopya, ses yok), mp4+mp3 0–3 sn kopya kesim, hatalı aralık
+    uyarısı, MOV 0:05,5–0:12 tam kare → 6,5 sn MP4
+- Sıradaki: kullanıcıya sor (test7 ön sürümü / yeni özellik)
 
 ## Kaldığımız yer (2026-10-28 gece, kullanıcı "bugünlük yeter, kaydet" dedi)
 - **`pdfium-cokme` dalı (push edildi, PR açılmadı) — önce bu birleşmeli:** Docnet ile PDF işlemleri (PDF → resim,
