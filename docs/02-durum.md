@@ -235,7 +235,11 @@ Son güncelleme: 2026-10-27
   (sürüm 1.4'e çekiliyor); `/Rotate`'li sayfada `XGraphics` döndürülmemiş koordinatta çiziyor (dönüşüm ekleniyor);
   döşemede ızgara yazı doğrultusunda kurulmalı (yatay ızgarada üst üste biniyordu)
 - macOS'ta PDFsharp için yazı tipi çözücü gerekecek (`UseWindowsFontsUnderWindows` yalnız Windows)
-- Sıradaki: ses/video seçenekleri veya test6 ön sürümü
+- PR #12 (filigran) birleşti (main aa25281). Ön sürüm **`v0.1.0-test6`** (main aa25281),
+  https://github.com/cohard32/royconvert/releases/tag/v0.1.0-test6, SHA-256
+  `8ce1b542a54ee5a836822e068baa4ae821bdb74b9763171dcca1b3704b10d016`. Program Files'a test5 üzerine kuruldu; menüden
+  döşeli filigran (2 JPG + PDF), yeniden adlandırma, PDF küçült, PDF → PNG tamam. **Bu PC'de menü Program Files test6'ya bağlı**
+- Sıradaki: ses/video seçenekleri
 
 ## Kaldığımız yer (2026-10-28 gece, kullanıcı "bugünlük yeter, kaydet" dedi)
 - **`pdfium-cokme` dalı (push edildi, PR açılmadı) — önce bu birleşmeli:** Docnet ile PDF işlemleri (PDF → resim,
