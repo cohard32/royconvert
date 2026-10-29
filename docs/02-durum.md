@@ -207,8 +207,28 @@ Son güncelleme: 2026-10-27
 - Bu oturumda yapılanlar sırasıyla: Microsoft Office ile PDF, PDF birleştirme/bölme, ayarlar penceresi, DVD (sahte diskle)
 - Win 11 / Mac denemeleri: kullanıcı kendisi söyleyince yapılacak, hatırlatılmayacak. DVD denemesi disk bulununca
 
-## Kaldığımız yer (2026-10-28)
-- `main`'de ek olarak: PR #4 (pencere kapanırken dosya kaybı), PR #5 (DVD sağ tık menüsü, b959553)
+## Kaldığımız yer (2026-10-28 gece, kullanıcı "bugünlük yeter, kaydet" dedi)
+- **`pdfium-cokme` dalı (push edildi, PR açılmadı) — önce bu birleşmeli:** Docnet ile PDF işlemleri (PDF → resim,
+  birleştir, böl) ara sıra **tüm programı çökertiyordu** (AccessViolation, `FPDFDOC_ExitFormFillEnvironment`,
+  `DocReader.Dispose`). Neden: Docnet'in `DocumentWrapper._formInfo` (`FPDF_FORMFILLINFO`) yönetilen sınıf olarak
+  marshal ediliyor; PDFium geçici kopyanın adresini saklıyor. GC/bellek yeniden kullanımı arttıkça çökme artıyor
+  (tek dosyada sık GC ile 12'de 2; 4 PDF birlikte daha sık; sıkıştırma testleriyle test süreci her seferinde çöktü).
+  Bizim kilitle çözülmedi (denendi). Çözüm: `Core/Pdfium.cs` `PdfiumDocument` — pdfium.dll'i doğrudan P/Invoke ile
+  çağırır, form ortamı yok (FPDF_ANNOT), belge baytı kapanana kadar yerel bellekte, tüm çağrılar tek kilitte.
+  Docnet artık yalnız pdfium.dll'i getirmek için paket olarak duruyor; kodda/testlerde kullanılmıyor
+  - Doğrulama: `dotnet test` 3 kez 170/170 (+2 yeni: paralel+GC, bozuk PDF). Uygulama stres (4 PDF aynı anda PNG,
+    `DOTNET_GCgen0size=0x20000`): eski test4 15'te 1 çökme + 6 eksik çıktı; yeni 15'te 0/0, ardından 40'ta 0/0.
+    İzole Docnet test programı çökmeyi üretemedi (yalnız uygulamada görülüyor)
+- **`pdf-sikistir` dalı (1d04f81, push edildi, PR yok):** "PDF (küçült)" (`compress-pdf`, `Core/PdfCompression.cs`):
+  içteki RGB/gri 8 bit resimler sayfaya göre 150 dpi'ye küçültülüp JPEG 75; yalnız küçülürse değişir (kayıpsız
+  resim yarıya inmezse dokunulmaz), SMask/CMYK/indexed atlanır; sonuç büyükse hata, çıktı yok. Canlı: 5,7 MB →
+  231 KB, LibreOffice PDF'i 644 → 139 KB, 150 dpi'de gözle fark yok. **pdfium-cokme birleşince bu dal main'e rebase
+  edilip (PdfPages.EnsureReadable → yeni `Open`) testler çalıştırılmalı, sonra PR**
+- PDFsharp ad çözümü: dolaylı nesneler `PdfReference.Value`, dolaylı isimler `PdfNameObject` (PdfName değil)
+- Ortam: başka bir Claude Code oturumu açılırken scratchpad'i ve `%TEMP%` altındaki klasörleri siliyor → denemeler
+  `E:\rc-deneme`'de yapıldı (silindi)
+- `main`'de ek olarak: PR #4 (pencere kapanırken dosya kaybı), PR #5 (DVD sağ tık menüsü, b959553), PR #7 (EXIF silme,
+  PDF döndürme)
 - **PDF → Word** `pdf-word` dalında bekliyor (PR yok): bu PC'nin Word'ü elle de PDF açamıyor, Office güncellemesi 17002
   ile kurulamıyor; ayrıntı o daldaki bu dosyada
 - Ön sürüm **`v0.1.0-test4`** (main b959553), https://github.com/cohard32/royconvert/releases/tag/v0.1.0-test4,
