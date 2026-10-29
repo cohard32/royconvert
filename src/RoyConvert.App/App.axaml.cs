@@ -43,6 +43,10 @@ public partial class App : Application
                 // Explorer sends all selected files at once, so each rename gets its own window.
                 desktop.MainWindow = new RenameWindow { DataContext = new RenameViewModel(Command.Files) };
             }
+            else if (Command.Kind == CommandKind.Watermark)
+            {
+                desktop.MainWindow = new WatermarkWindow { DataContext = new WatermarkViewModel(Command.Files) };
+            }
             else
             {
                 var progress = CreateProgress();

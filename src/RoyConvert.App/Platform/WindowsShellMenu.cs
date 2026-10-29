@@ -116,9 +116,9 @@ public static class WindowsShellMenu
     /// One line per preset: id, menu label (from <paramref name="label"/>) and input extensions, tab separated.
     /// Presets without a submenu come first, then the submenus in catalog order; the handler keeps this order.
     /// DVD presets get <see cref="DvdInput"/> instead of extensions: the handler offers them for DVD folders and drives.
-    /// With <paramref name="renameLabel"/>, a last line opens the rename window for any mix of supported files.
+    /// The <paramref name="tools"/> (windows such as rename) come last.
     /// </summary>
-    public static string BuildMenuFile(IReadOnlyList<Preset> presets, Func<Preset, string> label, string? renameLabel = null)
+    public static string BuildMenuFile(IReadOnlyList<Preset> presets, Func<Preset, string> label, IReadOnlyList<MenuTool>? tools = null)
     {
         var ordered = presets.Where(p => !p.Name.Contains('/'))
             .Concat(presets.Where(p => p.Name.Contains('/')).GroupBy(p => p.Name[..p.Name.IndexOf('/')]).SelectMany(g => g));
@@ -138,11 +138,10 @@ public static class WindowsShellMenu
             text.Append("\r\n");
         }
 
-        if (renameLabel is not null)
+        foreach (var tool in tools ?? [])
         {
-            text.Append(CommandLine.RenamePresetId).Append('\t').Append(renameLabel).Append('\t')
-                .AppendJoin(' ', presets.SelectMany(p => p.InputExtensions).Distinct(StringComparer.OrdinalIgnoreCase)
-                    .Order(StringComparer.OrdinalIgnoreCase))
+            text.Append(tool.Id).Append('\t').Append(tool.Label()).Append('\t')
+                .AppendJoin(' ', tool.Extensions.Order(StringComparer.OrdinalIgnoreCase))
                 .Append("\r\n");
         }
 
@@ -152,7 +151,7 @@ public static class WindowsShellMenu
     private static void WriteMenuFile(IReadOnlyList<Preset> presets)
     {
         Directory.CreateDirectory(Path.GetDirectoryName(MenuFilePath)!);
-        File.WriteAllText(MenuFilePath, BuildMenuFile(presets, PresetNames.DisplayName, Strings.Rename_Menu), new UTF8Encoding(false));
+        File.WriteAllText(MenuFilePath, BuildMenuFile(presets, PresetNames.DisplayName, MenuTools.All), new UTF8Encoding(false));
     }
 
     private static string HandlerKeyPath(string extension) => $@"{AssociationsPath}\.{extension}\shellex\ContextMenuHandlers\{Name}";

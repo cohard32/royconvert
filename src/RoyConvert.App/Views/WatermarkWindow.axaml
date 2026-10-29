@@ -1,0 +1,70 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:vm="using:RoyConvert.App.ViewModels"
+        xmlns:res="using:RoyConvert.App.Resources"
+        x:Class="RoyConvert.App.Views.WatermarkWindow"
+        x:DataType="vm:WatermarkViewModel"
+        Title="{Binding Title}"
+        Icon="/Assets/royconvert.ico"
+        Width="900" Height="600" MinWidth="640" MinHeight="420"
+        WindowStartupLocation="CenterScreen">
+
+    <Grid Margin="20" ColumnDefinitions="300,*" ColumnSpacing="20" RowDefinitions="*,Auto">
+        <StackPanel Spacing="14">
+            <StackPanel Spacing="4">
+                <TextBlock Text="{x:Static res:Strings.Watermark_Text}" />
+                <TextBox x:Name="TextBox" Text="{Binding Text}" Watermark="{x:Static res:Strings.Watermark_TextHint}" />
+            </StackPanel>
+
+            <StackPanel Spacing="4">
+                <TextBlock Text="{x:Static res:Strings.Watermark_Position}" />
+                <ComboBox ItemsSource="{Binding Positions}" SelectedItem="{Binding Position}" HorizontalAlignment="Stretch">
+                    <ComboBox.ItemTemplate>
+                        <DataTemplate x:DataType="vm:PositionOption">
+                            <TextBlock Text="{Binding Name}" />
+                        </DataTemplate>
+                    </ComboBox.ItemTemplate>
+                </ComboBox>
+            </StackPanel>
+
+            <StackPanel Spacing="4">
+                <Grid ColumnDefinitions="*,Auto">
+                    <TextBlock Text="{x:Static res:Strings.Watermark_Opacity}" />
+                    <TextBlock Grid.Column="1" Text="{Binding Opacity, StringFormat={}%{0:0}}" FontWeight="SemiBold" />
+                </Grid>
+                <Slider Minimum="10" Maximum="90" TickFrequency="5" IsSnapToTickEnabled="True" Value="{Binding Opacity}" />
+            </StackPanel>
+
+            <StackPanel Spacing="4">
+                <Grid ColumnDefinitions="*,Auto">
+                    <TextBlock Text="{x:Static res:Strings.Watermark_Size}" />
+                    <TextBlock Grid.Column="1" Text="{Binding Size, StringFormat={}%{0:0}}" FontWeight="SemiBold" />
+                </Grid>
+                <Slider Minimum="2" Maximum="20" TickFrequency="1" IsSnapToTickEnabled="True" Value="{Binding Size}" />
+            </StackPanel>
+
+            <TextBlock Text="{x:Static res:Strings.Watermark_Note}" FontSize="12" Opacity="0.6" TextWrapping="Wrap" />
+        </StackPanel>
+
+        <Grid Grid.Column="1" RowDefinitions="*,Auto" RowSpacing="6">
+            <Border BorderThickness="1" BorderBrush="{DynamicResource SystemControlForegroundBaseLowBrush}" CornerRadius="4" Padding="8">
+                <Image Source="{Binding Preview}" Stretch="Uniform" />
+            </Border>
+            <TextBlock Grid.Row="1" Text="{Binding PreviewName}" FontSize="12" Opacity="0.6" HorizontalAlignment="Center"
+                       TextTrimming="CharacterEllipsis" />
+        </Grid>
+
+        <Grid Grid.Row="1" Grid.ColumnSpan="2" ColumnDefinitions="*,Auto" ColumnSpacing="12" Margin="0,16,0,0">
+            <StackPanel VerticalAlignment="Center">
+                <TextBlock Text="{Binding Status}" TextWrapping="Wrap" />
+                <SelectableTextBlock Text="{Binding Errors}" TextWrapping="Wrap" FontSize="12" MaxHeight="90"
+                                     Foreground="{DynamicResource SystemControlErrorTextForegroundBrush}"
+                                     IsVisible="{Binding Errors, Converter={x:Static StringConverters.IsNotNullOrEmpty}}" />
+            </StackPanel>
+            <StackPanel Grid.Column="1" Orientation="Horizontal" Spacing="8" VerticalAlignment="Bottom">
+                <Button Content="{x:Static res:Strings.Watermark_Close}" Command="{Binding CloseCommand}" IsCancel="True" />
+                <Button Content="{x:Static res:Strings.Watermark_Apply}" Command="{Binding ApplyCommand}" Classes="accent" IsDefault="True" />
+            </StackPanel>
+        </Grid>
+    </Grid>
+</Window>

@@ -95,4 +95,21 @@
   <data name="Rename_Failed" xml:space="preserve"><value>Nothing was renamed: {0}</value></data>
   <data name="Rename_NoFiles" xml:space="preserve"><value>No files to rename.</value></data>
   <data name="Rename_InUse" xml:space="preserve"><value>"{0}" is open in another program.</value></data>
+  <data name="Watermark_Menu" xml:space="preserve"><value>Add watermark…</value></data>
+  <data name="Watermark_Title" xml:space="preserve"><value>Watermark {0} files</value></data>
+  <data name="Watermark_Text" xml:space="preserve"><value>Text</value></data>
+  <data name="Watermark_TextHint" xml:space="preserve"><value>e.g. © Your name</value></data>
+  <data name="Watermark_Position" xml:space="preserve"><value>Position</value></data>
+  <data name="Watermark_Diagonal" xml:space="preserve"><value>Across the middle</value></data>
+  <data name="Watermark_BottomRight" xml:space="preserve"><value>Bottom right corner</value></data>
+  <data name="Watermark_Tiled" xml:space="preserve"><value>Repeated over the page</value></data>
+  <data name="Watermark_Opacity" xml:space="preserve"><value>Opacity</value></data>
+  <data name="Watermark_Size" xml:space="preserve"><value>Size</value></data>
+  <data name="Watermark_Note" xml:space="preserve"><value>New files are saved next to the originals with "(watermarked)" in the name; the originals stay as they are.</value></data>
+  <data name="Watermark_FileSuffix" xml:space="preserve"><value> (watermarked)</value></data>
+  <data name="Watermark_Apply" xml:space="preserve"><value>Add watermark</value></data>
+  <data name="Watermark_Close" xml:space="preserve"><value>Close</value></data>
+  <data name="Watermark_Progress" xml:space="preserve"><value>{0} / {1}…</value></data>
+  <data name="Watermark_Failed" xml:space="preserve"><value>{0} of {1} files could not be watermarked:</value></data>
+  <data name="Watermark_NoFiles" xml:space="preserve"><value>No pictures or PDFs to watermark.</value></data>
 </root>

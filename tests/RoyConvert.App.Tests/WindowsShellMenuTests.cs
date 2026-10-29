@@ -49,14 +49,16 @@ public class WindowsShellMenuTests
     }
 
     [Fact]
-    public void MenuFile_WithRenameLabel_EndsWithRenameForEverySupportedExtension()
+    public void MenuFile_EndsWithTheTools_RenameForEverySupportedExtension()
     {
-        var lines = WindowsShellMenu.BuildMenuFile(PresetCatalog.Default, p => p.Name, "Rename…")
+        var lines = WindowsShellMenu.BuildMenuFile(PresetCatalog.Default, p => p.Name, MenuTools.All)
             .Split("\r\n", StringSplitOptions.RemoveEmptyEntries);
 
-        Assert.Equal(Lines, lines[..^1]);
+        Assert.Equal(Lines, lines[..^2]);
+        Assert.Equal(["watermark", "rename"], lines[^2..].Select(line => line.Split('\t')[0]));
+        Assert.DoesNotContain("gif", lines[^2].Split('\t')[2].Split(' '));
         var fields = lines[^1].Split('\t');
-        Assert.Equal([CommandLine.RenamePresetId, "Rename…"], fields[..2]);
+        Assert.Equal(MenuTools.Rename.Label(), fields[1]);
         var extensions = fields[2].Split(' ');
         Assert.Equal(PresetCatalog.Default.SelectMany(p => p.InputExtensions).Distinct(StringComparer.OrdinalIgnoreCase).Count(),
             extensions.Length);
