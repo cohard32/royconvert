@@ -219,7 +219,14 @@ Son güncelleme: 2026-10-27
 - `build-installer.ps1` bu PC'de `-ExecutionPolicy Bypass` olmadan çalışıyor (CurrentUser Unrestricted) → Claude derler.
   **Yükleme sürerken `artifacts`'ta yeniden derleme setup'ı bozar** (Inno üzerine yazdı, 950 KB kaldı) → yüklemeyi
   ayrı bir kopyadan yap
-- Sıradaki: kullanıcıya yeni özellik seç (filigran / toplu yeniden adlandırma metin girişi ister; ses/video seçenekleri)
+- **Toplu yeniden adlandırma** (`toplu-ad` dalı): menünün sonunda "Yeniden adlandır…" (menü dosyasında `rename` satırı,
+  desteklenen tüm uzantılar; DLL değişmedi, `--preset rename` → `CommandKind.Rename`, tek örnek kullanılmaz). Pencere:
+  kalıp (`{n}` sıra, `{name}` eski ad), başlangıç numarası, anlık önizleme, sorunlu satır kırmızı, düğme kapalı.
+  `Core/BatchRename.cs`: doğal sıra, numara son numaranın genişliğine göre sıfırla dolar, önce geçici adlar (yer
+  değiştirme / yalnız büyük-küçük harf çalışır), hata olursa hepsi geri alınır. Canlı (Debug, menüden): jpg+pdf karışık
+  seçim, aynı ad uyarısı, adlandırma, kilitli dosyada geri alma + Türkçe mesaj, kilit açılınca tekrar deneme tamam
+- UI otomasyonu: `E:\rc-deneme\ui.ps1` (UIAutomation ile yaz/tıkla, PrintWindow ile ekran görüntüsü)
+- Sıradaki: filigran (metin girişi; bu pencereyle aynı yaklaşım) veya ses/video seçenekleri
 
 ## Kaldığımız yer (2026-10-28 gece, kullanıcı "bugünlük yeter, kaydet" dedi)
 - **`pdfium-cokme` dalı (push edildi, PR açılmadı) — önce bu birleşmeli:** Docnet ile PDF işlemleri (PDF → resim,

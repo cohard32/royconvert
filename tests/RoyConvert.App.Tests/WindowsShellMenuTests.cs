@@ -47,4 +47,21 @@ public class WindowsShellMenuTests
         var contiguous = groups.Skip(firstGrouped).Where((g, i) => i == 0 || g != groups[firstGrouped + i - 1]).ToList();
         Assert.Equal(order, contiguous);
     }
+
+    [Fact]
+    public void MenuFile_WithRenameLabel_EndsWithRenameForEverySupportedExtension()
+    {
+        var lines = WindowsShellMenu.BuildMenuFile(PresetCatalog.Default, p => p.Name, "Rename…")
+            .Split("\r\n", StringSplitOptions.RemoveEmptyEntries);
+
+        Assert.Equal(Lines, lines[..^1]);
+        var fields = lines[^1].Split('\t');
+        Assert.Equal([CommandLine.RenamePresetId, "Rename…"], fields[..2]);
+        var extensions = fields[2].Split(' ');
+        Assert.Equal(PresetCatalog.Default.SelectMany(p => p.InputExtensions).Distinct(StringComparer.OrdinalIgnoreCase).Count(),
+            extensions.Length);
+        Assert.Contains("mp4", extensions);
+        Assert.Contains("pdf", extensions);
+        Assert.Contains("docx", extensions);
+    }
 }

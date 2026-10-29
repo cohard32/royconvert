@@ -38,6 +38,11 @@ public partial class App : Application
             {
                 desktop.MainWindow = CreateMainWindow([]);
             }
+            else if (Command.Kind == CommandKind.Rename)
+            {
+                // Explorer sends all selected files at once, so each rename gets its own window.
+                desktop.MainWindow = new RenameWindow { DataContext = new RenameViewModel(Command.Files) };
+            }
             else
             {
                 var progress = CreateProgress();

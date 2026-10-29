@@ -80,4 +80,19 @@
   <data name="Settings_SaveFailed" xml:space="preserve"><value>The settings could not be saved: {0}</value></data>
   <data name="Home_ChooseDvd" xml:space="preserve"><value>DVD…</value></data>
   <data name="Home_ChooseDvdTitle" xml:space="preserve"><value>Choose a DVD drive or a folder with VIDEO_TS</value></data>
+  <data name="Rename_Menu" xml:space="preserve"><value>Rename…</value></data>
+  <data name="Rename_Title" xml:space="preserve"><value>Rename {0} files</value></data>
+  <data name="Rename_Pattern" xml:space="preserve"><value>New name</value></data>
+  <data name="Rename_Hint" xml:space="preserve"><value>{n} = number, {name} = old name. The extension stays.</value></data>
+  <data name="Rename_Start" xml:space="preserve"><value>Start at</value></data>
+  <data name="Rename_Apply" xml:space="preserve"><value>Rename</value></data>
+  <data name="Rename_Cancel" xml:space="preserve"><value>Cancel</value></data>
+  <data name="Rename_DefaultPattern" xml:space="preserve"><value>File {n}</value></data>
+  <data name="Rename_EmptyName" xml:space="preserve"><value>empty name</value></data>
+  <data name="Rename_InvalidCharacter" xml:space="preserve"><value>not allowed: \ / : * ? " &lt; &gt; |</value></data>
+  <data name="Rename_Duplicate" xml:space="preserve"><value>same name as another file</value></data>
+  <data name="Rename_Exists" xml:space="preserve"><value>a file with this name exists</value></data>
+  <data name="Rename_Failed" xml:space="preserve"><value>Nothing was renamed: {0}</value></data>
+  <data name="Rename_NoFiles" xml:space="preserve"><value>No files to rename.</value></data>
+  <data name="Rename_InUse" xml:space="preserve"><value>"{0}" is open in another program.</value></data>
 </root>
