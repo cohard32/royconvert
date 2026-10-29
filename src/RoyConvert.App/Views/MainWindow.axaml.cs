@@ -7,13 +7,17 @@ using RoyConvert.App.ViewModels;
 
 namespace RoyConvert.App.Views;
 
-public partial class MainWindow : Window
+public partial class MainWindow : Window, IUpdateHost
 {
     public MainWindow()
     {
         InitializeComponent();
         AddHandler(DragDrop.DropEvent, OnDrop);
     }
+
+    public bool CanInstallUpdate => true;
+
+    public void ShowUpdate(UpdateViewModel update) => UpdateHost.Content = update;
 
     private HomeViewModel? ViewModel => DataContext as HomeViewModel;
 

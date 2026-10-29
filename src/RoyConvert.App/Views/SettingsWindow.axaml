@@ -40,6 +40,8 @@
             <ComboBox ItemsSource="{Binding Parallelisms}" SelectedItem="{Binding SelectedParallelism}" HorizontalAlignment="Stretch" />
         </StackPanel>
 
+        <CheckBox Content="{x:Static res:Strings.Settings_CheckUpdates}" IsChecked="{Binding CheckForUpdates}" />
+
         <TextBlock Text="{x:Static res:Strings.Settings_Note}" FontSize="12" Opacity="0.6" TextWrapping="Wrap" />
         <TextBlock Text="{Binding Status}" TextWrapping="Wrap" Foreground="{DynamicResource SystemControlErrorTextForegroundBrush}"
                    IsVisible="{Binding Status, Converter={x:Static StringConverters.IsNotNullOrEmpty}}" />

@@ -29,6 +29,9 @@ public partial class SettingsViewModel : ViewModelBase
     private SettingOption _selectedParallelism;
 
     [ObservableProperty]
+    private bool _checkForUpdates;
+
+    [ObservableProperty]
     private string _status = string.Empty;
 
     /// <param name="save">Writes <paramref name="settings"/> to disk; may throw <see cref="IOException"/>.</param>
@@ -53,6 +56,7 @@ public partial class SettingsViewModel : ViewModelBase
 
         _imageQuality = settings.ImageQuality ?? Defaults.ImageQuality;
         _selectedParallelism = Parallelisms.FirstOrDefault(o => o.Value == settings.MaxParallelism) ?? Parallelisms[0];
+        _checkForUpdates = settings.CheckForUpdates;
     }
 
     public IReadOnlyList<SettingOption> VideoQualities { get; }
@@ -71,6 +75,7 @@ public partial class SettingsViewModel : ViewModelBase
         _settings.VideoQuality = OrNull(SelectedVideoQuality.Value, Defaults.VideoQuality);
         _settings.PdfDpi = OrNull(SelectedPdfDpi.Value, Defaults.PdfDpi);
         _settings.MaxParallelism = SelectedParallelism.Value;
+        _settings.CheckForUpdates = CheckForUpdates;
         try
         {
             _save();
@@ -93,6 +98,7 @@ public partial class SettingsViewModel : ViewModelBase
         SelectedVideoQuality = VideoQualities.First(o => o.Value == Defaults.VideoQuality);
         SelectedPdfDpi = PdfDpis.First(o => o.Value == Defaults.PdfDpi);
         SelectedParallelism = Parallelisms[0];
+        CheckForUpdates = true;
     }
 
     /// <summary>Defaults are stored as null, so a later change of a built-in default reaches the user.</summary>

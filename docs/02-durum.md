@@ -249,7 +249,45 @@ Son güncelleme: 2026-10-27
     (`FfmpegConverter.ProbeDurationAsync`); ilerleme kesilen bölüme göre
   - Canlı (Debug, menüden): sesi kaldır MP4 (h264 kopya, ses yok), mp4+mp3 0–3 sn kopya kesim, hatalı aralık
     uyarısı, MOV 0:05,5–0:12 tam kare → 6,5 sn MP4
-- Sıradaki: kullanıcıya sor (test7 ön sürümü / yeni özellik)
+- PR #14 (sesi kaldır + kırp) birleşti (main c95f66c)
+
+## Kaldığımız yer (2026-10-29 gece, kullanıcı "her şeyi kaydet, kaldığın yeri özellikle kaydet" dedi)
+**Hedef (kullanıcı kararı):** otomatik güncelleme + PDF şifre koy/kaldır eklenecek, test edilecek, sonra **ilk canlı
+sürüm v1.0.0** (ön sürüm değil, "Latest") yayımlanacak ve **depo herkese açılacak** (kullanıcı "Herkese aç" seçti;
+açmadan önce Claude gizli bilgi taraması yapacak, açma komutunu kullanıcı çalıştıracak).
+
+1. **PDF şifre — BİTTİ, PR #15 açık (`pdf-sifre`, birleşmedi).** "Şifre koy…" (PDFsharp AES-256, `PdfSecurity.Protect`)
+   ve "Şifreyi kaldır…" (PDFium `FPDF_REMOVE_SECURITY`, sahip şifreli PDF'ler şifresiz açılır). PDFium'a şifre UTF-8
+   (`LPUTF8Str`). Canlı menüden denendi. Aynı PR'da Excel testi bekleme süresi 20 → 60 sn ve güncelleme metinleri
+   (Update_*, Settings_CheckUpdates) var
+2. **Otomatik güncelleme — kod BİTTİ, testler geçti (272/272), `oto-guncelleme` dalı (pdf-sifre'nin üstünde), PR yok.**
+   - `Core/Updates/UpdateChecker.cs`: GitHub `releases/latest` (ön sürümleri saymaz; `ROYCONVERT_UPDATE_URL` ile
+     değiştirilebilir), sürüm `vX.Y.Z`, setup varlığı `*-setup.exe`, SHA-256 varlığın `digest` alanından ya da notlardaki
+     "SHA-256: `…`" satırından; indirme SHA tutmazsa silinir
+   - `App`: günde en çok bir kez (`AppSettings.CheckForUpdates`, `LastUpdateCheck`; ayarlar penceresinde kutu), yalnız
+     kurulu programda (`unins*.exe` yanında); bant (`UpdateViewModel`/`UpdateView`) ana pencerede ve ilerleme
+     penceresinde; bant varken ilerleme penceresi kendiliğinden kapanmaz, "Sonra" ile kapanır; "Güncelle" indirir,
+     `UpdateInstaller` setup'ı `/SILENT /SUPPRESSMSGBOXES /NORESTART` + Program Files ise `/ALLUSERS` değilse
+     `/CURRENTUSER` ile başlatır ve programı kapatır
+   - **csproj `<Version>` 1.0.0 yapıldı** (bu dalda)
+3. **SIRADAKİ: güncellemenin uçtan uca canlı denemesi (yapılmadı).** Hazır dosyalar (git'te değil):
+   - `E:\royconvert\artifacts\royconvert-1.0.0-setup.exe` SHA `6ab74b647ef42bccf0df10ee5f5bd3560b9c6c53e9213e90b99bf887167f56ac`
+   - `E:\rc-deneme\upd\royconvert-1.0.1-setup.exe` (yalnız deneme için, Version geçici 1.0.1 yapılıp derlendi, geri
+     alındı) SHA `22e1d3bceb568beb64f8a4ddc633973186c3e3e985e7ec1330d749f401b9e8a5`
+   - Adımlar: (a) 1.0.0'ı `/ALLUSERS /VERYSILENT` ile test6 üzerine kur (UAC: kullanıcı Evet) (b) yerel sunucu
+     (PowerShell HttpListener): `/latest` → `{"tag_name":"v1.0.1","prerelease":false,"draft":false,"body":"",
+     "assets":[{"name":"royconvert-1.0.1-setup.exe","browser_download_url":"http://localhost:PORT/setup.exe",
+     "digest":"sha256:22e1…e8a5"}]}`, `/setup.exe` → dosya (c) `ROYCONVERT_UPDATE_URL=http://localhost:PORT/latest`
+     ile kurulu royconvert.exe'yi aç → bant → Güncelle → UAC → 1.0.1 kuruldu mu (royconvert.exe sürümü / kaldırma
+     kaydı DisplayVersion) (d) menüden dönüşümde ilerleme penceresinde bandın kalıp "Sonra" ile kapanması
+     (e) `%APPDATA%\royconvert\settings.json`'daki `LastUpdateCheck` her denemeden önce silinmeli (20 saat kuralı)
+     (f) sonunda 1.0.0'ı yeniden kur; deneme settings.json'u sil (kullanıcının önceden yoktu)
+4. Sonra: `oto-guncelleme` PR'ı (PR #15'ten sonra birleşmeli), gizli bilgi taraması (git geçmişi dahil), README/lisans
+   kontrolü (FFmpeg GPL, LibreOffice MPL, PDFsharp MIT 6.2.4), kullanıcı depoyu açar
+   (`! gh repo edit cohard32/royconvert --visibility public --accept-visibility-change-consequences`),
+   main'den 1.0.0 setup derle (sürüm aynıysa SHA aynı çıkar), `gh release create v1.0.0` (**--prerelease YOK**),
+   yükleme ayrı kopyadan, GitHub'da `releases/latest` ve varlık `digest` alanı kontrol edilir
+- Bu PC: menü Program Files **test6**'ya bağlı; deneme klasörü E:\rc-deneme (menudump, fixtures, ui.ps1)
 
 ## Kaldığımız yer (2026-10-28 gece, kullanıcı "bugünlük yeter, kaydet" dedi)
 - **`pdfium-cokme` dalı (push edildi, PR açılmadı) — önce bu birleşmeli:** Docnet ile PDF işlemleri (PDF → resim,

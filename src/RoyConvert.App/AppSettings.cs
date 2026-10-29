@@ -33,6 +33,12 @@ public sealed class AppSettings
     /// <summary>Conversions running at the same time; null for <see cref="ConversionRunner.DefaultParallelism"/>.</summary>
     public int? MaxParallelism { get; set; }
 
+    /// <summary>Looks for a newer release about once a day when a window opens.</summary>
+    public bool CheckForUpdates { get; set; } = true;
+
+    /// <summary>When the last look for a newer release was made.</summary>
+    public DateTimeOffset? LastUpdateCheck { get; set; }
+
     /// <summary>Missing or unreadable settings give the defaults; out-of-range values are brought into range.</summary>
     public static AppSettings Load(string? path = null)
     {
