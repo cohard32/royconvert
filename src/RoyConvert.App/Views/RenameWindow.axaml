@@ -1,0 +1,55 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:vm="using:RoyConvert.App.ViewModels"
+        xmlns:res="using:RoyConvert.App.Resources"
+        x:Class="RoyConvert.App.Views.RenameWindow"
+        x:DataType="vm:RenameViewModel"
+        Title="{Binding Title}"
+        Icon="/Assets/royconvert.ico"
+        Width="620" Height="520" MinWidth="420" MinHeight="320"
+        WindowStartupLocation="CenterScreen">
+
+    <Grid Margin="20" RowDefinitions="Auto,Auto,*,Auto,Auto" RowSpacing="12">
+        <Grid ColumnDefinitions="*,Auto" ColumnSpacing="12">
+            <StackPanel Spacing="4">
+                <TextBlock Text="{x:Static res:Strings.Rename_Pattern}" />
+                <TextBox x:Name="PatternBox" Text="{Binding Pattern}" />
+            </StackPanel>
+            <StackPanel Grid.Column="1" Spacing="4">
+                <TextBlock Text="{x:Static res:Strings.Rename_Start}" />
+                <NumericUpDown Value="{Binding Start}" Minimum="0" Maximum="999999" Increment="1" FormatString="0" Width="130" />
+            </StackPanel>
+        </Grid>
+
+        <TextBlock Grid.Row="1" Text="{x:Static res:Strings.Rename_Hint}" FontSize="12" Opacity="0.6" TextWrapping="Wrap" />
+
+        <Border Grid.Row="2" BorderThickness="1" BorderBrush="{DynamicResource SystemControlForegroundBaseLowBrush}" CornerRadius="4">
+            <ScrollViewer>
+                <ItemsControl ItemsSource="{Binding Rows}" Margin="8,4">
+                    <ItemsControl.ItemTemplate>
+                        <DataTemplate x:DataType="vm:RenameRow">
+                            <Grid ColumnDefinitions="*,Auto,*" ColumnSpacing="8" Margin="0,3">
+                                <TextBlock Text="{Binding OldName}" Opacity="0.7" TextTrimming="CharacterEllipsis" />
+                                <TextBlock Grid.Column="1" Text="→" Opacity="0.5" />
+                                <StackPanel Grid.Column="2">
+                                    <TextBlock Text="{Binding NewName}" TextTrimming="CharacterEllipsis" FontWeight="SemiBold" />
+                                    <TextBlock Text="{Binding Problem}" FontSize="12" TextWrapping="Wrap"
+                                               Foreground="{DynamicResource SystemControlErrorTextForegroundBrush}"
+                                               IsVisible="{Binding Problem, Converter={x:Static StringConverters.IsNotNullOrEmpty}}" />
+                                </StackPanel>
+                            </Grid>
+                        </DataTemplate>
+                    </ItemsControl.ItemTemplate>
+                </ItemsControl>
+            </ScrollViewer>
+        </Border>
+
+        <TextBlock Grid.Row="3" Text="{Binding Status}" TextWrapping="Wrap" Foreground="{DynamicResource SystemControlErrorTextForegroundBrush}"
+                   IsVisible="{Binding Status, Converter={x:Static StringConverters.IsNotNullOrEmpty}}" />
+
+        <StackPanel Grid.Row="4" Orientation="Horizontal" HorizontalAlignment="Right" Spacing="8">
+            <Button Content="{x:Static res:Strings.Rename_Cancel}" Command="{Binding CancelCommand}" IsCancel="True" />
+            <Button Content="{x:Static res:Strings.Rename_Apply}" Command="{Binding ApplyCommand}" Classes="accent" IsDefault="True" />
+        </StackPanel>
+    </Grid>
+</Window>

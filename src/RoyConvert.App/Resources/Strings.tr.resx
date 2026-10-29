@@ -80,4 +80,19 @@
   <data name="Settings_SaveFailed" xml:space="preserve"><value>Ayarlar kaydedilemedi: {0}</value></data>
   <data name="Home_ChooseDvd" xml:space="preserve"><value>DVD…</value></data>
   <data name="Home_ChooseDvdTitle" xml:space="preserve"><value>DVD sürücüsünü ya da VIDEO_TS içeren klasörü seçin</value></data>
+  <data name="Rename_Menu" xml:space="preserve"><value>Yeniden adlandır…</value></data>
+  <data name="Rename_Title" xml:space="preserve"><value>{0} dosyayı yeniden adlandır</value></data>
+  <data name="Rename_Pattern" xml:space="preserve"><value>Yeni ad</value></data>
+  <data name="Rename_Hint" xml:space="preserve"><value>{n} = sıra numarası, {name} = eski ad. Uzantı aynı kalır.</value></data>
+  <data name="Rename_Start" xml:space="preserve"><value>Başlangıç</value></data>
+  <data name="Rename_Apply" xml:space="preserve"><value>Yeniden adlandır</value></data>
+  <data name="Rename_Cancel" xml:space="preserve"><value>İptal</value></data>
+  <data name="Rename_DefaultPattern" xml:space="preserve"><value>Dosya {n}</value></data>
+  <data name="Rename_EmptyName" xml:space="preserve"><value>ad boş</value></data>
+  <data name="Rename_InvalidCharacter" xml:space="preserve"><value>kullanılamaz: \ / : * ? " &lt; &gt; |</value></data>
+  <data name="Rename_Duplicate" xml:space="preserve"><value>başka bir dosyayla aynı ad</value></data>
+  <data name="Rename_Exists" xml:space="preserve"><value>bu adda bir dosya var</value></data>
+  <data name="Rename_Failed" xml:space="preserve"><value>Hiçbir dosyanın adı değişmedi: {0}</value></data>
+  <data name="Rename_NoFiles" xml:space="preserve"><value>Yeniden adlandırılacak dosya yok.</value></data>
+  <data name="Rename_InUse" xml:space="preserve"><value>"{0}" başka bir programda açık.</value></data>
 </root>

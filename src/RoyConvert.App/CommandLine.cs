@@ -7,6 +7,8 @@ public enum CommandKind
     /// <summary>No arguments: show the home window.</summary>
     Home,
     Convert,
+    /// <summary>"--preset rename" (the Explorer menu starts every item as a preset): the rename window.</summary>
+    Rename,
     ListPresets,
     RegisterShell,
     UnregisterShell,
@@ -23,6 +25,9 @@ public enum CommandKind
 /// </summary>
 public sealed record CommandLine(CommandKind Kind, string? PresetId, IReadOnlyList<string> Files, string? Error = null)
 {
+    /// <summary>The menu item that opens the rename window instead of converting.</summary>
+    public const string RenamePresetId = "rename";
+
     public static CommandLine Parse(IReadOnlyList<string> args, string? workingDirectory = null)
     {
         workingDirectory ??= Environment.CurrentDirectory;
@@ -87,7 +92,8 @@ public sealed record CommandLine(CommandKind Kind, string? PresetId, IReadOnlyLi
 
         // Absolute paths, so the arguments can be forwarded to an instance with another working directory.
         var absolute = files.Select(f => Path.GetFullPath(f.Trim().Trim('"'), workingDirectory)).ToList();
-        return new CommandLine(CommandKind.Convert, presetId, absolute);
+        var kind = string.Equals(presetId, RenamePresetId, StringComparison.OrdinalIgnoreCase) ? CommandKind.Rename : CommandKind.Convert;
+        return new CommandLine(kind, presetId, absolute);
     }
 
     /// <summary>Arguments that reproduce this command; used to forward it to the running instance.</summary>

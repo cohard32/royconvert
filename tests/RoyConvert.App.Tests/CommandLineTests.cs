@@ -93,4 +93,13 @@ public class CommandLineTests
 
         Assert.Equal(command.Files, CommandLine.Parse(command.ToArguments(), "C:\\elsewhere").Files);
     }
+
+    [Fact]
+    public void RenamePreset_IsTheRenameCommand_WithItsFiles()
+    {
+        var command = CommandLine.Parse(["--preset", CommandLine.RenamePresetId, "a.jpg", "b.pdf"], Cwd);
+
+        Assert.Equal(CommandKind.Rename, command.Kind);
+        Assert.Equal([Path.Combine(Cwd, "a.jpg"), Path.Combine(Cwd, "b.pdf")], command.Files);
+    }
 }
