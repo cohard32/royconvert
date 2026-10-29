@@ -226,7 +226,16 @@ Son güncelleme: 2026-10-27
   değiştirme / yalnız büyük-küçük harf çalışır), hata olursa hepsi geri alınır. Canlı (Debug, menüden): jpg+pdf karışık
   seçim, aynı ad uyarısı, adlandırma, kilitli dosyada geri alma + Türkçe mesaj, kilit açılınca tekrar deneme tamam
 - UI otomasyonu: `E:\rc-deneme\ui.ps1` (UIAutomation ile yaz/tıkla, PrintWindow ile ekran görüntüsü)
-- Sıradaki: filigran (metin girişi; bu pencereyle aynı yaklaşım) veya ses/video seçenekleri
+- PR #11 (toplu ad) birleşti (main 46d69d6)
+- **Filigran** (`filigran` dalı): menüde "Filigran ekle…" (`MenuTools`: pencere açan menü öğeleri, `rename` ile
+  birlikte menü dosyasının sonunda). Pencere: yazı, konum (ortada çapraz / sağ alt / döşe), görünürlük, boyut, ilk
+  dosyanın anlık önizlemesi. `Core/Watermark.cs`: resim Magick.NET (Arial Bold dosyası; Magick'in varsayılan yazı
+  tipinde ğ yok), PDF PDFsharp ile vektör yazı (metin olarak aranabilir). Yeni dosya "(filigranlı)" ekiyle, asıl dosya
+  değişmez; HEIC/DNG/PSD/TGA → JPG; GIF/ICO/SVG/EXR yok. Tuzaklar: PDFsharp saydamlığı PDF < 1.4'te yok sayıyor
+  (sürüm 1.4'e çekiliyor); `/Rotate`'li sayfada `XGraphics` döndürülmemiş koordinatta çiziyor (dönüşüm ekleniyor);
+  döşemede ızgara yazı doğrultusunda kurulmalı (yatay ızgarada üst üste biniyordu)
+- macOS'ta PDFsharp için yazı tipi çözücü gerekecek (`UseWindowsFontsUnderWindows` yalnız Windows)
+- Sıradaki: ses/video seçenekleri veya test6 ön sürümü
 
 ## Kaldığımız yer (2026-10-28 gece, kullanıcı "bugünlük yeter, kaydet" dedi)
 - **`pdfium-cokme` dalı (push edildi, PR açılmadı) — önce bu birleşmeli:** Docnet ile PDF işlemleri (PDF → resim,

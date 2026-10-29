@@ -95,4 +95,21 @@
   <data name="Rename_Failed" xml:space="preserve"><value>Hiçbir dosyanın adı değişmedi: {0}</value></data>
   <data name="Rename_NoFiles" xml:space="preserve"><value>Yeniden adlandırılacak dosya yok.</value></data>
   <data name="Rename_InUse" xml:space="preserve"><value>"{0}" başka bir programda açık.</value></data>
+  <data name="Watermark_Menu" xml:space="preserve"><value>Filigran ekle…</value></data>
+  <data name="Watermark_Title" xml:space="preserve"><value>{0} dosyaya filigran ekle</value></data>
+  <data name="Watermark_Text" xml:space="preserve"><value>Yazı</value></data>
+  <data name="Watermark_TextHint" xml:space="preserve"><value>ör. © Adınız</value></data>
+  <data name="Watermark_Position" xml:space="preserve"><value>Konum</value></data>
+  <data name="Watermark_Diagonal" xml:space="preserve"><value>Ortada çapraz</value></data>
+  <data name="Watermark_BottomRight" xml:space="preserve"><value>Sağ alt köşe</value></data>
+  <data name="Watermark_Tiled" xml:space="preserve"><value>Tüm sayfaya döşe</value></data>
+  <data name="Watermark_Opacity" xml:space="preserve"><value>Görünürlük</value></data>
+  <data name="Watermark_Size" xml:space="preserve"><value>Boyut</value></data>
+  <data name="Watermark_Note" xml:space="preserve"><value>Yeni dosyalar adına "(filigranlı)" eklenerek yanına kaydedilir; asıl dosyalar değişmez.</value></data>
+  <data name="Watermark_FileSuffix" xml:space="preserve"><value> (filigranlı)</value></data>
+  <data name="Watermark_Apply" xml:space="preserve"><value>Filigran ekle</value></data>
+  <data name="Watermark_Close" xml:space="preserve"><value>Kapat</value></data>
+  <data name="Watermark_Progress" xml:space="preserve"><value>{0} / {1}…</value></data>
+  <data name="Watermark_Failed" xml:space="preserve"><value>{1} dosyanın {0} tanesine eklenemedi:</value></data>
+  <data name="Watermark_NoFiles" xml:space="preserve"><value>Filigran eklenecek resim ya da PDF yok.</value></data>
 </root>

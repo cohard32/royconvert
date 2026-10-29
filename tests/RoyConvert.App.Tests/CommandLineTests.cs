@@ -94,12 +94,20 @@ public class CommandLineTests
         Assert.Equal(command.Files, CommandLine.Parse(command.ToArguments(), "C:\\elsewhere").Files);
     }
 
-    [Fact]
-    public void RenamePreset_IsTheRenameCommand_WithItsFiles()
+    [Theory]
+    [InlineData("rename", CommandKind.Rename)]
+    [InlineData("watermark", CommandKind.Watermark)]
+    public void ToolIds_OpenTheirWindow_WithTheFiles(string id, CommandKind kind)
     {
-        var command = CommandLine.Parse(["--preset", CommandLine.RenamePresetId, "a.jpg", "b.pdf"], Cwd);
+        var command = CommandLine.Parse(["--preset", id, "a.jpg", "b.pdf"], Cwd);
 
-        Assert.Equal(CommandKind.Rename, command.Kind);
+        Assert.Equal(kind, command.Kind);
         Assert.Equal([Path.Combine(Cwd, "a.jpg"), Path.Combine(Cwd, "b.pdf")], command.Files);
+    }
+
+    [Fact]
+    public void ToolIds_AreNotPresetIds()
+    {
+        Assert.All(MenuTools.All, tool => Assert.Null(Core.PresetCatalog.Find(Core.PresetCatalog.Default, tool.Id)));
     }
 }

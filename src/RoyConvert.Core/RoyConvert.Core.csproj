@@ -13,4 +13,8 @@
     <PackageReference Include="PDFsharp" Version="6.2.4" />
   </ItemGroup>
 
+  <ItemGroup>
+    <InternalsVisibleTo Include="RoyConvert.Core.Tests" />
+  </ItemGroup>
+
 </Project>
