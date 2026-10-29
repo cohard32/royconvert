@@ -131,4 +131,30 @@
   <data name="Trim_Failed" xml:space="preserve"><value>{0} of {1} files could not be cut:</value></data>
   <data name="Trim_NoFiles" xml:space="preserve"><value>No videos or sound files to cut.</value></data>
   <data name="Trim_NoFfmpeg" xml:space="preserve"><value>ffmpeg was not found; reinstall royconvert.</value></data>
+  <data name="Password_ProtectMenu" xml:space="preserve"><value>Add password…</value></data>
+  <data name="Password_RemoveMenu" xml:space="preserve"><value>Remove password…</value></data>
+  <data name="Password_ProtectTitle" xml:space="preserve"><value>Add a password to {0} PDFs</value></data>
+  <data name="Password_RemoveTitle" xml:space="preserve"><value>Remove the password from {0} PDFs</value></data>
+  <data name="Password_Password" xml:space="preserve"><value>Password</value></data>
+  <data name="Password_Repeat" xml:space="preserve"><value>Password again</value></data>
+  <data name="Password_Show" xml:space="preserve"><value>Show</value></data>
+  <data name="Password_ProtectNote" xml:space="preserve"><value>The PDF can only be opened with this password (AES-256). Keep it safe: it cannot be recovered. New files are saved next to the originals with "(protected)" in the name.</value></data>
+  <data name="Password_RemoveNote" xml:space="preserve"><value>Leave it empty if the PDF opens without a password and only printing or copying is limited. New files are saved next to the originals with "(unprotected)" in the name.</value></data>
+  <data name="Password_Mismatch" xml:space="preserve"><value>The two passwords are not the same.</value></data>
+  <data name="Password_ProtectApply" xml:space="preserve"><value>Add password</value></data>
+  <data name="Password_RemoveApply" xml:space="preserve"><value>Remove password</value></data>
+  <data name="Password_ProtectSuffix" xml:space="preserve"><value> (protected)</value></data>
+  <data name="Password_RemoveSuffix" xml:space="preserve"><value> (unprotected)</value></data>
+  <data name="Password_Wrong" xml:space="preserve"><value>the password is wrong</value></data>
+  <data name="Password_NotProtected" xml:space="preserve"><value>it has no password</value></data>
+  <data name="Password_AlreadyProtected" xml:space="preserve"><value>it already has a password</value></data>
+  <data name="Password_Failed" xml:space="preserve"><value>{0} of {1} PDFs could not be done:</value></data>
+  <data name="Password_NoFiles" xml:space="preserve"><value>No PDFs selected.</value></data>
+  <data name="Update_Available" xml:space="preserve"><value>royconvert {0} is available (you have {1}).</value></data>
+  <data name="Update_Install" xml:space="preserve"><value>Update</value></data>
+  <data name="Update_Later" xml:space="preserve"><value>Later</value></data>
+  <data name="Update_Downloading" xml:space="preserve"><value>Downloading… {0:0}%</value></data>
+  <data name="Update_Failed" xml:space="preserve"><value>The update could not be installed: {0}</value></data>
+  <data name="Update_BadFile" xml:space="preserve"><value>the downloaded file is not the published one</value></data>
+  <data name="Settings_CheckUpdates" xml:space="preserve"><value>Check for updates automatically</value></data>
 </root>

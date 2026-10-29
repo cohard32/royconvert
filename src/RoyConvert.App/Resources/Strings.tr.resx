@@ -131,4 +131,30 @@
   <data name="Trim_Failed" xml:space="preserve"><value>{1} dosyanın {0} tanesi kırpılamadı:</value></data>
   <data name="Trim_NoFiles" xml:space="preserve"><value>Kırpılacak video ya da ses dosyası yok.</value></data>
   <data name="Trim_NoFfmpeg" xml:space="preserve"><value>ffmpeg bulunamadı; royconvert'i yeniden kurun.</value></data>
+  <data name="Password_ProtectMenu" xml:space="preserve"><value>Şifre koy…</value></data>
+  <data name="Password_RemoveMenu" xml:space="preserve"><value>Şifreyi kaldır…</value></data>
+  <data name="Password_ProtectTitle" xml:space="preserve"><value>{0} PDF'e şifre koy</value></data>
+  <data name="Password_RemoveTitle" xml:space="preserve"><value>{0} PDF'in şifresini kaldır</value></data>
+  <data name="Password_Password" xml:space="preserve"><value>Şifre</value></data>
+  <data name="Password_Repeat" xml:space="preserve"><value>Şifre (tekrar)</value></data>
+  <data name="Password_Show" xml:space="preserve"><value>Göster</value></data>
+  <data name="Password_ProtectNote" xml:space="preserve"><value>PDF yalnızca bu şifreyle açılabilir (AES-256). Şifreyi saklayın: unutulursa geri alınamaz. Yeni dosyalar adına "(şifreli)" eklenerek yanına kaydedilir.</value></data>
+  <data name="Password_RemoveNote" xml:space="preserve"><value>PDF şifresiz açılıyor da yalnız yazdırma ya da kopyalama kısıtlıysa boş bırakın. Yeni dosyalar adına "(şifresiz)" eklenerek yanına kaydedilir.</value></data>
+  <data name="Password_Mismatch" xml:space="preserve"><value>İki şifre aynı değil.</value></data>
+  <data name="Password_ProtectApply" xml:space="preserve"><value>Şifre koy</value></data>
+  <data name="Password_RemoveApply" xml:space="preserve"><value>Şifreyi kaldır</value></data>
+  <data name="Password_ProtectSuffix" xml:space="preserve"><value> (şifreli)</value></data>
+  <data name="Password_RemoveSuffix" xml:space="preserve"><value> (şifresiz)</value></data>
+  <data name="Password_Wrong" xml:space="preserve"><value>şifre yanlış</value></data>
+  <data name="Password_NotProtected" xml:space="preserve"><value>şifresi yok</value></data>
+  <data name="Password_AlreadyProtected" xml:space="preserve"><value>zaten şifreli</value></data>
+  <data name="Password_Failed" xml:space="preserve"><value>{1} PDF'in {0} tanesi yapılamadı:</value></data>
+  <data name="Password_NoFiles" xml:space="preserve"><value>PDF seçilmedi.</value></data>
+  <data name="Update_Available" xml:space="preserve"><value>royconvert {0} çıktı (sizdeki {1}).</value></data>
+  <data name="Update_Install" xml:space="preserve"><value>Güncelle</value></data>
+  <data name="Update_Later" xml:space="preserve"><value>Sonra</value></data>
+  <data name="Update_Downloading" xml:space="preserve"><value>İndiriliyor… %{0:0}</value></data>
+  <data name="Update_Failed" xml:space="preserve"><value>Güncelleme kurulamadı: {0}</value></data>
+  <data name="Update_BadFile" xml:space="preserve"><value>indirilen dosya yayımlanan dosyayla aynı değil</value></data>
+  <data name="Settings_CheckUpdates" xml:space="preserve"><value>Güncellemeleri otomatik denetle</value></data>
 </root>

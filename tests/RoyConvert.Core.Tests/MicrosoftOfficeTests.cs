@@ -171,10 +171,13 @@ public sealed class MicrosoftOfficeTests : IDisposable
     private static HashSet<int> Running(OfficeApp app) =>
         Process.GetProcessesByName(ProcessName(app)).Select(p => p.Id).ToHashSet();
 
-    /// <summary>The converter quits the Office process it started; it may take a moment to exit.</summary>
+    /// <summary>
+    /// The converter quits the Office process it started; it may take a moment to exit. While the other test classes
+    /// run in parallel Excel has needed more than 20 s.
+    /// </summary>
     private static async Task AssertOfficeExited(OfficeApp app, HashSet<int> before)
     {
-        var deadline = DateTime.UtcNow + TimeSpan.FromSeconds(20);
+        var deadline = DateTime.UtcNow + TimeSpan.FromSeconds(60);
         while (Running(app).Except(before).Any() && DateTime.UtcNow < deadline)
         {
             await Task.Delay(250);
