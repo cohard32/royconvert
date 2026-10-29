@@ -56,6 +56,8 @@
   <data name="FileName_compress-pdf" xml:space="preserve"><value> (küçültülmüş)</value></data>
   <data name="Preset_strip-metadata" xml:space="preserve"><value>Bilgileri sil (EXIF, konum)</value></data>
   <data name="FileName_strip-metadata" xml:space="preserve"><value> (bilgisiz)</value></data>
+  <data name="Preset_mute" xml:space="preserve"><value>Sesi kaldır</value></data>
+  <data name="FileName_mute" xml:space="preserve"><value> (sessiz)</value></data>
   <data name="Preset_split-pdf" xml:space="preserve"><value>PDF (sayfalara böl)</value></data>
   <data name="FileName_split-pdf" xml:space="preserve"><value>-sayfa</value></data>
   <data name="Job_MoreFiles" xml:space="preserve"><value>{0} ve {1} dosya daha</value></data>
@@ -112,4 +114,21 @@
   <data name="Watermark_Progress" xml:space="preserve"><value>{0} / {1}…</value></data>
   <data name="Watermark_Failed" xml:space="preserve"><value>{1} dosyanın {0} tanesine eklenemedi:</value></data>
   <data name="Watermark_NoFiles" xml:space="preserve"><value>Filigran eklenecek resim ya da PDF yok.</value></data>
+  <data name="Trim_Menu" xml:space="preserve"><value>Kırp…</value></data>
+  <data name="Trim_Title" xml:space="preserve"><value>{0} dosyayı kırp</value></data>
+  <data name="Trim_Start" xml:space="preserve"><value>Başlangıç</value></data>
+  <data name="Trim_End" xml:space="preserve"><value>Bitiş</value></data>
+  <data name="Trim_EndHint" xml:space="preserve"><value>sonu</value></data>
+  <data name="Trim_Hint" xml:space="preserve"><value>Zamanı 1:30 ya da 0:01:30.5 gibi yazın. "Bitiş" boş kalırsa "Başlangıç"tan sonrası tümüyle alınır. Seçilen her dosyadan aynı bölüm kesilir.</value></data>
+  <data name="Trim_Precise" xml:space="preserve"><value>Tam karesinden kes (video yeniden kodlanır; daha yavaş)</value></data>
+  <data name="Trim_PreciseNote" xml:space="preserve"><value>İşaretlenmezse bölüm olduğu gibi kopyalanır: hızlı ve kayıpsızdır, ama video birkaç saniye erken başlayabilir.</value></data>
+  <data name="Trim_Length" xml:space="preserve"><value>{0}: {1} uzunluğunda</value></data>
+  <data name="Trim_LengthUnknown" xml:space="preserve"><value>{0}: uzunluğu okunamadı</value></data>
+  <data name="Trim_BadTime" xml:space="preserve"><value>Zamanı 1:30 ya da 0:01:30 gibi yazın.</value></data>
+  <data name="Trim_EndBeforeStart" xml:space="preserve"><value>"Bitiş", "Başlangıç"tan sonra olmalı.</value></data>
+  <data name="Trim_Apply" xml:space="preserve"><value>Kırp</value></data>
+  <data name="Trim_FileSuffix" xml:space="preserve"><value> (kırpılmış)</value></data>
+  <data name="Trim_Failed" xml:space="preserve"><value>{1} dosyanın {0} tanesi kırpılamadı:</value></data>
+  <data name="Trim_NoFiles" xml:space="preserve"><value>Kırpılacak video ya da ses dosyası yok.</value></data>
+  <data name="Trim_NoFfmpeg" xml:space="preserve"><value>ffmpeg bulunamadı; royconvert'i yeniden kurun.</value></data>
 </root>

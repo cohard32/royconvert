@@ -42,6 +42,18 @@ public static class FfmpegArguments
         {
             args.AddRange(["-map", "0:v:0", "-map", "0:a?"]);
         }
+        else if (CanCopyVideo(input, format, s))
+        {
+            // Only the sound goes: the picture is copied as it is, which is fast and loses nothing.
+            args.AddRange(["-map", "0:v", "-c:v", "copy", "-an"]);
+            if (format == OutputFormat.Mp4)
+            {
+                args.AddRange(["-movflags", "+faststart"]);
+            }
+
+            args.Add(output);
+            return args;
+        }
 
         switch (format)
         {
@@ -145,6 +157,67 @@ public static class FfmpegArguments
 
         return filters.Count == 0 ? null : string.Join(",", filters);
     }
+
+    /// <summary>
+    /// A video without sound in the container it already has (or in MKV, which holds any codec) needs no encoding:
+    /// nothing else changes. Custom arguments may ask for more, so they always encode.
+    /// </summary>
+    public static bool CanCopyVideo(string input, OutputFormat format, ConversionSettings s) =>
+        !s.EnableAudio && VideoFilter(s) is null && string.IsNullOrWhiteSpace(s.CustomFfmpegArguments)
+        && Formats.VideoInputs.Contains(Formats.ExtensionOf(input))
+        && (format == OutputFormat.Mkv || (Formats.KindOf(format) == MediaKind.Video && format != OutputFormat.Gif
+            && Formats.ExtensionOf(input) == Formats.Extension(format)));
+
+    /// <summary>
+    /// Keeps <paramref name="start"/> to <paramref name="end"/> (null: to the end) of a video or sound file in its own
+    /// format. Without <paramref name="precise"/> the streams are copied: fast and lossless, but a video starts at the
+    /// key frame before <paramref name="start"/>. With it the video is encoded again (see <see cref="TrimFormat"/>)
+    /// so the cut is frame exact.
+    /// </summary>
+    public static IReadOnlyList<string> BuildTrim(string input, string output, TimeSpan start, TimeSpan? end, bool precise,
+        ConversionSettings s)
+    {
+        var args = new List<string> { "-hide_banner", "-nostdin", "-n", "-progress", "pipe:1", "-nostats" };
+        // Before -i: seeks quickly; when encoding, ffmpeg still decodes from the key frame and drops what comes before.
+        if (start > TimeSpan.Zero)
+        {
+            args.AddRange(["-ss", Seconds(start)]);
+        }
+
+        args.AddRange(["-i", input]);
+        if (end is { } until)
+        {
+            args.AddRange(["-t", Seconds(until - start)]);
+        }
+
+        if (precise && TrimFormat(input) is { } format)
+        {
+            var encode = Build(input, output, format, s, dvd: false);
+            // Everything after "-i <input>" of the normal conversion: codecs, quality, output.
+            var afterInput = encode.ToList().IndexOf(input) + 1;
+            args.AddRange(encode.Skip(afterInput));
+            return args;
+        }
+
+        args.AddRange(["-map", "0:v?", "-map", "0:a?", "-c", "copy", "-avoid_negative_ts", "make_zero"]);
+        args.Add(output);
+        return args;
+    }
+
+    /// <summary>
+    /// What a precise trim encodes to: the input's own format for the videos royconvert writes, MP4 for other videos,
+    /// null for sound, which is always copied (its packets are a few milliseconds long).
+    /// </summary>
+    public static OutputFormat? TrimFormat(string input) => Formats.ExtensionOf(input) switch
+    {
+        "mkv" => OutputFormat.Mkv,
+        "webm" => OutputFormat.Webm,
+        "avi" => OutputFormat.Avi,
+        var e when Formats.VideoInputs.Contains(e) => OutputFormat.Mp4,
+        _ => null,
+    };
+
+    private static string Seconds(TimeSpan time) => time.TotalSeconds.ToString("0.###", CultureInfo.InvariantCulture);
 
     public static string SpeedName(EncodingSpeed speed) => speed.ToString().ToLowerInvariant();
 

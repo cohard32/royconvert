@@ -78,6 +78,13 @@ public static class PresetCatalog
                 "{dir}/{name} (no metadata)"));
         }
 
+        // Into the same format the picture is copied, not encoded (see FfmpegArguments.CanCopyVideo).
+        foreach (var format in VideoOutputs)
+        {
+            presets.Add(Make(format, video with { EnableAudio = false }, Formats.VideoInputs, "mute", "Remove sound",
+                "{dir}/{name} (no sound)"));
+        }
+
         return presets;
     }
 

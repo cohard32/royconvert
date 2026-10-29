@@ -47,6 +47,13 @@ public partial class App : Application
             {
                 desktop.MainWindow = new WatermarkWindow { DataContext = new WatermarkViewModel(Command.Files) };
             }
+            else if (Command.Kind == CommandKind.Trim)
+            {
+                desktop.MainWindow = new TrimWindow
+                {
+                    DataContext = new TrimViewModel(Command.Files, _ffmpegPath, Settings.ApplyTo(new ConversionSettings())),
+                };
+            }
             else
             {
                 var progress = CreateProgress();

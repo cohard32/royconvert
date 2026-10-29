@@ -1,0 +1,48 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:vm="using:RoyConvert.App.ViewModels"
+        xmlns:res="using:RoyConvert.App.Resources"
+        x:Class="RoyConvert.App.Views.TrimWindow"
+        x:DataType="vm:TrimViewModel"
+        Title="{Binding Title}"
+        Icon="/Assets/royconvert.ico"
+        Width="520" SizeToContent="Height" CanResize="False"
+        WindowStartupLocation="CenterScreen">
+
+    <StackPanel Margin="20" Spacing="14">
+        <TextBlock Text="{Binding Length}" FontWeight="SemiBold" TextTrimming="CharacterEllipsis"
+                   IsVisible="{Binding Length, Converter={x:Static StringConverters.IsNotNullOrEmpty}}" />
+
+        <Grid ColumnDefinitions="*,*" ColumnSpacing="12">
+            <StackPanel Spacing="4">
+                <TextBlock Text="{x:Static res:Strings.Trim_Start}" />
+                <TextBox x:Name="StartBox" Text="{Binding Start}" />
+            </StackPanel>
+            <StackPanel Grid.Column="1" Spacing="4">
+                <TextBlock Text="{x:Static res:Strings.Trim_End}" />
+                <TextBox Text="{Binding End}" Watermark="{x:Static res:Strings.Trim_EndHint}" />
+            </StackPanel>
+        </Grid>
+
+        <TextBlock Text="{Binding Problem}" Foreground="{DynamicResource SystemControlErrorTextForegroundBrush}"
+                   IsVisible="{Binding Problem, Converter={x:Static StringConverters.IsNotNullOrEmpty}}" />
+        <TextBlock Text="{x:Static res:Strings.Trim_Hint}" FontSize="12" Opacity="0.6" TextWrapping="Wrap" />
+
+        <StackPanel Spacing="4" IsVisible="{Binding HasVideo}">
+            <CheckBox Content="{x:Static res:Strings.Trim_Precise}" IsChecked="{Binding Precise}" />
+            <TextBlock Text="{x:Static res:Strings.Trim_PreciseNote}" FontSize="12" Opacity="0.6" TextWrapping="Wrap" />
+        </StackPanel>
+
+        <ProgressBar Value="{Binding Progress}" Maximum="1" IsVisible="{Binding IsBusy}" />
+        <TextBlock Text="{Binding Status}" TextWrapping="Wrap"
+                   IsVisible="{Binding Status, Converter={x:Static StringConverters.IsNotNullOrEmpty}}" />
+        <SelectableTextBlock Text="{Binding Errors}" TextWrapping="Wrap" FontSize="12" MaxHeight="120"
+                             Foreground="{DynamicResource SystemControlErrorTextForegroundBrush}"
+                             IsVisible="{Binding Errors, Converter={x:Static StringConverters.IsNotNullOrEmpty}}" />
+
+        <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" Spacing="8">
+            <Button Content="{x:Static res:Strings.Watermark_Close}" Command="{Binding CloseCommand}" IsCancel="True" />
+            <Button Content="{x:Static res:Strings.Trim_Apply}" Command="{Binding ApplyCommand}" Classes="accent" IsDefault="True" />
+        </StackPanel>
+    </StackPanel>
+</Window>

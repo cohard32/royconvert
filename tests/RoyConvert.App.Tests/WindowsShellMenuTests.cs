@@ -54,8 +54,9 @@ public class WindowsShellMenuTests
         var lines = WindowsShellMenu.BuildMenuFile(PresetCatalog.Default, p => p.Name, MenuTools.All)
             .Split("\r\n", StringSplitOptions.RemoveEmptyEntries);
 
-        Assert.Equal(Lines, lines[..^2]);
-        Assert.Equal(["watermark", "rename"], lines[^2..].Select(line => line.Split('\t')[0]));
+        Assert.Equal(Lines, lines[..^3]);
+        Assert.Equal(["trim", "watermark", "rename"], lines[^3..].Select(line => line.Split('\t')[0]));
+        Assert.Contains("mp3", lines[^3].Split('\t')[2].Split(' '));
         Assert.DoesNotContain("gif", lines[^2].Split('\t')[2].Split(' '));
         var fields = lines[^1].Split('\t');
         Assert.Equal(MenuTools.Rename.Label(), fields[1]);
