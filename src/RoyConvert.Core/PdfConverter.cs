@@ -15,6 +15,12 @@ public sealed class PdfConverter(IConverter image, IReadOnlyList<IDocumentConver
             return;
         }
 
+        if (preset.CompressesPdf)
+        {
+            await Task.Run(() => PdfCompression.Compress(input, output, preset.Settings, progress, cancellationToken), cancellationToken);
+            return;
+        }
+
         if (Formats.ExtensionOf(input) == "pdf" && preset.Settings.Rotation != Rotation.None)
         {
             await Task.Run(() => PdfPages.Rotate(input, output, preset.Settings.Rotation, progress, cancellationToken), cancellationToken);

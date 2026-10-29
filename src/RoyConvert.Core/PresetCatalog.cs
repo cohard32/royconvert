@@ -54,6 +54,9 @@ public static class PresetCatalog
             "{dir}/{name} (combined)", CombinesInputs: true));
         presets.Add(new Preset("split-pdf", "PDF (split pages)", OutputFormat.Pdf, Union([], ["pdf"]), image,
             "{dir}/{name}-page", SplitsPages: true));
+        // Smaller than the image presets' quality: the point is the file size, and 150 dpi still prints well.
+        presets.Add(new Preset("compress-pdf", "PDF (compressed)", OutputFormat.Pdf, Union([], ["pdf"]), image with { ImageQuality = 75 },
+            "{dir}/{name} (compressed)", CompressesPdf: true));
 
         foreach (var format in (OutputFormat[])[OutputFormat.Mp4, OutputFormat.Mkv])
         {

@@ -6,6 +6,7 @@ namespace RoyConvert.Core;
 /// <param name="CombinesInputs">All selected files become one job and one output (e.g. images → one PDF).</param>
 /// <param name="SplitsPages">Every page of the PDF input becomes its own PDF ("name-01.pdf", "name-02.pdf"…).</param>
 /// <param name="ReadsDvd">The input is a DVD folder or drive (see <see cref="Dvd.DvdDisc"/>) instead of a file.</param>
+/// <param name="CompressesPdf">The PDF input is made smaller by recompressing its images (see <see cref="PdfCompression"/>).</param>
 public sealed record Preset(
     string Id,
     string Name,
@@ -15,7 +16,8 @@ public sealed record Preset(
     string FileNameTemplate = OutputPath.DefaultTemplate,
     bool CombinesInputs = false,
     bool SplitsPages = false,
-    bool ReadsDvd = false)
+    bool ReadsDvd = false,
+    bool CompressesPdf = false)
 {
     public bool Accepts(string path) => ReadsDvd
         ? Dvd.DvdDisc.Open(path) is not null
