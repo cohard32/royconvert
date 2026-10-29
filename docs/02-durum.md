@@ -207,6 +207,20 @@ Son güncelleme: 2026-10-27
 - Bu oturumda yapılanlar sırasıyla: Microsoft Office ile PDF, PDF birleştirme/bölme, ayarlar penceresi, DVD (sahte diskle)
 - Win 11 / Mac denemeleri: kullanıcı kendisi söyleyince yapılacak, hatırlatılmayacak. DVD denemesi disk bulununca
 
+## Kaldığımız yer (2026-10-29)
+- PR #8 (`pdfium-cokme`, PDFium doğrudan) ve PR #9 (`pdf-kucult` = `pdf-sikistir`'in main'e rebase'i, "PDF (küçült)")
+  birleşti (main 0c9a0c6); 177 test. Eski uzak `pdf-sikistir` dalı duruyor (zorla push otomatik denetimde reddedildi)
+- Ön sürüm **`v0.1.0-test5`** (main 0c9a0c6), https://github.com/cohard32/royconvert/releases/tag/v0.1.0-test5,
+  SHA-256 `74a0776ea70d110aa76699f6f16f3a9bdd73953af519fe24931782a36b25847a` (derleme tekrarlanabilir: yeniden derleme
+  aynı SHA'yı verdi). Program Files'a test4 üzerine kuruldu; **bu PC'de menü Program Files test5'e bağlı**
+- Canlı deneme sağ tık menüsünden (`E:\rc-deneme\menudump`, IContextMenu dökümü + `--invoke`; **STA iş parçacığı şart**,
+  yoksa royconvert menüsü görünmez): EXIF silme (GPS gitti), 3 fotoğraf → tek PDF, PDF küçült 15,5 MB → 987 KB,
+  sağa döndür, PDF → PNG; 4 PDF aynı anda PNG + `DOTNET_GCgen0size=0x20000` 15 turda 15/15, olay günlüğünde çökme yok
+- `build-installer.ps1` bu PC'de `-ExecutionPolicy Bypass` olmadan çalışıyor (CurrentUser Unrestricted) → Claude derler.
+  **Yükleme sürerken `artifacts`'ta yeniden derleme setup'ı bozar** (Inno üzerine yazdı, 950 KB kaldı) → yüklemeyi
+  ayrı bir kopyadan yap
+- Sıradaki: kullanıcıya yeni özellik seç (filigran / toplu yeniden adlandırma metin girişi ister; ses/video seçenekleri)
+
 ## Kaldığımız yer (2026-10-28 gece, kullanıcı "bugünlük yeter, kaydet" dedi)
 - **`pdfium-cokme` dalı (push edildi, PR açılmadı) — önce bu birleşmeli:** Docnet ile PDF işlemleri (PDF → resim,
   birleştir, böl) ara sıra **tüm programı çökertiyordu** (AccessViolation, `FPDFDOC_ExitFormFillEnvironment`,
