@@ -1,6 +1,7 @@
 using System.Diagnostics;
 using System.Runtime.InteropServices;
 using System.Runtime.Versioning;
+using Microsoft.Win32;
 
 namespace RoyConvert.Core.Office;
 
@@ -252,9 +253,14 @@ public sealed class MicrosoftOfficeConverter(IReadOnlySet<OfficeApp> installed, 
             word.Visible = false;
             word.DisplayAlerts = 0; // wdAlertsNone
             word.AutomationSecurity = 3; // msoAutomationSecurityForceDisable: macros never run
-            dynamic document = word.Documents.Open(
-                FileName: input, ConfirmConversions: false, ReadOnly: true, AddToRecentFiles: false,
-                PasswordDocument: WrongPassword, Revert: false, Visible: false, NoEncodingDialog: true);
+            dynamic document;
+            using (format == OutputFormat.Docx ? PdfImportWarning.Suppress((string)word.Version) : null)
+            {
+                document = word.Documents.Open(
+                    FileName: input, ConfirmConversions: false, ReadOnly: true, AddToRecentFiles: false,
+                    PasswordDocument: WrongPassword, Revert: false, Visible: false, NoEncodingDialog: true);
+            }
+
             try
             {
                 if (format == OutputFormat.Docx)
@@ -422,6 +428,67 @@ public sealed class MicrosoftOfficeConverter(IReadOnlySet<OfficeApp> installed, 
                 {
                     // Already exited.
                 }
+            }
+        }
+    }
+
+    /// <summary>
+    /// Word's PDF import (PDFREFLOW.EXE) asks "Word will now convert your PDF…" in its own process, which ignores
+    /// DisplayAlerts and ConfirmConversions and so blocks a hidden Word. The user's "do not show again" setting turns
+    /// it off; it is set while the PDF is opened and put back as it was afterwards.
+    /// </summary>
+    private sealed class PdfImportWarning : IDisposable
+    {
+        private const string ValueName = "DisableConvertPdfWarning";
+
+        private readonly string _keyPath;
+        private readonly object? _previous;
+
+        private PdfImportWarning(string keyPath, object? previous)
+        {
+            _keyPath = keyPath;
+            _previous = previous;
+        }
+
+        /// <param name="version">Word's version, e.g. "16.0".</param>
+        public static PdfImportWarning? Suppress(string version)
+        {
+            var keyPath = $@"Software\Microsoft\Office\{version}\Word\Options";
+            try
+            {
+                using var key = Registry.CurrentUser.CreateSubKey(keyPath);
+                var previous = key.GetValue(ValueName);
+                key.SetValue(ValueName, 1, RegistryValueKind.DWord);
+                return new PdfImportWarning(keyPath, previous);
+            }
+            catch (Exception e) when (e is UnauthorizedAccessException or System.Security.SecurityException or IOException)
+            {
+                return null; // The prompt may then block until the timeout.
+            }
+        }
+
+        public void Dispose()
+        {
+            try
+            {
+                using var key = Registry.CurrentUser.OpenSubKey(_keyPath, writable: true);
+                if (key is null)
+                {
+                    return;
+                }
+
+                if (_previous is null)
+                {
+                    key.DeleteValue(ValueName, throwOnMissingValue: false);
+                }
+                else
+                {
+                    key.SetValue(ValueName, _previous);
+                }
+            }
+            catch (Exception e) when (e is UnauthorizedAccessException or System.Security.SecurityException or IOException)
+            {
+                // Leaving the warning off does no harm.
             }
         }
     }

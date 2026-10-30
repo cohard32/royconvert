@@ -141,6 +141,7 @@ public sealed class MicrosoftOfficeTests : IDisposable
         File.Delete(source);
         var hash = SHA256.HashData(File.ReadAllBytes(pdf));
         var job = new ConversionJob(pdf, PresetCatalog.Find(PresetCatalog.Default, "docx")!);
+        var warningSetting = PdfWarningSetting();
 
         using (var runner = ConversionRunner.CreateDefault(null, 1, microsoftOffice: Office))
         {
@@ -148,6 +149,8 @@ public sealed class MicrosoftOfficeTests : IDisposable
         }
 
         Assert.True(job.State == JobState.Done, job.Error);
+        // The PDF import prompt is turned off only while the PDF is opened.
+        Assert.Equal(warningSetting, PdfWarningSetting());
         Assert.Equal(Path.Combine(_dir, "rapor ğüş.docx"), job.Output);
         Assert.Contains("Merhaba royconvert: ğüşıöç ĞÜŞİÖÇ", DocxText(job.Output!));
         Assert.Equal(hash, SHA256.HashData(File.ReadAllBytes(pdf)));
@@ -168,6 +171,11 @@ public sealed class MicrosoftOfficeTests : IDisposable
         Assert.Equal(JobState.Failed, job.State);
         Assert.Contains("Microsoft Word", job.Error);
     }
+
+    [System.Runtime.Versioning.SupportedOSPlatform("windows")]
+    private static object? PdfWarningSetting() =>
+        Microsoft.Win32.Registry.GetValue(@"HKEY_CURRENT_USER\Software\Microsoft\Office\16.0\Word\Options",
+            "DisableConvertPdfWarning", null);
 
     /// <summary>The text of a DOCX (paragraph runs of word/document.xml).</summary>
     private static string DocxText(string path)
