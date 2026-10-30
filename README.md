@@ -62,6 +62,7 @@ açılır (`msiexec /a`) ve `tools\LibreOffice`'e konur; sisteme LibreOffice kur
 `/CURRENTUSER` ile (ya da kurulumdaki seçimle) yönetici izni olmadan kullanıcı klasörüne kurulur. Kurulum sağ tık
 menüsünü kurar, kaldırma onu da kaldırır.
 
+royconvert GPL-3.0 lisanslıdır (`LICENSE`; kurulumda `royconvert-LICENSE.txt`).
 ffmpeg GPLv3 lisanslıdır ve kurulumda ayrı bir program olarak bulunur; lisansı ve kaynak bilgisi `tools\` klasöründedir.
 LibreOffice MPL-2.0 lisanslıdır; lisans dosyaları `tools\LibreOffice\` içindedir.
 
