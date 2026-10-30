@@ -71,6 +71,7 @@ Expand-Archive $zip $extract
 $build = Get-ChildItem $extract -Directory | Select-Object -First 1
 $tools = Join-Path $publish 'tools'
 New-Item -ItemType Directory -Force $tools | Out-Null
+Copy-Item (Join-Path $root 'LICENSE') (Join-Path $publish 'royconvert-LICENSE.txt')
 Copy-Item (Join-Path $build.FullName 'bin\ffmpeg.exe') $tools
 # GPL: ship the license and where the build and its source come from.
 Copy-Item (Join-Path $build.FullName 'LICENSE') (Join-Path $tools 'ffmpeg-LICENSE.txt')
