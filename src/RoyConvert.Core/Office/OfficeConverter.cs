@@ -18,7 +18,8 @@ public sealed class OfficeConverter(string sofficePath, TimeSpan? timeout = null
     public string Name => "LibreOffice";
 
     /// <summary>After Microsoft Office for its own formats, before it for OpenDocument files.</summary>
-    public int? Priority(string input) => Formats.OfficeInputs.Contains(Formats.ExtensionOf(input)) ? 1 : null;
+    public int? Priority(string input, OutputFormat output) =>
+        output == OutputFormat.Pdf && Formats.OfficeInputs.Contains(Formats.ExtensionOf(input)) ? 1 : null;
 
     public async Task ConvertAsync(string input, string output, Preset preset, IProgress<double?> progress, CancellationToken cancellationToken)
     {

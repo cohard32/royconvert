@@ -157,4 +157,5 @@
   <data name="Update_Failed" xml:space="preserve"><value>Güncelleme kurulamadı: {0}</value></data>
   <data name="Update_BadFile" xml:space="preserve"><value>indirilen dosya yayımlanan dosyayla aynı değil</value></data>
   <data name="Settings_CheckUpdates" xml:space="preserve"><value>Güncellemeleri otomatik denetle</value></data>
+  <data name="Preset_docx" xml:space="preserve"><value>Word belgesi (DOCX)</value></data>
 </root>

@@ -157,4 +157,5 @@
   <data name="Update_Failed" xml:space="preserve"><value>The update could not be installed: {0}</value></data>
   <data name="Update_BadFile" xml:space="preserve"><value>the downloaded file is not the published one</value></data>
   <data name="Settings_CheckUpdates" xml:space="preserve"><value>Check for updates automatically</value></data>
+  <data name="Preset_docx" xml:space="preserve"><value>Word document (DOCX)</value></data>
 </root>

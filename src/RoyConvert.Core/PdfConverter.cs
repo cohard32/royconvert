@@ -3,7 +3,8 @@ namespace RoyConvert.Core;
 /// <summary>
 /// The "PDF" preset accepts both images and office documents: images go to <paramref name="image"/>, documents to
 /// the installed office suites (<paramref name="documents"/>, by <see cref="IDocumentConverter.Priority"/>). When one
-/// fails the next is tried, e.g. LibreOffice after Microsoft Office. It also merges and splits PDFs (<see cref="PdfPages"/>).
+/// fails the next is tried, e.g. LibreOffice after Microsoft Office. It also merges and splits PDFs (<see cref="PdfPages"/>)
+/// and hands PDF → Word (DOCX) to the suite that can do it (only Microsoft Word).
 /// </summary>
 public sealed class PdfConverter(IConverter image, IReadOnlyList<IDocumentConverter> documents) : IConverter
 {
@@ -34,14 +35,16 @@ public sealed class PdfConverter(IConverter image, IReadOnlyList<IDocumentConver
         }
 
         var candidates = documents
-            .Select(converter => (Converter: converter, Priority: converter.Priority(input)))
+            .Select(converter => (Converter: converter, Priority: converter.Priority(input, preset.Output)))
             .Where(c => c.Priority is not null)
             .OrderBy(c => c.Priority)
             .Select(c => c.Converter)
             .ToList();
         if (candidates.Count == 0)
         {
-            throw new ConversionException(
+            throw new ConversionException(preset.Output == OutputFormat.Docx
+                ? "Converting PDF to Word needs Microsoft Word."
+                :
                 "Neither Microsoft Office nor LibreOffice was found. Install one of them to convert documents " +
                 "(LibreOffice is free: https://www.libreoffice.org).");
         }

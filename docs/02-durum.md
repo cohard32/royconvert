@@ -260,7 +260,14 @@ Son güncelleme: 2026-10-27
 - Bu PC'deki Program Files 1.0.0, oto-guncelleme dalından (aynı sürüm numarası → güncelleme bandı çıkmaz).
 - Kalan hedefler (öneri sırası):
   1. Win 11 PC denemesi (kullanıcı v1.0.0 ile yapacak; aşağıdaki "Win 11 denemesi")
-  2. PDF → Word (`pdf-word` dalı): Word'ün PDF açabildiği PC'de (Win 11 PC olabilir) dene → PR
+  2. ~~PDF → Word~~ → `pdf-docx` dalı (main'den, eski `pdf-word`'ün yerine), canlı denendi (2026-10-30). Bu PC'de
+     Word'ün PDF açamamasının nedeni **WPS Office artıklarıydı**: HKCU\Software\Classes\Interface'te 1050 arayüz
+     (Word `_Application` dahil) ve 9 TypeLib, silinmiş WPS dosyalarını gösteriyordu (64 bit Word 32 bit WPS
+     kitaplığını yükleyemiyor → "PDF Files dönüştürücüsünü başlatamıyor", PowerShell COM'da TYPE_E_CANTLOADLIBRARY).
+     Kullanıcı onayıyla silindi, yedek `E:\rc-deneme\wps-yedek\*.reg`. Ardından gizli Word takıldı: PDFREFLOW.EXE
+     "Word, PDF'inizi dönüştürecek…" uyarısını kendi sürecinde gösteriyor, DisplayAlerts/ConfirmConversions onu
+     kapatmıyor → `PdfImportWarning` PDF açılırken HKCU `Word\Options\DisableConvertPdfWarning`=1 yapıp sonra eski
+     haline getiriyor (testte doğrulanıyor). 277 test; RTF → PDF → DOCX canlı, Türkçe metin düzenlenebilir geldi
   3. Güncellemeden sonra programın yeniden açılması (şu an kapanıp kalıyor)
   4. Kod imzalama sertifikası (SmartScreen, Win 11 imzasız paket)
   5. macOS sürümü (Finder Quick Action / Finder Sync, LibreOffice gömülü değil)

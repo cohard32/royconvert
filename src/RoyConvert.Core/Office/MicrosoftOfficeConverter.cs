@@ -1,6 +1,7 @@
 using System.Diagnostics;
 using System.Runtime.InteropServices;
 using System.Runtime.Versioning;
+using Microsoft.Win32;
 
 namespace RoyConvert.Core.Office;
 
@@ -12,8 +13,9 @@ public enum OfficeApp
 }
 
 /// <summary>
-/// Exports documents to PDF with the installed Microsoft Word, Excel or PowerPoint through COM automation.
-/// The source is opened read-only with macros disabled and closed without saving, so it is never changed.
+/// Exports documents to PDF with the installed Microsoft Word, Excel or PowerPoint through COM automation, and
+/// PDFs to editable Word documents (DOCX) with Word. The source is opened read-only with macros disabled and closed
+/// without saving, so it is never changed.
 /// </summary>
 /// <param name="timeout">
 /// A hidden dialog (e.g. an unexpected prompt) would block forever, so the Office process is killed after this long.
@@ -57,12 +59,13 @@ public sealed class MicrosoftOfficeConverter(IReadOnlySet<OfficeApp> installed, 
     }
 
     /// <summary>
-    /// First for Microsoft's own formats; for OpenDocument files after LibreOffice (priority 1), which writes them natively.
+    /// Office documents → PDF: first for Microsoft's own formats; for OpenDocument files after LibreOffice (priority 1),
+    /// which writes them natively. PDF → DOCX: only Word can (it rebuilds an editable document from the PDF).
     /// </summary>
-    public int? Priority(string input)
+    public int? Priority(string input, OutputFormat output)
     {
         var extension = Formats.ExtensionOf(input);
-        if (!AppByExtension.TryGetValue(extension, out var app) || !installed.Contains(app))
+        if (AppFor(extension, output) is not { } app || !installed.Contains(app))
         {
             return null;
         }
@@ -72,14 +75,11 @@ public sealed class MicrosoftOfficeConverter(IReadOnlySet<OfficeApp> installed, 
 
     public async Task ConvertAsync(string input, string output, Preset preset, IProgress<double?> progress, CancellationToken cancellationToken)
     {
-        if (preset.Output != OutputFormat.Pdf)
+        if (AppFor(Formats.ExtensionOf(input), preset.Output) is not { } app || !installed.Contains(app))
         {
-            throw new ArgumentOutOfRangeException(nameof(preset), preset.Output, "Microsoft Office only exports PDF here.");
-        }
-
-        if (!AppByExtension.TryGetValue(Formats.ExtensionOf(input), out var app) || !installed.Contains(app))
-        {
-            throw new ConversionException($"Microsoft Office cannot open {Path.GetFileName(input)}.");
+            throw new ConversionException(preset.Output == OutputFormat.Docx
+                ? "Converting PDF to Word needs Microsoft Word."
+                : $"Microsoft Office cannot open {Path.GetFileName(input)}.");
         }
 
         progress.Report(null);
@@ -88,8 +88,8 @@ public sealed class MicrosoftOfficeConverter(IReadOnlySet<OfficeApp> installed, 
         try
         {
             Directory.CreateDirectory(work);
-            var result = Path.Combine(work, "out.pdf");
-            var session = new Session(app, Path.GetFullPath(input), result);
+            var result = Path.Combine(work, "out." + Formats.Extension(preset.Output));
+            var session = new Session(app, Path.GetFullPath(input), result, preset.Output);
 
             // COM objects of Office live in a single-threaded apartment.
             var thread = new Thread(session.Run) { IsBackground = true, Name = "royconvert " + app };
@@ -115,7 +115,7 @@ public sealed class MicrosoftOfficeConverter(IReadOnlySet<OfficeApp> installed, 
 
             if (!File.Exists(result))
             {
-                throw new ConversionException($"Microsoft {app} did not create a PDF.");
+                throw new ConversionException($"Microsoft {app} did not create the {Formats.Extension(preset.Output).ToUpperInvariant()} file.");
             }
 
             File.Move(result, output);
@@ -130,6 +130,13 @@ public sealed class MicrosoftOfficeConverter(IReadOnlySet<OfficeApp> installed, 
     }
 
     private static string ProgId(OfficeApp app) => app + ".Application";
+
+    private static OfficeApp? AppFor(string extension, OutputFormat output) => output switch
+    {
+        OutputFormat.Pdf when AppByExtension.TryGetValue(extension, out var app) => app,
+        OutputFormat.Docx when extension == "pdf" => OfficeApp.Word,
+        _ => null,
+    };
 
     private static void DeleteQuietly(string directory)
     {
@@ -146,7 +153,7 @@ public sealed class MicrosoftOfficeConverter(IReadOnlySet<OfficeApp> installed, 
     }
 
     /// <summary>One export on its own STA thread; <see cref="Kill"/> ends the Office process it started.</summary>
-    private sealed class Session(OfficeApp app, string input, string output)
+    private sealed class Session(OfficeApp app, string input, string output, OutputFormat format)
     {
         private readonly TaskCompletionSource _done = new(TaskCreationOptions.RunContinuationsAsynchronously);
         private readonly object _lock = new();
@@ -172,8 +179,11 @@ public sealed class MicrosoftOfficeConverter(IReadOnlySet<OfficeApp> installed, 
             catch (Exception e)
             {
                 var reason = e is COMException ? e.Message : e.GetType().Name + ": " + e.Message;
+                var hint = format == OutputFormat.Docx
+                    ? "Word's PDF import may not work on this computer"
+                    : "It may be damaged or password protected";
                 _done.TrySetException(new ConversionException(
-                    $"Microsoft {app} could not convert the file. It may be damaged or password protected. ({reason.Trim()})", e));
+                    $"Microsoft {app} could not convert the file. {hint}. ({reason.Trim()})", e));
             }
             finally
             {
@@ -243,14 +253,27 @@ public sealed class MicrosoftOfficeConverter(IReadOnlySet<OfficeApp> installed, 
             word.Visible = false;
             word.DisplayAlerts = 0; // wdAlertsNone
             word.AutomationSecurity = 3; // msoAutomationSecurityForceDisable: macros never run
-            dynamic document = word.Documents.Open(
-                FileName: input, ConfirmConversions: false, ReadOnly: true, AddToRecentFiles: false,
-                PasswordDocument: WrongPassword, Revert: false, Visible: false, NoEncodingDialog: true);
+            dynamic document;
+            using (format == OutputFormat.Docx ? PdfImportWarning.Suppress((string)word.Version) : null)
+            {
+                document = word.Documents.Open(
+                    FileName: input, ConfirmConversions: false, ReadOnly: true, AddToRecentFiles: false,
+                    PasswordDocument: WrongPassword, Revert: false, Visible: false, NoEncodingDialog: true);
+            }
+
             try
             {
-                document.ExportAsFixedFormat(
-                    OutputFileName: output, ExportFormat: 17 /* wdExportFormatPDF */, OpenAfterExport: false,
-                    OptimizeFor: 0 /* print quality */, CreateBookmarks: 1 /* from headings */);
+                if (format == OutputFormat.Docx)
+                {
+                    // A PDF input was rebuilt into an editable document by Word's PDF import ("reflow").
+                    document.SaveAs2(FileName: output, FileFormat: 16 /* wdFormatXMLDocument */, AddToRecentFiles: false);
+                }
+                else
+                {
+                    document.ExportAsFixedFormat(
+                        OutputFileName: output, ExportFormat: 17 /* wdExportFormatPDF */, OpenAfterExport: false,
+                        OptimizeFor: 0 /* print quality */, CreateBookmarks: 1 /* from headings */);
+                }
             }
             finally
             {
@@ -303,12 +326,14 @@ public sealed class MicrosoftOfficeConverter(IReadOnlySet<OfficeApp> installed, 
 
         /// <summary>
         /// Quits Office only when this session started it and nothing else is open in it (the user may have opened a
-        /// file in the hidden instance meanwhile; then it is shown instead).
+        /// file in the hidden instance meanwhile; then it is shown instead). Our own file is closed first: Office can
+        /// fail to open it and still leave it open (Word shows a PDF it cannot convert as plain text).
         /// </summary>
         private void Quit(dynamic office, bool startedByUs)
         {
             try
             {
+                CloseInput(office);
                 int open = app switch
                 {
                     OfficeApp.Word => office.Documents.Count,
@@ -343,6 +368,40 @@ public sealed class MicrosoftOfficeConverter(IReadOnlySet<OfficeApp> installed, 
             }
         }
 
+        /// <summary>Closes, without saving, every open document whose path is our input.</summary>
+        private void CloseInput(dynamic office)
+        {
+            dynamic documents = app switch
+            {
+                OfficeApp.Word => office.Documents,
+                OfficeApp.Excel => office.Workbooks,
+                _ => office.Presentations,
+            };
+
+            // COM collections are 1-based; going backwards keeps the indexes valid while closing.
+            for (int i = documents.Count; i >= 1; i--)
+            {
+                dynamic document = documents[i];
+                if (!string.Equals((string)document.FullName, input, StringComparison.OrdinalIgnoreCase))
+                {
+                    continue;
+                }
+
+                switch (app)
+                {
+                    case OfficeApp.Word:
+                        document.Close(SaveChanges: 0);
+                        break;
+                    case OfficeApp.Excel:
+                        document.Close(SaveChanges: false);
+                        break;
+                    default:
+                        document.Close();
+                        break;
+                }
+            }
+        }
+
         private int[] ProcessIds()
         {
             var processes = Process.GetProcessesByName(ProcessName);
@@ -369,6 +428,67 @@ public sealed class MicrosoftOfficeConverter(IReadOnlySet<OfficeApp> installed, 
                 {
                     // Already exited.
                 }
+            }
+        }
+    }
+
+    /// <summary>
+    /// Word's PDF import (PDFREFLOW.EXE) asks "Word will now convert your PDF…" in its own process, which ignores
+    /// DisplayAlerts and ConfirmConversions and so blocks a hidden Word. The user's "do not show again" setting turns
+    /// it off; it is set while the PDF is opened and put back as it was afterwards.
+    /// </summary>
+    private sealed class PdfImportWarning : IDisposable
+    {
+        private const string ValueName = "DisableConvertPdfWarning";
+
+        private readonly string _keyPath;
+        private readonly object? _previous;
+
+        private PdfImportWarning(string keyPath, object? previous)
+        {
+            _keyPath = keyPath;
+            _previous = previous;
+        }
+
+        /// <param name="version">Word's version, e.g. "16.0".</param>
+        public static PdfImportWarning? Suppress(string version)
+        {
+            var keyPath = $@"Software\Microsoft\Office\{version}\Word\Options";
+            try
+            {
+                using var key = Registry.CurrentUser.CreateSubKey(keyPath);
+                var previous = key.GetValue(ValueName);
+                key.SetValue(ValueName, 1, RegistryValueKind.DWord);
+                return new PdfImportWarning(keyPath, previous);
+            }
+            catch (Exception e) when (e is UnauthorizedAccessException or System.Security.SecurityException or IOException)
+            {
+                return null; // The prompt may then block until the timeout.
+            }
+        }
+
+        public void Dispose()
+        {
+            try
+            {
+                using var key = Registry.CurrentUser.OpenSubKey(_keyPath, writable: true);
+                if (key is null)
+                {
+                    return;
+                }
+
+                if (_previous is null)
+                {
+                    key.DeleteValue(ValueName, throwOnMissingValue: false);
+                }
+                else
+                {
+                    key.SetValue(ValueName, _previous);
+                }
+            }
+            catch (Exception e) when (e is UnauthorizedAccessException or System.Security.SecurityException or IOException)
+            {
+                // Leaving the warning off does no harm.
             }
         }
     }

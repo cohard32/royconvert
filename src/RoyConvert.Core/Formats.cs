@@ -26,6 +26,7 @@ public enum OutputFormat
     Avif,
     Ico,
     Pdf,
+    Docx,
 }
 
 public static class Formats
@@ -55,7 +56,7 @@ public static class Formats
     {
         OutputFormat.Mp4 or OutputFormat.Mkv or OutputFormat.Webm or OutputFormat.Avi or OutputFormat.Gif => MediaKind.Video,
         OutputFormat.Mp3 or OutputFormat.Ogg or OutputFormat.Flac or OutputFormat.Wav or OutputFormat.Aac => MediaKind.Audio,
-        OutputFormat.Pdf => MediaKind.Document,
+        OutputFormat.Pdf or OutputFormat.Docx => MediaKind.Document,
         _ => MediaKind.Image,
     };
 
