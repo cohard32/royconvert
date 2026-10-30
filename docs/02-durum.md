@@ -270,7 +270,13 @@ açmadan önce Claude gizli bilgi taraması yapacak, açma komutunu kullanıcı 
      `UpdateInstaller` setup'ı `/SILENT /SUPPRESSMSGBOXES /NORESTART` + Program Files ise `/ALLUSERS` değilse
      `/CURRENTUSER` ile başlatır ve programı kapatır
    - **csproj `<Version>` 1.0.0 yapıldı** (bu dalda)
-3. **SIRADAKİ: güncellemenin uçtan uca canlı denemesi (yapılmadı).** Hazır dosyalar (git'te değil):
+3. **Güncellemenin uçtan uca canlı denemesi — YAPILDI (2026-10-30), hepsi geçti:** 1.0.0 Program Files'a kuruldu;
+   yerel sunucuyla ana pencerede bant "royconvert 1.0.1 çıktı (sizdeki 1.0.0)" → Güncelle → program kapandı, UAC,
+   ~100 sn'de 1.0.1 sessiz kuruldu (exe ve DisplayVersion 1.0.1). Güncellemeden sonra program yeniden açılmıyor
+   (şimdilik böyle). 1.0.0 geri kuruldu; komut satırından PNG → JPG'de ilerleme penceresinde bant çıktı, pencere açık
+   kaldı, "Sonra" ile kapandı; hemen tekrar çalıştırınca sunucuya istek gitmedi ve pencere kendiliğinden kapandı.
+   Deneme settings.json silindi; bu PC'de menü artık Program Files **1.0.0**'a bağlı. Deneme dosyaları
+   (`E:\rc-deneme\upd\server.ps1` sahte sunucu):
    - `E:\royconvert\artifacts\royconvert-1.0.0-setup.exe` SHA `6ab74b647ef42bccf0df10ee5f5bd3560b9c6c53e9213e90b99bf887167f56ac`
    - `E:\rc-deneme\upd\royconvert-1.0.1-setup.exe` (yalnız deneme için, Version geçici 1.0.1 yapılıp derlendi, geri
      alındı) SHA `22e1d3bceb568beb64f8a4ddc633973186c3e3e985e7ec1330d749f401b9e8a5`
@@ -287,7 +293,7 @@ açmadan önce Claude gizli bilgi taraması yapacak, açma komutunu kullanıcı 
    (`! gh repo edit cohard32/royconvert --visibility public --accept-visibility-change-consequences`),
    main'den 1.0.0 setup derle (sürüm aynıysa SHA aynı çıkar), `gh release create v1.0.0` (**--prerelease YOK**),
    yükleme ayrı kopyadan, GitHub'da `releases/latest` ve varlık `digest` alanı kontrol edilir
-- Bu PC: menü Program Files **test6**'ya bağlı; deneme klasörü E:\rc-deneme (menudump, fixtures, ui.ps1)
+- Bu PC: menü Program Files **1.0.0**'a bağlı; deneme klasörü E:\rc-deneme (menudump, fixtures, ui.ps1)
 
 ## Kaldığımız yer (2026-10-28 gece, kullanıcı "bugünlük yeter, kaydet" dedi)
 - **`pdfium-cokme` dalı (push edildi, PR açılmadı) — önce bu birleşmeli:** Docnet ile PDF işlemleri (PDF → resim,
