@@ -251,6 +251,17 @@ Son güncelleme: 2026-10-27
     uyarısı, MOV 0:05,5–0:12 tam kare → 6,5 sn MP4
 - PR #14 (sesi kaldır + kırp) birleşti (main c95f66c)
 
+## KALDIĞIMIZ YER (2026-10-30 akşam, kullanıcı "yaptıklarımızı kaydet, sonra devam ederiz" dedi)
+- main ba27fbd: v1.0.0 sonrası **PR #19 (PDF → Word) birleşti**; bekleyen PR yok. PDF → Word yayındaki v1.0.0'da YOK.
+- GitHub'da yalnız v1.0.0 görünüyor: test1–test6 taslağa çevrildi, etiketleri kullanıcı sildi (commit'ler: test1
+  da57586, test2 9e15473, test3 2bcb7d8, test4 b959553, test5 0c9a0c6, test6 aa25281).
+- Gereksiz dallar: `pdf-word` (yerini pdf-docx aldı), `office-kapanis` (boş) → silme komutunu kullanıcı çalıştırır.
+- **Sıradaki (öneri):** (1) güncellemeden sonra programı yeniden açma → (2) **v1.0.1** yayını (PDF → Word + bu;
+  csproj Version 1.0.1; bu PC'deki 1.0.0 gerçek GitHub'dan güncellenerek uçtan uca denenir) → (3) Win 11 denemesi
+  (kullanıcı diğer PC'de) → (4) kod imzalama, macOS, gerçek DVD.
+- Bu PC: Program Files'ta 1.0.0 (oto-guncelleme dalından), menü ona bağlı. Word artık PDF açıyor (WPS artıkları
+  silindi). Office Hızlı Onarım hâlâ 30068-13 veriyor (ayrı sorun).
+
 ## Kaldığımız yer (2026-10-30) — v1.0.0 YAYINDA
 - PR #15 (PDF şifre), #16 (oto güncelleme), #17 (GPL-3.0 lisansı; kurulumda `royconvert-LICENSE.txt`) birleşti,
   main 10e82b9; 272 test. Gizli bilgi taraması (geçmiş dahil) temiz; commit e-postası görünür kalsın dendi.
