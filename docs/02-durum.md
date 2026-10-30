@@ -251,6 +251,21 @@ Son güncelleme: 2026-10-27
     uyarısı, MOV 0:05,5–0:12 tam kare → 6,5 sn MP4
 - PR #14 (sesi kaldır + kırp) birleşti (main c95f66c)
 
+## Kaldığımız yer (2026-10-30) — v1.0.0 YAYINDA
+- PR #15 (PDF şifre), #16 (oto güncelleme), #17 (GPL-3.0 lisansı; kurulumda `royconvert-LICENSE.txt`) birleşti,
+  main 10e82b9; 272 test. Gizli bilgi taraması (geçmiş dahil) temiz; commit e-postası görünür kalsın dendi.
+- Depo **herkese açık** (kullanıcı açtı). **v1.0.0** "Latest" (ön sürüm değil):
+  https://github.com/cohard32/royconvert/releases/tag/v1.0.0, SHA `fb7a8a99ce80c859034c535de6199c972c9da1eeca8a2a78a650daeb05ba233e`,
+  `releases/latest` API'de `digest` var. Yalnız Windows x64. `gh release create --target` tam SHA ister (kısası 422).
+- Bu PC'deki Program Files 1.0.0, oto-guncelleme dalından (aynı sürüm numarası → güncelleme bandı çıkmaz).
+- Kalan hedefler (öneri sırası):
+  1. Win 11 PC denemesi (kullanıcı v1.0.0 ile yapacak; aşağıdaki "Win 11 denemesi")
+  2. PDF → Word (`pdf-word` dalı): Word'ün PDF açabildiği PC'de (Win 11 PC olabilir) dene → PR
+  3. Güncellemeden sonra programın yeniden açılması (şu an kapanıp kalıyor)
+  4. Kod imzalama sertifikası (SmartScreen, Win 11 imzasız paket)
+  5. macOS sürümü (Finder Quick Action / Finder Sync, LibreOffice gömülü değil)
+  6. Gerçek DVD denemesi; eski ön sürümler (test1–test6) ve boş `office-kapanis` dalı temizliği
+
 ## Kaldığımız yer (2026-10-29 gece, kullanıcı "her şeyi kaydet, kaldığın yeri özellikle kaydet" dedi)
 **Hedef (kullanıcı kararı):** otomatik güncelleme + PDF şifre koy/kaldır eklenecek, test edilecek, sonra **ilk canlı
 sürüm v1.0.0** (ön sürüm değil, "Latest") yayımlanacak ve **depo herkese açılacak** (kullanıcı "Herkese aç" seçti;
