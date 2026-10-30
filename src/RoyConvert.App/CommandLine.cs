@@ -13,6 +13,10 @@ public enum CommandKind
     Watermark,
     /// <summary>"--preset trim": the window that cuts a part of videos and sound files.</summary>
     Trim,
+    /// <summary>"--preset pdf-protect": the window that puts a password on PDFs.</summary>
+    ProtectPdf,
+    /// <summary>"--preset pdf-unprotect": the window that takes the password off PDFs.</summary>
+    UnprotectPdf,
     ListPresets,
     RegisterShell,
     UnregisterShell,

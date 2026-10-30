@@ -33,15 +33,17 @@ public sealed class PdfiumDocument : IDisposable
         _document = document;
     }
 
-    /// <exception cref="PdfiumException">The bytes are not a PDF PDFium can open (damaged or password protected).</exception>
-    public static PdfiumDocument Open(byte[] bytes)
+    /// <param name="password">Opens a PDF that needs one to be read (the user password, or the owner password).</param>
+    /// <exception cref="PdfiumException">The bytes are not a PDF PDFium can open (damaged, or password protected and
+    /// <paramref name="password"/> is missing or wrong).</exception>
+    public static PdfiumDocument Open(byte[] bytes, string? password = null)
     {
         var data = Marshal.AllocHGlobal(Math.Max(bytes.Length, 1));
         Marshal.Copy(bytes, 0, data, bytes.Length);
         lock (Lock)
         {
             Initialize();
-            var document = FPDF_LoadMemDocument(data, bytes.Length, null);
+            var document = FPDF_LoadMemDocument(data, bytes.Length, password);
             if (document != IntPtr.Zero)
             {
                 return new PdfiumDocument(data, document);
@@ -55,7 +57,28 @@ public sealed class PdfiumDocument : IDisposable
         }
     }
 
-    public static PdfiumDocument Open(string path) => Open(File.ReadAllBytes(path));
+    public static PdfiumDocument Open(string path, string? password = null) => Open(File.ReadAllBytes(path), password);
+
+    /// <summary>The PDF is encrypted: it has a password to open it, or one that limits printing, copying or editing.</summary>
+    public bool IsEncrypted
+    {
+        get
+        {
+            lock (Lock)
+            {
+                return FPDF_GetSecurityHandlerRevision(Handle) >= 0;
+            }
+        }
+    }
+
+    /// <summary>The whole document written again without encryption, passwords or permission limits.</summary>
+    public byte[] SaveWithoutSecurity()
+    {
+        lock (Lock)
+        {
+            return Save(Handle, FPDF_REMOVE_SECURITY);
+        }
+    }
 
     public int PageCount
     {
@@ -211,7 +234,7 @@ public sealed class PdfiumDocument : IDisposable
         }
     }
 
-    private static byte[] Save(IntPtr document)
+    private static byte[] Save(IntPtr document, uint flags = 0)
     {
         using var output = new MemoryStream();
         WriteBlock write = (_, data, size) =>
@@ -222,12 +245,13 @@ public sealed class PdfiumDocument : IDisposable
             return 1;
         };
         var writer = new FileWrite { Version = 1, WriteBlock = Marshal.GetFunctionPointerForDelegate(write) };
-        var saved = FPDF_SaveAsCopy(document, ref writer, 0);
+        var saved = FPDF_SaveAsCopy(document, ref writer, flags);
         GC.KeepAlive(write);
         return saved != 0 ? output.ToArray() : throw new PdfiumException("The PDF could not be written.");
     }
 
     private const uint FPDF_ERR_PASSWORD = 4;
+    private const uint FPDF_REMOVE_SECURITY = 3;
     private const int FPDF_ANNOT = 0x01;
     private const string Library = "pdfium";
 
@@ -242,9 +266,10 @@ public sealed class PdfiumDocument : IDisposable
     }
 
     [DllImport(Library)] private static extern void FPDF_InitLibrary();
-    [DllImport(Library)] private static extern IntPtr FPDF_LoadMemDocument(IntPtr data, int size, [MarshalAs(UnmanagedType.LPStr)] string? password);
+    [DllImport(Library)] private static extern IntPtr FPDF_LoadMemDocument(IntPtr data, int size, [MarshalAs(UnmanagedType.LPUTF8Str)] string? password);
     [DllImport(Library)] private static extern uint FPDF_GetLastError();
     [DllImport(Library)] private static extern int FPDF_GetPageCount(IntPtr document);
+    [DllImport(Library)] private static extern int FPDF_GetSecurityHandlerRevision(IntPtr document);
     [DllImport(Library)] private static extern int FPDF_GetPageSizeByIndex(IntPtr document, int index, out double width, out double height);
     [DllImport(Library)] private static extern IntPtr FPDF_LoadPage(IntPtr document, int index);
     [DllImport(Library)] private static extern void FPDF_ClosePage(IntPtr page);
