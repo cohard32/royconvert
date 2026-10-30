@@ -16,6 +16,10 @@
                     IsVisible="{Binding !AllFinished}" />
         </Grid>
 
+        <!-- A newer release, when one is found (UpdateViewModel). -->
+        <ContentControl x:Name="UpdateHost" DockPanel.Dock="Top" Margin="0,0,0,12"
+                        IsVisible="{Binding $self.Content, Converter={x:Static ObjectConverters.IsNotNull}}" />
+
         <ItemsControl DockPanel.Dock="Top" ItemsSource="{Binding Messages}" Margin="0,0,0,8">
             <ItemsControl.ItemTemplate>
                 <DataTemplate x:DataType="x:String">

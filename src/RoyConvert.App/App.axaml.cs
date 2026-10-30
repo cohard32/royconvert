@@ -73,10 +73,65 @@ public partial class App : Application
 
                 desktop.MainWindow = new ProgressWindow(progress, Instance);
             }
+
+            if (desktop.MainWindow is IUpdateHost host)
+            {
+                _ = CheckForUpdateAsync(host, desktop);
+            }
         }
 
         base.OnFrameworkInitializationCompleted();
     }
+
+    /// <summary>The running version (&lt;Version&gt; in the project file).</summary>
+    public static Version Version { get; } = typeof(App).Assembly.GetName().Version is { } v
+        ? new Version(v.Major, v.Minor, Math.Max(v.Build, 0))
+        : new Version(0, 0, 0);
+
+    /// <summary>
+    /// At most about once a day, and only for an installed royconvert (a setup can only replace an install). A newer
+    /// release shows a bar in <paramref name="host"/>; no network or a GitHub error is ignored until the next time.
+    /// </summary>
+    private async Task CheckForUpdateAsync(IUpdateHost host, IClassicDesktopStyleApplicationLifetime desktop)
+    {
+        if (!OperatingSystem.IsWindows() || !Settings.CheckForUpdates || !IsInstalled()
+            || Settings.LastUpdateCheck > DateTimeOffset.Now.AddHours(-20))
+        {
+            return;
+        }
+
+        var http = Core.Updates.UpdateChecker.CreateClient(Version);
+        Core.Updates.UpdateInfo? update;
+        try
+        {
+            update = await Task.Run(() => Core.Updates.UpdateChecker.CheckAsync(http, Core.Updates.UpdateChecker.LatestReleaseUrl, Version));
+            Settings.LastUpdateCheck = DateTimeOffset.Now;
+            Settings.Save();
+        }
+        catch (Exception e) when (e is HttpRequestException or TaskCanceledException or System.Text.Json.JsonException
+                                      or IOException or UnauthorizedAccessException or InvalidOperationException
+                                      or KeyNotFoundException or UriFormatException)
+        {
+            return;
+        }
+
+        if (update is null)
+        {
+            http.Dispose();
+            return;
+        }
+
+        host.ShowUpdate(new UpdateViewModel(update, Version, http, () => host.CanInstallUpdate, setup =>
+        {
+            UpdateInstaller.Start(setup);
+            desktop.Shutdown();
+        }));
+    }
+
+    /// <summary>Installed by setup: its uninstaller is next to the exe (a build from source has none).</summary>
+    private static bool IsInstalled() =>
+        Environment.GetEnvironmentVariable("ROYCONVERT_UPDATE_URL") is { Length: > 0 }
+        || Directory.EnumerateFiles(AppContext.BaseDirectory, "unins*.exe").Any();
 
     private MainWindow CreateMainWindow(IReadOnlyList<string> files)
     {

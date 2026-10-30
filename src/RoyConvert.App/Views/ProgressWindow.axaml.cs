@@ -4,11 +4,12 @@ using RoyConvert.App.ViewModels;
 
 namespace RoyConvert.App.Views;
 
-public partial class ProgressWindow : Window
+public partial class ProgressWindow : Window, IUpdateHost
 {
     private static readonly TimeSpan CloseDelay = TimeSpan.FromSeconds(2);
 
     private readonly SingleInstance? _instance;
+    private UpdateViewModel? _update;
 
     public ProgressWindow()
     {
@@ -22,12 +23,32 @@ public partial class ProgressWindow : Window
     {
         DataContext = viewModel;
         _instance = instance;
-        viewModel.Completed += () => DispatcherTimer.RunOnce(CloseIfStillComplete, CloseDelay);
+        viewModel.Completed += () =>
+        {
+            _update?.Refresh();
+            DispatcherTimer.RunOnce(CloseIfStillComplete, CloseDelay);
+        };
         Closed += (_, _) => viewModel.Dispose();
+    }
+
+    /// <summary>Setup replaces the files that convert, so it waits until every job is done.</summary>
+    public bool CanInstallUpdate => DataContext is ProgressViewModel { IsComplete: true };
+
+    /// <summary>The window then stays open when the files are done, until the bar is answered.</summary>
+    public void ShowUpdate(UpdateViewModel update)
+    {
+        _update = update;
+        UpdateHost.Content = update;
+        update.Dismissed += CloseIfStillComplete;
     }
 
     private void CloseIfStillComplete()
     {
+        if (_update is { IsVisible: true })
+        {
+            return;
+        }
+
         // Files may have arrived from Explorer during the delay. Once the instance stops accepting, later ones are
         // refused and their process opens its own window.
         if (DataContext is ProgressViewModel viewModel
