@@ -66,6 +66,8 @@ Name: "{autodesktop}\royconvert"; Filename: "{app}\royconvert.exe"; Tasks: deskt
 ; As the user who started setup: the menu lives in that user's registry (HKCU) and %LOCALAPPDATA%.
 Filename: "{app}\royconvert.exe"; Parameters: "--register-shell"; StatusMsg: "{cm:ShellMenuStatus}"; Tasks: shellmenu; Flags: runasoriginaluser runhidden waituntilterminated
 Filename: "{app}\royconvert.exe"; Description: "{cm:LaunchProgram,royconvert}"; Flags: postinstall nowait skipifsilent runasoriginaluser
+; An update started from royconvert (/SILENT /RELAUNCH) opens it again, as the user and not as administrator.
+Filename: "{app}\royconvert.exe"; Flags: nowait runasoriginaluser; Check: ShouldRelaunch
 
 [UninstallRun]
 Filename: "{app}\royconvert.exe"; Parameters: "--unregister-shell"; RunOnceId: "UnregisterShell"; Flags: runhidden waituntilterminated
@@ -73,3 +75,20 @@ Filename: "{app}\royconvert.exe"; Parameters: "--unregister-shell"; RunOnceId: "
 [UninstallDelete]
 ; Left by --register-shell (shell-menu.txt is removed by --unregister-shell above); kept if it holds anything else.
 Type: dirifempty; Name: "{localappdata}\royconvert"
+
+[Code]
+// True for a silent setup started with /RELAUNCH (our own option, passed by royconvert's updater).
+function ShouldRelaunch: Boolean;
+var
+  I: Integer;
+begin
+  Result := False;
+  if not WizardSilent then
+    Exit;
+  for I := 1 to ParamCount do
+    if CompareText(ParamStr(I), '/RELAUNCH') = 0 then
+    begin
+      Result := True;
+      Exit;
+    end;
+end;
