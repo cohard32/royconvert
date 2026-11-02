@@ -265,6 +265,16 @@ Son güncelleme: 2026-10-27
 - Bu PC'de SmartScreen grup ilkesiyle kapalı (`HKLM\SOFTWARE\Policies\Microsoft\Windows\System\EnableSmartScreen=0`)
   → uyarı burada üretilemiyor, değiştirilmedi.
 - Kalan hedefler: Win 11 denemesi (kullanıcı diğer PC'de) → macOS sürümü → gerçek DVD.
+- **Sonraki sürüm için özellikler (kullanıcı "Resim ve PDF/belge" seçti, 2026-11-02):**
+  1. ~~HEIC → JPG/PNG~~ zaten vardı (1.0.0'da da): menüde .heic var, libheif okuyor (yazamıyor), dönük fotoğraf bir
+     kez döndürülüyor. Deneme HEIC'leri `pillow-heif` ile (`E:\rc-deneme\heic\venv`, betik `E:\rc-deneme\heic-tools`);
+     gerçek iPhone HEIC'i (ızgara, 10 bit) denenmedi
+  2. ~~Özel boyutlandırma~~ → `boyutlandir` dalı: sağ tık "Boyutlandır…" (`MenuTools.Resize`, `ImageResize`):
+     genişlik/yükseklik (biri boşsa oran, ikisi de varsa kutuya sığdır) ya da yüzde; büyütmez; GIF'in tüm kareleri;
+     HEIC/raw/PSD → JPEG, diğerleri kendi biçiminde (JPEG kendi kalitesiyle); ilk resmin önizlemesi. `Ping` EXIF
+     yönünü okumuyor → önizleme boyutu tam okuma + AutoOrient ile. Canlı: menüden açıldı; px ve % ile JPG/HEIC/GIF
+  3. PDF'ten sayfa çıkarma/silme (sırada)
+  4. Excel → CSV
 
 ## KALDIĞIMIZ YER (2026-10-30 akşam, kullanıcı "yaptıklarımızı kaydet, sonra devam ederiz" dedi)
 - main ba27fbd: v1.0.0 sonrası **PR #19 (PDF → Word) birleşti**; bekleyen PR yok. PDF → Word yayındaki v1.0.0'da YOK.

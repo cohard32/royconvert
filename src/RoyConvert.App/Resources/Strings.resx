@@ -131,6 +131,23 @@
   <data name="Trim_Failed" xml:space="preserve"><value>{0} of {1} files could not be cut:</value></data>
   <data name="Trim_NoFiles" xml:space="preserve"><value>No videos or sound files to cut.</value></data>
   <data name="Trim_NoFfmpeg" xml:space="preserve"><value>ffmpeg was not found; reinstall royconvert.</value></data>
+  <data name="Resize_Menu" xml:space="preserve"><value>Resize…</value></data>
+  <data name="Resize_Title" xml:space="preserve"><value>Resize {0} pictures</value></data>
+  <data name="Resize_ByPixels" xml:space="preserve"><value>Pixels</value></data>
+  <data name="Resize_ByPercent" xml:space="preserve"><value>Percent</value></data>
+  <data name="Resize_Width" xml:space="preserve"><value>Width</value></data>
+  <data name="Resize_Height" xml:space="preserve"><value>Height</value></data>
+  <data name="Resize_Percent" xml:space="preserve"><value>Percent of the size</value></data>
+  <data name="Resize_Any" xml:space="preserve"><value>to match</value></data>
+  <data name="Resize_Hint" xml:space="preserve"><value>Proportions are always kept: with only a width or a height, the other one follows; with both, the picture fits inside that box. Pictures are never enlarged. Each one is written to a new file next to it.</value></data>
+  <data name="Resize_Preview" xml:space="preserve"><value>{0}: {1} × {2} → {3} × {4}</value></data>
+  <data name="Resize_PreviewUnknown" xml:space="preserve"><value>{0}: the size could not be read</value></data>
+  <data name="Resize_NeedSize" xml:space="preserve"><value>Type a width or a height (1–100000 pixels).</value></data>
+  <data name="Resize_BadPercent" xml:space="preserve"><value>Type a percentage below 100, e.g. 50.</value></data>
+  <data name="Resize_Apply" xml:space="preserve"><value>Resize</value></data>
+  <data name="Resize_FileSuffix" xml:space="preserve"><value> (resized)</value></data>
+  <data name="Resize_Failed" xml:space="preserve"><value>{0} of {1} pictures could not be resized:</value></data>
+  <data name="Resize_NoFiles" xml:space="preserve"><value>No pictures to resize.</value></data>
   <data name="Password_ProtectMenu" xml:space="preserve"><value>Add password…</value></data>
   <data name="Password_RemoveMenu" xml:space="preserve"><value>Remove password…</value></data>
   <data name="Password_ProtectTitle" xml:space="preserve"><value>Add a password to {0} PDFs</value></data>

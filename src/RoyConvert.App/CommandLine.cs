@@ -17,6 +17,8 @@ public enum CommandKind
     ProtectPdf,
     /// <summary>"--preset pdf-unprotect": the window that takes the password off PDFs.</summary>
     UnprotectPdf,
+    /// <summary>"--preset resize": the window that makes pictures smaller.</summary>
+    Resize,
     ListPresets,
     RegisterShell,
     UnregisterShell,
