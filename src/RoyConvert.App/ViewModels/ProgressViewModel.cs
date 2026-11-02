@@ -86,11 +86,13 @@ public partial class ProgressViewModel : ViewModelBase, IDisposable
         UpdateSummary();
     }
 
-    public void Add(Preset preset, IEnumerable<string> files)
+    /// <param name="inOrder">For a preset that combines files: they are already in the order chosen by the user
+    /// (see <see cref="CombineOrderViewModel"/>); otherwise they are put in natural name order.</param>
+    public void Add(Preset preset, IEnumerable<string> files, bool inOrder = false)
     {
         preset = PresetNames.WithLocalizedFileName(preset) with { Settings = _settings.ApplyTo(preset.Settings) };
         IEnumerable<ConversionJob> jobs = preset.CombinesInputs
-            ? [new ConversionJob(files.Order(NaturalComparer.Instance).ToList(), preset)]
+            ? [new ConversionJob(inOrder ? files.ToList() : files.Order(NaturalComparer.Instance).ToList(), preset)]
             : files.Select(file => new ConversionJob(file, preset));
 
         foreach (var job in jobs)

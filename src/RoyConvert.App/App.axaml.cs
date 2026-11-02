@@ -77,17 +77,32 @@ public partial class App : Application
                     DataContext = new PdfPasswordViewModel(Command.Files, protect: Command.Kind == CommandKind.ProtectPdf),
                 };
             }
-            else
+            else if (CombinedFiles(Command) is { } preset)
             {
-                var progress = CreateProgress();
-                progress.Add(Command);
+                // The order is chosen first; files sent by later Explorer invocations wait in Instance meanwhile.
                 if (Instance is not null)
                 {
-                    Instance.Listen(progress.Receive);
                     desktop.Exit += (_, _) => Instance.Dispose();
                 }
 
-                desktop.MainWindow = new ProgressWindow(progress, Instance);
+                var order = new CombineOrderViewModel(Command.Files);
+                var window = new CombineOrderWindow { DataContext = order };
+                order.Cancelled += window.Close;
+                order.Confirmed += files =>
+                {
+                    var progress = StartProgress(desktop, p => p.Add(preset, files, inOrder: true));
+                    progress.Show();
+                    window.Close();
+                };
+                desktop.MainWindow = window;
+            }
+            else
+            {
+                StartProgress(desktop, p => p.Add(Command));
+                if (Instance is not null)
+                {
+                    desktop.Exit += (_, _) => Instance.Dispose();
+                }
             }
 
             if (desktop.MainWindow is IUpdateHost host)
@@ -142,6 +157,30 @@ public partial class App : Application
             UpdateInstaller.Start(setup);
             desktop.Shutdown();
         }));
+    }
+
+    /// <summary>The preset when <paramref name="command"/> combines several files into one (e.g. "PDF (one file)").</summary>
+    private Preset? CombinedFiles(CommandLine command) =>
+        command.Kind == CommandKind.Convert && command.Files.Count > 1
+        && PresetCatalog.Find(_presets, command.PresetId!) is { CombinesInputs: true } preset
+            ? preset
+            : null;
+
+    /// <summary>The progress window as the main window, listening for files from later Explorer invocations.</summary>
+    private ProgressWindow StartProgress(IClassicDesktopStyleApplicationLifetime desktop, Action<ProgressViewModel> add)
+    {
+        var progress = CreateProgress();
+        add(progress);
+        Instance?.Listen(progress.Receive);
+        var window = new ProgressWindow(progress, Instance);
+        var first = desktop.MainWindow is null;
+        desktop.MainWindow = window;
+        if (!first)
+        {
+            _ = CheckForUpdateAsync(window, desktop);
+        }
+
+        return window;
     }
 
     /// <summary>Installed by setup: its uninstaller is next to the exe (a build from source has none).</summary>
