@@ -1,0 +1,40 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:vm="using:RoyConvert.App.ViewModels"
+        xmlns:res="using:RoyConvert.App.Resources"
+        x:Class="RoyConvert.App.Views.PdfPagesWindow"
+        x:DataType="vm:PdfPagesViewModel"
+        Title="{Binding Title}"
+        Icon="/Assets/royconvert.ico"
+        Width="520" SizeToContent="Height" CanResize="False"
+        WindowStartupLocation="CenterScreen">
+
+    <StackPanel Margin="20" Spacing="14">
+        <StackPanel Orientation="Horizontal" Spacing="16">
+            <RadioButton GroupName="Mode" Content="{x:Static res:Strings.Pages_Keep}" IsChecked="{Binding Keep}" />
+            <RadioButton GroupName="Mode" Content="{x:Static res:Strings.Pages_Delete}" IsChecked="{Binding Delete}" />
+        </StackPanel>
+
+        <StackPanel Spacing="4">
+            <TextBlock Text="{x:Static res:Strings.Pages_Label}" />
+            <TextBox x:Name="PagesBox" Text="{Binding Pages}" Watermark="{x:Static res:Strings.Pages_Example}" />
+        </StackPanel>
+
+        <TextBlock Text="{Binding Preview}" FontWeight="SemiBold" TextTrimming="CharacterEllipsis"
+                   IsVisible="{Binding Preview, Converter={x:Static StringConverters.IsNotNullOrEmpty}}" />
+        <TextBlock Text="{Binding Problem}" Foreground="{DynamicResource SystemControlErrorTextForegroundBrush}"
+                   IsVisible="{Binding Problem, Converter={x:Static StringConverters.IsNotNullOrEmpty}}" />
+        <TextBlock Text="{x:Static res:Strings.Pages_Hint}" FontSize="12" Opacity="0.6" TextWrapping="Wrap" />
+
+        <TextBlock Text="{Binding Status}" TextWrapping="Wrap"
+                   IsVisible="{Binding Status, Converter={x:Static StringConverters.IsNotNullOrEmpty}}" />
+        <SelectableTextBlock Text="{Binding Errors}" TextWrapping="Wrap" FontSize="12" MaxHeight="120"
+                             Foreground="{DynamicResource SystemControlErrorTextForegroundBrush}"
+                             IsVisible="{Binding Errors, Converter={x:Static StringConverters.IsNotNullOrEmpty}}" />
+
+        <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" Spacing="8">
+            <Button Content="{x:Static res:Strings.Watermark_Close}" Command="{Binding CloseCommand}" IsCancel="True" />
+            <Button Content="{x:Static res:Strings.Pages_Apply}" Command="{Binding ApplyCommand}" Classes="accent" IsDefault="True" />
+        </StackPanel>
+    </StackPanel>
+</Window>

@@ -19,6 +19,8 @@ public enum CommandKind
     UnprotectPdf,
     /// <summary>"--preset resize": the window that makes pictures smaller.</summary>
     Resize,
+    /// <summary>"--preset pdf-pages": the window that keeps or deletes pages of PDFs.</summary>
+    PdfPages,
     ListPresets,
     RegisterShell,
     UnregisterShell,

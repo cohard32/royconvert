@@ -273,7 +273,12 @@ Son güncelleme: 2026-10-27
      genişlik/yükseklik (biri boşsa oran, ikisi de varsa kutuya sığdır) ya da yüzde; büyütmez; GIF'in tüm kareleri;
      HEIC/raw/PSD → JPEG, diğerleri kendi biçiminde (JPEG kendi kalitesiyle); ilk resmin önizlemesi. `Ping` EXIF
      yönünü okumuyor → önizleme boyutu tam okuma + AutoOrient ile. Canlı: menüden açıldı; px ve % ile JPG/HEIC/GIF
-  3. PDF'ten sayfa çıkarma/silme (sırada)
+  3. ~~PDF'ten sayfa çıkarma/silme~~ → `pdf-sayfa` dalı: sağ tık "Sayfa seç…" (`MenuTools.PdfPages`,
+     `PdfPageSelection`): "1-3, 5, 8-" (8-: sona kadar; "1 - 3" ve uzun tire de olur), "Bu sayfaları al / sil";
+     sayfalar belge sırasıyla, her biri bir kez; PDFium `Combine` ile ardışık bloklar kopyalanır (metin korunur).
+     Seçilen her PDF kendi sayfa sayısına göre denetlenir, uymayan atlanır (Türkçe hata). Canlı: menüden açıldı;
+     10 sayfa "1-3, 5, 8-" → 7 sayfa (4. sayfa "5", 7. "10"), sil "2-9" → 1 ve 10; 3 sayfalık PDF "4. sayfa yok"
+     ile atlandı. Deneme PDF'i `E:\rc-deneme\heic-tools\make_pdf.py` (sayfa numarası büyük yazılı)
   4. Excel → CSV
 
 ## KALDIĞIMIZ YER (2026-10-30 akşam, kullanıcı "yaptıklarımızı kaydet, sonra devam ederiz" dedi)

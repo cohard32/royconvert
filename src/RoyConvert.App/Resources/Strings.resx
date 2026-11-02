@@ -148,6 +148,24 @@
   <data name="Resize_FileSuffix" xml:space="preserve"><value> (resized)</value></data>
   <data name="Resize_Failed" xml:space="preserve"><value>{0} of {1} pictures could not be resized:</value></data>
   <data name="Resize_NoFiles" xml:space="preserve"><value>No pictures to resize.</value></data>
+  <data name="Pages_Menu" xml:space="preserve"><value>Choose pages…</value></data>
+  <data name="Pages_Title" xml:space="preserve"><value>Choose pages in {0} PDFs</value></data>
+  <data name="Pages_Keep" xml:space="preserve"><value>Keep these pages</value></data>
+  <data name="Pages_Delete" xml:space="preserve"><value>Delete these pages</value></data>
+  <data name="Pages_Label" xml:space="preserve"><value>Pages</value></data>
+  <data name="Pages_Example" xml:space="preserve"><value>e.g. 1-3, 5, 8-</value></data>
+  <data name="Pages_Hint" xml:space="preserve"><value>Separate pages with commas; "1-3" means 1 to 3, "8-" means 8 to the end. Pages are written in the order of the document. The same pages are used for every selected PDF; each result is a new PDF next to it.</value></data>
+  <data name="Pages_Count" xml:space="preserve"><value>{0}: {1} pages</value></data>
+  <data name="Pages_Result" xml:space="preserve"><value>{0}: {1} pages → {2} pages</value></data>
+  <data name="Pages_Unreadable" xml:space="preserve"><value>{0}: could not be opened (it may be damaged or password protected)</value></data>
+  <data name="Pages_Invalid" xml:space="preserve"><value>Type the pages like 1-3, 5, 8-.</value></data>
+  <data name="Pages_PastTheEnd" xml:space="preserve"><value>This PDF has {0} pages; there is no page {1}.</value></data>
+  <data name="Pages_NothingLeft" xml:space="preserve"><value>Not every page can be deleted.</value></data>
+  <data name="Pages_Apply" xml:space="preserve"><value>Save</value></data>
+  <data name="Pages_KeepSuffix" xml:space="preserve"><value> (chosen pages)</value></data>
+  <data name="Pages_DeleteSuffix" xml:space="preserve"><value> (pages deleted)</value></data>
+  <data name="Pages_Failed" xml:space="preserve"><value>{0} of {1} PDFs could not be saved:</value></data>
+  <data name="Pages_NoFiles" xml:space="preserve"><value>No PDF files.</value></data>
   <data name="Password_ProtectMenu" xml:space="preserve"><value>Add password…</value></data>
   <data name="Password_RemoveMenu" xml:space="preserve"><value>Remove password…</value></data>
   <data name="Password_ProtectTitle" xml:space="preserve"><value>Add a password to {0} PDFs</value></data>

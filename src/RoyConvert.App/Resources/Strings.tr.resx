@@ -148,6 +148,24 @@
   <data name="Resize_FileSuffix" xml:space="preserve"><value> (boyutlandırılmış)</value></data>
   <data name="Resize_Failed" xml:space="preserve"><value>{1} resmin {0} tanesi boyutlandırılamadı:</value></data>
   <data name="Resize_NoFiles" xml:space="preserve"><value>Boyutlandırılacak resim yok.</value></data>
+  <data name="Pages_Menu" xml:space="preserve"><value>Sayfa seç…</value></data>
+  <data name="Pages_Title" xml:space="preserve"><value>{0} PDF'te sayfa seç</value></data>
+  <data name="Pages_Keep" xml:space="preserve"><value>Bu sayfaları al</value></data>
+  <data name="Pages_Delete" xml:space="preserve"><value>Bu sayfaları sil</value></data>
+  <data name="Pages_Label" xml:space="preserve"><value>Sayfalar</value></data>
+  <data name="Pages_Example" xml:space="preserve"><value>ör. 1-3, 5, 8-</value></data>
+  <data name="Pages_Hint" xml:space="preserve"><value>Sayfaları virgülle ayırın; "1-3" 1'den 3'e kadar, "8-" 8'den sona kadar demektir. Sayfalar belgedeki sırasıyla yazılır. Seçilen her PDF'e aynı sayfalar uygulanır; sonuç yanına yeni PDF olarak yazılır.</value></data>
+  <data name="Pages_Count" xml:space="preserve"><value>{0}: {1} sayfa</value></data>
+  <data name="Pages_Result" xml:space="preserve"><value>{0}: {1} sayfa → {2} sayfa</value></data>
+  <data name="Pages_Unreadable" xml:space="preserve"><value>{0}: açılamadı (bozuk ya da şifreli olabilir)</value></data>
+  <data name="Pages_Invalid" xml:space="preserve"><value>Sayfaları 1-3, 5, 8- gibi yazın.</value></data>
+  <data name="Pages_PastTheEnd" xml:space="preserve"><value>Bu PDF {0} sayfa; {1}. sayfa yok.</value></data>
+  <data name="Pages_NothingLeft" xml:space="preserve"><value>Bütün sayfalar silinemez.</value></data>
+  <data name="Pages_Apply" xml:space="preserve"><value>Kaydet</value></data>
+  <data name="Pages_KeepSuffix" xml:space="preserve"><value> (seçilen sayfalar)</value></data>
+  <data name="Pages_DeleteSuffix" xml:space="preserve"><value> (sayfalar silinmiş)</value></data>
+  <data name="Pages_Failed" xml:space="preserve"><value>{1} PDF'in {0} tanesi kaydedilemedi:</value></data>
+  <data name="Pages_NoFiles" xml:space="preserve"><value>PDF dosyası yok.</value></data>
   <data name="Password_ProtectMenu" xml:space="preserve"><value>Şifre koy…</value></data>
   <data name="Password_RemoveMenu" xml:space="preserve"><value>Şifreyi kaldır…</value></data>
   <data name="Password_ProtectTitle" xml:space="preserve"><value>{0} PDF'e şifre koy</value></data>
