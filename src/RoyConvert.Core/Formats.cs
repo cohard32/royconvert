@@ -27,6 +27,7 @@ public enum OutputFormat
     Ico,
     Pdf,
     Docx,
+    Csv,
 }
 
 public static class Formats
@@ -44,6 +45,9 @@ public static class Formats
     public static readonly IReadOnlySet<string> OfficeInputs = Set(
         "doc", "docx", "odp", "ods", "odt", "ppt", "pptx", "rtf", "xls", "xlsx");
 
+    /// <summary>Spreadsheets that LibreOffice can export to CSV, one file per sheet.</summary>
+    public static readonly IReadOnlySet<string> SpreadsheetInputs = Set("ods", "xls", "xlsx");
+
     public static bool IsPdf(string path) => ExtensionOf(path) == "pdf";
 
     public static string Extension(OutputFormat format) => format switch
@@ -56,7 +60,7 @@ public static class Formats
     {
         OutputFormat.Mp4 or OutputFormat.Mkv or OutputFormat.Webm or OutputFormat.Avi or OutputFormat.Gif => MediaKind.Video,
         OutputFormat.Mp3 or OutputFormat.Ogg or OutputFormat.Flac or OutputFormat.Wav or OutputFormat.Aac => MediaKind.Audio,
-        OutputFormat.Pdf or OutputFormat.Docx => MediaKind.Document,
+        OutputFormat.Pdf or OutputFormat.Docx or OutputFormat.Csv => MediaKind.Document,
         _ => MediaKind.Image,
     };
 
