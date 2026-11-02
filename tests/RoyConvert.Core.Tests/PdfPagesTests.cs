@@ -189,14 +189,14 @@ public sealed class PdfPagesTests : IDisposable
         return document.Pages.Cast<PdfSharp.Pdf.PdfPage>().Select(p => p.Rotate).ToArray();
     }
 
-    private static string[] Texts(string path)
+    internal static string[] Texts(string path)
     {
         using var document = PdfiumDocument.Open(path);
         return Enumerable.Range(0, document.PageCount).Select(i => document.Text(i).Trim()).ToArray();
     }
 
     /// <summary>A minimal PDF with one line of real (selectable) text per page.</summary>
-    private static void CreateTextPdf(string path, params string[] pages)
+    internal static void CreateTextPdf(string path, params string[] pages)
     {
         var objects = new List<string>
         {

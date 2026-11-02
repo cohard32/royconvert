@@ -54,14 +54,16 @@ public class WindowsShellMenuTests
         var lines = WindowsShellMenu.BuildMenuFile(PresetCatalog.Default, p => p.Name, MenuTools.All)
             .Split("\r\n", StringSplitOptions.RemoveEmptyEntries);
 
-        Assert.Equal(Lines, lines[..^6]);
-        Assert.Equal(["trim", "resize", "watermark", "pdf-protect", "pdf-unprotect", "rename"], lines[^6..].Select(line => line.Split('\t')[0]));
-        Assert.Contains("mp3", lines[^6].Split('\t')[2].Split(' '));
-        var resize = lines[^5].Split('\t')[2].Split(' ');
+        Assert.Equal(Lines, lines[..^7]);
+        Assert.Equal(["trim", "resize", "watermark", "pdf-pages", "pdf-protect", "pdf-unprotect", "rename"],
+            lines[^7..].Select(line => line.Split('\t')[0]));
+        Assert.Contains("mp3", lines[^7].Split('\t')[2].Split(' '));
+        var resize = lines[^6].Split('\t')[2].Split(' ');
         Assert.Contains("heic", resize);
         Assert.Contains("gif", resize);
         Assert.DoesNotContain("svg", resize);
-        Assert.DoesNotContain("gif", lines[^4].Split('\t')[2].Split(' '));
+        Assert.DoesNotContain("gif", lines[^5].Split('\t')[2].Split(' '));
+        Assert.Equal("pdf", lines[^4].Split('\t')[2]);
         Assert.Equal("pdf", lines[^3].Split('\t')[2]);
         var fields = lines[^1].Split('\t');
         Assert.Equal(MenuTools.Rename.Label(), fields[1]);

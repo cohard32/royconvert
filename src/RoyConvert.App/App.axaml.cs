@@ -66,6 +66,10 @@ public partial class App : Application
                     DataContext = new ResizeViewModel(Command.Files, Settings.ApplyTo(new ConversionSettings()).ImageQuality),
                 };
             }
+            else if (Command.Kind == CommandKind.PdfPages)
+            {
+                desktop.MainWindow = new PdfPagesWindow { DataContext = new PdfPagesViewModel(Command.Files) };
+            }
             else if (Command.Kind is CommandKind.ProtectPdf or CommandKind.UnprotectPdf)
             {
                 desktop.MainWindow = new PdfPasswordWindow

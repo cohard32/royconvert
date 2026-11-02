@@ -23,6 +23,8 @@ public static class MenuTools
 
     public static MenuTool ProtectPdf { get; } = new("pdf-protect", CommandKind.ProtectPdf, () => Strings.Password_ProtectMenu, Pdf);
 
+    public static MenuTool PdfPages { get; } = new("pdf-pages", CommandKind.PdfPages, () => Strings.Pages_Menu, Pdf);
+
     public static MenuTool UnprotectPdf { get; } = new("pdf-unprotect", CommandKind.UnprotectPdf, () => Strings.Password_RemoveMenu, Pdf);
 
     /// <summary>Any mix of the files royconvert knows.</summary>
@@ -30,7 +32,7 @@ public static class MenuTools
         PresetCatalog.Default.SelectMany(p => p.InputExtensions).ToHashSet(StringComparer.OrdinalIgnoreCase));
 
     /// <summary>In menu order, after the presets.</summary>
-    public static IReadOnlyList<MenuTool> All { get; } = [Trim, Resize, Watermark, ProtectPdf, UnprotectPdf, Rename];
+    public static IReadOnlyList<MenuTool> All { get; } = [Trim, Resize, Watermark, PdfPages, ProtectPdf, UnprotectPdf, Rename];
 
     public static MenuTool? Find(string id) =>
         All.FirstOrDefault(tool => string.Equals(tool.Id, id, StringComparison.OrdinalIgnoreCase));
