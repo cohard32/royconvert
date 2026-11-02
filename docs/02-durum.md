@@ -182,7 +182,8 @@ Son güncelleme: 2026-10-27
 8. ~~Çıktı dosya adı ekleri İngilizce kalıyor~~ → arayüz diline çevriliyor (2026-10-26).
 9. Program Files kurulumu yönetici olmayan bir hesapta başka bir yöneticinin şifresiyle yapılırsa, kaldırma menü kaydını kurulumu
    yapan hesap yerine yönetici hesabından silmeye çalışır (Inno'da kaldırma adımı "asıl kullanıcı olarak" çalıştırılamıyor).
-10. Kurulum dosyası imzasız: Windows SmartScreen "tanınmayan uygulama" uyarısı verir (kod imzalama sertifikasıyla çözülür).
+10. Kurulum dosyası imzasız: Windows SmartScreen "tanınmayan uygulama" uyarısı verir. Kullanıcı kararıyla (2026-11-02)
+    ücretli imza alınmayacak; README "Kurulum" bölümü uyarının nasıl geçileceğini anlatıyor.
 11. LibreOffice'li kurulum paketi (2026-10-26): `build-installer.ps1`'i kullanıcı çalıştırdı (Claude'a `-ExecutionPolicy Bypass`
     izni otomatik denetimde reddediliyor; Git Bash'te `!` ile yol `E:/royconvert/...` yazılmalı). `royconvert-0.1.0-setup.exe`
     **312 MB**. `/CURRENTUSER /VERYSILENT` kurulum → kurulu uygulama docx/pptx → PDF'i paketteki
@@ -251,6 +252,20 @@ Son güncelleme: 2026-10-27
     uyarısı, MOV 0:05,5–0:12 tam kare → 6,5 sn MP4
 - PR #14 (sesi kaldır + kırp) birleşti (main c95f66c)
 
+## KALDIĞIMIZ YER (2026-11-02)
+- PR #21 birleşti (main a7f154b): güncellemeden sonra royconvert yeniden açılır (setup `/RELAUNCH`, `runasoriginaluser`).
+  Canlı 1.0.1 → 1.0.2 (Program Files, UAC, sahte sunucu `E:\rc-deneme\upd2\server.ps1`) ~91 sn, normal yetkiyle açıldı.
+  1.0.0 bu seçeneği vermez → 1.0.0'dan ilk güncellemede program açılmaz. Bu PC'ye gerçek v1.0.0 geri kuruldu.
+- `pdf-word`, `office-kapanis` dalları silindi.
+- **Kullanıcı kararları:** her özellik için ayrı sürüm yok, birkaç özellik birikince tek sürüm (yayını kullanıcı söyler).
+  **Ücretli kod imzalama yok** (Windows sertifikası, Apple Developer 99 $): program GitHub'dan ücretsiz dağıtılıyor;
+  README'ye kurulum uyarısı yardımı eklendi. macOS'ta ücretsiz ad-hoc imza (`codesign -s -`, Apple Silicon şart koşar)
+  atılacak, Finder entegrasyonu Quick Action ile (Finder Sync imzasız sorun çıkarabilir). SignPath Foundation
+  (açık kaynak için ücretsiz imza) ileride seçenek.
+- Bu PC'de SmartScreen grup ilkesiyle kapalı (`HKLM\SOFTWARE\Policies\Microsoft\Windows\System\EnableSmartScreen=0`)
+  → uyarı burada üretilemiyor, değiştirilmedi.
+- Kalan hedefler: Win 11 denemesi (kullanıcı diğer PC'de) → macOS sürümü → gerçek DVD.
+
 ## KALDIĞIMIZ YER (2026-10-30 akşam, kullanıcı "yaptıklarımızı kaydet, sonra devam ederiz" dedi)
 - main ba27fbd: v1.0.0 sonrası **PR #19 (PDF → Word) birleşti**; bekleyen PR yok. PDF → Word yayındaki v1.0.0'da YOK.
 - GitHub'da yalnız v1.0.0 görünüyor: test1–test6 taslağa çevrildi, etiketleri kullanıcı sildi (commit'ler: test1
@@ -280,7 +295,7 @@ Son güncelleme: 2026-10-27
      kapatmıyor → `PdfImportWarning` PDF açılırken HKCU `Word\Options\DisableConvertPdfWarning`=1 yapıp sonra eski
      haline getiriyor (testte doğrulanıyor). 277 test; RTF → PDF → DOCX canlı, Türkçe metin düzenlenebilir geldi
   3. Güncellemeden sonra programın yeniden açılması (şu an kapanıp kalıyor)
-  4. Kod imzalama sertifikası (SmartScreen, Win 11 imzasız paket)
+  4. ~~Kod imzalama sertifikası~~ — ücretli imza alınmayacak (kullanıcı kararı, 2026-11-02)
   5. macOS sürümü (Finder Quick Action / Finder Sync, LibreOffice gömülü değil)
   6. Gerçek DVD denemesi; eski ön sürümler (test1–test6) ve boş `office-kapanis` dalı temizliği
 
