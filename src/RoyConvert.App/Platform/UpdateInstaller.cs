@@ -9,13 +9,14 @@ public static class UpdateInstaller
     /// Setup options: no questions, a progress window only, no restart. An install in Program Files was made for all
     /// users and needs administrator rights again (Windows asks); one elsewhere was made for this user only. Setup
     /// closes this royconvert itself (CloseApplications) and keeps the earlier choices, such as the right-click menu.
+    /// /RELAUNCH (our own option, see royconvert.iss) opens royconvert again when setup has finished.
     /// </summary>
     public static IReadOnlyList<string> Arguments(string installFolder)
     {
         var programFiles = Environment.GetFolderPath(Environment.SpecialFolder.ProgramFiles);
         var forAllUsers = Path.GetFullPath(installFolder).StartsWith(Path.GetFullPath(programFiles) + Path.DirectorySeparatorChar,
             StringComparison.OrdinalIgnoreCase);
-        return ["/SILENT", "/SUPPRESSMSGBOXES", "/NORESTART", forAllUsers ? "/ALLUSERS" : "/CURRENTUSER"];
+        return ["/SILENT", "/SUPPRESSMSGBOXES", "/NORESTART", forAllUsers ? "/ALLUSERS" : "/CURRENTUSER", "/RELAUNCH"];
     }
 
     /// <exception cref="System.ComponentModel.Win32Exception">Setup could not be started (e.g. the user said no to administrator rights).</exception>

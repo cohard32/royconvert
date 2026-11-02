@@ -22,11 +22,11 @@ public sealed class UpdateTests : IDisposable
         var programFiles = Environment.GetFolderPath(Environment.SpecialFolder.ProgramFiles);
         var local = Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData);
 
-        Assert.Equal(["/SILENT", "/SUPPRESSMSGBOXES", "/NORESTART", "/ALLUSERS"],
+        Assert.Equal(["/SILENT", "/SUPPRESSMSGBOXES", "/NORESTART", "/ALLUSERS", "/RELAUNCH"],
             UpdateInstaller.Arguments(Path.Combine(programFiles, "royconvert") + Path.DirectorySeparatorChar));
-        Assert.Equal("/CURRENTUSER", UpdateInstaller.Arguments(Path.Combine(local, "Programs", "royconvert"))[^1]);
+        Assert.Equal("/CURRENTUSER", UpdateInstaller.Arguments(Path.Combine(local, "Programs", "royconvert"))[^2]);
         // A folder that only starts like Program Files is not in it.
-        Assert.Equal("/CURRENTUSER", UpdateInstaller.Arguments(programFiles + "X\\royconvert")[^1]);
+        Assert.Equal("/CURRENTUSER", UpdateInstaller.Arguments(programFiles + "X\\royconvert")[^2]);
     }
 
     [Fact]
