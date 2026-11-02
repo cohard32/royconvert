@@ -98,6 +98,7 @@ public class CommandLineTests
     [InlineData("rename", CommandKind.Rename)]
     [InlineData("watermark", CommandKind.Watermark)]
     [InlineData("trim", CommandKind.Trim)]
+    [InlineData("resize", CommandKind.Resize)]
     [InlineData("pdf-protect", CommandKind.ProtectPdf)]
     [InlineData("pdf-unprotect", CommandKind.UnprotectPdf)]
     public void ToolIds_OpenTheirWindow_WithTheFiles(string id, CommandKind kind)

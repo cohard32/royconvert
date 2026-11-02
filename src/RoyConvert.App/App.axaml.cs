@@ -59,6 +59,13 @@ public partial class App : Application
                     DataContext = new TrimViewModel(Command.Files, _ffmpegPath, Settings.ApplyTo(new ConversionSettings())),
                 };
             }
+            else if (Command.Kind == CommandKind.Resize)
+            {
+                desktop.MainWindow = new ResizeWindow
+                {
+                    DataContext = new ResizeViewModel(Command.Files, Settings.ApplyTo(new ConversionSettings()).ImageQuality),
+                };
+            }
             else if (Command.Kind is CommandKind.ProtectPdf or CommandKind.UnprotectPdf)
             {
                 desktop.MainWindow = new PdfPasswordWindow

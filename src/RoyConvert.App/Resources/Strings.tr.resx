@@ -131,6 +131,23 @@
   <data name="Trim_Failed" xml:space="preserve"><value>{1} dosyanın {0} tanesi kırpılamadı:</value></data>
   <data name="Trim_NoFiles" xml:space="preserve"><value>Kırpılacak video ya da ses dosyası yok.</value></data>
   <data name="Trim_NoFfmpeg" xml:space="preserve"><value>ffmpeg bulunamadı; royconvert'i yeniden kurun.</value></data>
+  <data name="Resize_Menu" xml:space="preserve"><value>Boyutlandır…</value></data>
+  <data name="Resize_Title" xml:space="preserve"><value>{0} resmi boyutlandır</value></data>
+  <data name="Resize_ByPixels" xml:space="preserve"><value>Piksel</value></data>
+  <data name="Resize_ByPercent" xml:space="preserve"><value>Yüzde</value></data>
+  <data name="Resize_Width" xml:space="preserve"><value>Genişlik</value></data>
+  <data name="Resize_Height" xml:space="preserve"><value>Yükseklik</value></data>
+  <data name="Resize_Percent" xml:space="preserve"><value>Boyutun yüzdesi</value></data>
+  <data name="Resize_Any" xml:space="preserve"><value>orana göre</value></data>
+  <data name="Resize_Hint" xml:space="preserve"><value>Oran hep korunur: yalnız genişlik ya da yükseklik yazılırsa öteki ona göre ayarlanır; ikisi de yazılırsa resim o kutunun içine sığdırılır. Resimler büyütülmez. Her biri yanına yeni dosya olarak yazılır.</value></data>
+  <data name="Resize_Preview" xml:space="preserve"><value>{0}: {1} × {2} → {3} × {4}</value></data>
+  <data name="Resize_PreviewUnknown" xml:space="preserve"><value>{0}: boyutu okunamadı</value></data>
+  <data name="Resize_NeedSize" xml:space="preserve"><value>Genişlik ya da yükseklik yazın (1–100000 piksel).</value></data>
+  <data name="Resize_BadPercent" xml:space="preserve"><value>Yüzdeyi 100'den küçük bir sayı olarak yazın, ör. 50.</value></data>
+  <data name="Resize_Apply" xml:space="preserve"><value>Boyutlandır</value></data>
+  <data name="Resize_FileSuffix" xml:space="preserve"><value> (boyutlandırılmış)</value></data>
+  <data name="Resize_Failed" xml:space="preserve"><value>{1} resmin {0} tanesi boyutlandırılamadı:</value></data>
+  <data name="Resize_NoFiles" xml:space="preserve"><value>Boyutlandırılacak resim yok.</value></data>
   <data name="Password_ProtectMenu" xml:space="preserve"><value>Şifre koy…</value></data>
   <data name="Password_RemoveMenu" xml:space="preserve"><value>Şifreyi kaldır…</value></data>
   <data name="Password_ProtectTitle" xml:space="preserve"><value>{0} PDF'e şifre koy</value></data>
