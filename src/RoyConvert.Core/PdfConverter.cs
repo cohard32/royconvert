@@ -44,6 +44,8 @@ public sealed class PdfConverter(IConverter image, IReadOnlyList<IDocumentConver
         {
             throw new ConversionException(preset.Output == OutputFormat.Docx
                 ? "Converting PDF to Word needs Microsoft Word."
+                : preset.Output == OutputFormat.Csv
+                ? "Converting to CSV needs LibreOffice (free: https://www.libreoffice.org)."
                 :
                 "Neither Microsoft Office nor LibreOffice was found. Install one of them to convert documents " +
                 "(LibreOffice is free: https://www.libreoffice.org).");

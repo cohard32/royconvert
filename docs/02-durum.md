@@ -279,7 +279,11 @@ Son güncelleme: 2026-10-27
      Seçilen her PDF kendi sayfa sayısına göre denetlenir, uymayan atlanır (Türkçe hata). Canlı: menüden açıldı;
      10 sayfa "1-3, 5, 8-" → 7 sayfa (4. sayfa "5", 7. "10"), sil "2-9" → 1 ve 10; 3 sayfalık PDF "4. sayfa yok"
      ile atlandı. Deneme PDF'i `E:\rc-deneme\heic-tools\make_pdf.py` (sayfa numarası büyük yazılı)
-  4. Excel → CSV
+  4. ~~Excel → CSV~~ → `excel-csv` dalı: "CSV" ön ayarı (xls/xlsx/ods), yalnız LibreOffice (`OfficeConverter.CsvFilter`:
+     `;` ayırıcı, `"` tırnak, UTF-8, hücreler göründüğü gibi, tüm sayfalar `-1`). soffice her sayfayı `ad-Sayfa.csv`
+     yazar → `MoveSheets`: tek sayfa `ad.csv`, çoksa `ad-Sayfa.csv`; LibreOffice BOM yazmıyor → UTF-8 BOM eklenir
+     (yoksa Excel ANSI okur). Ondalık ayırıcı sistem diline göre (TR: virgül). Canlı: menüden, sonuç gerçek Excel'de
+     (liste ayırıcı `;`) doğru sütunlarla ve Türkçe harflerle açıldı. Deneme xlsx `E:\rc-deneme\heic-tools\make_xlsx.py`
 
 ## KALDIĞIMIZ YER (2026-10-30 akşam, kullanıcı "yaptıklarımızı kaydet, sonra devam ederiz" dedi)
 - main ba27fbd: v1.0.0 sonrası **PR #19 (PDF → Word) birleşti**; bekleyen PR yok. PDF → Word yayındaki v1.0.0'da YOK.
