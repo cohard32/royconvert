@@ -166,6 +166,13 @@
   <data name="Pages_DeleteSuffix" xml:space="preserve"><value> (sayfalar silinmiş)</value></data>
   <data name="Pages_Failed" xml:space="preserve"><value>{1} PDF'in {0} tanesi kaydedilemedi:</value></data>
   <data name="Pages_NoFiles" xml:space="preserve"><value>PDF dosyası yok.</value></data>
+  <data name="Order_Title" xml:space="preserve"><value>{0} dosyayı tek PDF'te birleştir</value></data>
+  <data name="Order_Hint" xml:space="preserve"><value>Dosyalar PDF'e bu sırayla girer. Bir dosya seçip yukarı ya da aşağı taşıyın (Alt + ↑ / ↓); "Çıkar" onu bu PDF'e almaz, dosyayı silmez.</value></data>
+  <data name="Order_Up" xml:space="preserve"><value>Yukarı</value></data>
+  <data name="Order_Down" xml:space="preserve"><value>Aşağı</value></data>
+  <data name="Order_Remove" xml:space="preserve"><value>Çıkar</value></data>
+  <data name="Order_SortByName" xml:space="preserve"><value>Ada göre sırala</value></data>
+  <data name="Order_Combine" xml:space="preserve"><value>Birleştir</value></data>
   <data name="Password_ProtectMenu" xml:space="preserve"><value>Şifre koy…</value></data>
   <data name="Password_RemoveMenu" xml:space="preserve"><value>Şifreyi kaldır…</value></data>
   <data name="Password_ProtectTitle" xml:space="preserve"><value>{0} PDF'e şifre koy</value></data>

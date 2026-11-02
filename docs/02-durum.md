@@ -284,6 +284,11 @@ Son güncelleme: 2026-10-27
      yazar → `MoveSheets`: tek sayfa `ad.csv`, çoksa `ad-Sayfa.csv`; LibreOffice BOM yazmıyor → UTF-8 BOM eklenir
      (yoksa Excel ANSI okur). Ondalık ayırıcı sistem diline göre (TR: virgül). Canlı: menüden, sonuç gerçek Excel'de
      (liste ayırıcı `;`) doğru sütunlarla ve Türkçe harflerle açıldı. Deneme xlsx `E:\rc-deneme\heic-tools\make_xlsx.py`
+  5. ~~PDF birleştirme sırası~~ (kullanıcı ayrıca istedi) → `birlestirme-sirasi` dalı: "PDF (tek dosya)" 2+ dosyayla
+     gelince önce `CombineOrderWindow` (doğal ad sırası; Yukarı/Aşağı = Alt+↑/↓, Çıkar = Delete, Ada göre sırala;
+     Enter = Birleştir). Onaylanınca `App.StartProgress` ilerleme penceresine geçer (`ProgressViewModel.Add(..., inOrder: true)`);
+     bu arada gelen Explorer çağrıları `SingleInstance` içinde bekler. Kapat → hiçbir şey yazılmaz. Tek dosya ve
+     başka pencereden gelen birleştirme eskisi gibi (ad sırası). Canlı: menüden 3 PDF + PNG, kapak başa → K,1,2,10
 
 ## KALDIĞIMIZ YER (2026-10-30 akşam, kullanıcı "yaptıklarımızı kaydet, sonra devam ederiz" dedi)
 - main ba27fbd: v1.0.0 sonrası **PR #19 (PDF → Word) birleşti**; bekleyen PR yok. PDF → Word yayındaki v1.0.0'da YOK.

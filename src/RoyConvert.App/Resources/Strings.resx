@@ -166,6 +166,13 @@
   <data name="Pages_DeleteSuffix" xml:space="preserve"><value> (pages deleted)</value></data>
   <data name="Pages_Failed" xml:space="preserve"><value>{0} of {1} PDFs could not be saved:</value></data>
   <data name="Pages_NoFiles" xml:space="preserve"><value>No PDF files.</value></data>
+  <data name="Order_Title" xml:space="preserve"><value>Combine {0} files into one PDF</value></data>
+  <data name="Order_Hint" xml:space="preserve"><value>The files go into the PDF in this order. Select one and move it up or down (Alt + ↑ / ↓); "Leave out" keeps it out of this PDF without deleting the file.</value></data>
+  <data name="Order_Up" xml:space="preserve"><value>Up</value></data>
+  <data name="Order_Down" xml:space="preserve"><value>Down</value></data>
+  <data name="Order_Remove" xml:space="preserve"><value>Leave out</value></data>
+  <data name="Order_SortByName" xml:space="preserve"><value>Sort by name</value></data>
+  <data name="Order_Combine" xml:space="preserve"><value>Combine</value></data>
   <data name="Password_ProtectMenu" xml:space="preserve"><value>Add password…</value></data>
   <data name="Password_RemoveMenu" xml:space="preserve"><value>Remove password…</value></data>
   <data name="Password_ProtectTitle" xml:space="preserve"><value>Add a password to {0} PDFs</value></data>

@@ -1,0 +1,41 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:vm="using:RoyConvert.App.ViewModels"
+        xmlns:res="using:RoyConvert.App.Resources"
+        x:Class="RoyConvert.App.Views.CombineOrderWindow"
+        x:DataType="vm:CombineOrderViewModel"
+        Title="{Binding Title}"
+        Icon="/Assets/royconvert.ico"
+        Width="560" Height="460" MinWidth="420" MinHeight="320"
+        WindowStartupLocation="CenterScreen">
+
+    <Window.KeyBindings>
+        <KeyBinding Gesture="Alt+Up" Command="{Binding MoveUpCommand}" />
+        <KeyBinding Gesture="Alt+Down" Command="{Binding MoveDownCommand}" />
+        <KeyBinding Gesture="Delete" Command="{Binding RemoveCommand}" />
+    </Window.KeyBindings>
+
+    <DockPanel Margin="20">
+        <TextBlock DockPanel.Dock="Top" Text="{x:Static res:Strings.Order_Hint}" TextWrapping="Wrap" Margin="0,0,0,12" />
+
+        <StackPanel DockPanel.Dock="Bottom" Orientation="Horizontal" HorizontalAlignment="Right" Spacing="8" Margin="0,14,0,0">
+            <Button Content="{x:Static res:Strings.Watermark_Close}" Command="{Binding CloseCommand}" IsCancel="True" />
+            <Button Content="{x:Static res:Strings.Order_Combine}" Command="{Binding CombineCommand}" Classes="accent" IsDefault="True" />
+        </StackPanel>
+
+        <StackPanel DockPanel.Dock="Right" Spacing="8" Margin="12,0,0,0" Width="150">
+            <Button Content="{x:Static res:Strings.Order_Up}" Command="{Binding MoveUpCommand}" HorizontalAlignment="Stretch" />
+            <Button Content="{x:Static res:Strings.Order_Down}" Command="{Binding MoveDownCommand}" HorizontalAlignment="Stretch" />
+            <Button Content="{x:Static res:Strings.Order_Remove}" Command="{Binding RemoveCommand}" HorizontalAlignment="Stretch" />
+            <Button Content="{x:Static res:Strings.Order_SortByName}" Command="{Binding SortByNameCommand}" HorizontalAlignment="Stretch" />
+        </StackPanel>
+
+        <ListBox x:Name="FileList" ItemsSource="{Binding Items}" SelectedIndex="{Binding SelectedIndex}">
+            <ListBox.ItemTemplate>
+                <DataTemplate x:DataType="vm:OrderItem">
+                    <TextBlock Text="{Binding Name}" TextTrimming="CharacterEllipsis" ToolTip.Tip="{Binding Path}" />
+                </DataTemplate>
+            </ListBox.ItemTemplate>
+        </ListBox>
+    </DockPanel>
+</Window>
