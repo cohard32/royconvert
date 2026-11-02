@@ -4,7 +4,35 @@ Windows ve macOS için sağ tık menüsünden dosya dönüştürme aracı.
 Dosyaları seç → sağ tıkla → **royconvert** → hedef formatı seç.
 
 ## Durum
-Geliştirme aşamasında (v0.1 hedefi).
+Son sürüm: [Releases](https://github.com/cohard32/royconvert/releases/latest) (Windows x64). macOS sürümü hazırlanıyor.
+
+## Kurulum
+[Releases](https://github.com/cohard32/royconvert/releases/latest) sayfasından `royconvert-<sürüm>-setup.exe` dosyasını
+indirip çalıştırın. royconvert ücretsiz bir açık kaynak projedir ve kurulum dosyası ücretli bir kod imzalama
+sertifikasıyla **imzalanmamıştır**. Bu yüzden ilk kurulumda Windows (ve macOS) bir uyarı gösterebilir. Bu, programın
+zararlı olduğu anlamına gelmez; yayıncısının doğrulanmadığı anlamına gelir. Dosyanın doğruluğunu Releases sayfasındaki
+SHA-256 değeriyle karşılaştırabilirsiniz:
+```
+certutil -hashfile royconvert-<sürüm>-setup.exe SHA256
+```
+
+### Windows: "Windows bilgisayarınızı korudu"
+1. Mavi uyarı penceresinde **Ek bilgi** bağlantısına tıklayın.
+2. Altta görünen **Yine de çalıştır** düğmesine basın.
+3. Kurulum yönetici izni isterse **Evet** deyin (Program Files'a kurulum için; kurulumda "yalnız benim için" seçilirse
+   izin gerekmez).
+
+Tarayıcı (Edge/Chrome) dosyayı "yaygın olarak indirilmiyor" diye engellerse indirmeler listesinde dosyanın yanındaki
+**…** menüsünden **Sakla** / **Yine de sakla** seçin.
+
+### macOS: "… açılamıyor, Apple doğrulayamadı"
+macOS sürümü yayımlandığında Apple noterliği olmadan dağıtılacak; ilk açılışta:
+1. Uyarıda **Bitti** / **Tamam** deyin (Çöp Sepeti'ne taşımayın).
+2. **Sistem Ayarları → Gizlilik ve Güvenlik** bölümünü açın, en altta "royconvert engellendi" satırındaki
+   **Yine de Aç** düğmesine basın ve parolanızı girin.
+3. Program bundan sonra normal açılır.
+
+Eski macOS sürümlerinde (14 ve öncesi) uygulamaya **Control + tıklayıp → Aç** demek de yeterlidir.
 
 ## v0.1 kapsamı
 - Video: mp4, mkv, webm, avi, gif (+ ölçekleme 25% / 75% / 720p / 1080p, döndürme)
