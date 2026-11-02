@@ -252,6 +252,23 @@ Son güncelleme: 2026-10-27
     uyarısı, MOV 0:05,5–0:12 tam kare → 6,5 sn MP4
 - PR #14 (sesi kaldır + kırp) birleşti (main c95f66c)
 
+## KALDIĞIMIZ YER (2026-11-02 gece, kullanıcı "her şeyi kaydet, bu konuyu daha sonra çözelim" dedi)
+- **v1.0.1 YAYINDA** (Latest): https://github.com/cohard32/royconvert/releases/tag/v1.0.1, main 9f022bc (PR #27 sürüm
+  numarası), SHA-256 `7f8508797e8e4aa0003dc830f50e06e3f6ab2c0760f67f3dadf7e9a306cfde59` (312 MB), `releases/latest` API'de
+  digest var. Sürüm notu `E:\rc-deneme\upd2\notes-1.0.1.md`; setup kopyası `E:\rc-deneme\rel101`. İçinde: PDF → Word,
+  Boyutlandır…, Sayfa seç…, Excel/ODS → CSV, birleştirme sırası, güncelleme sonrası yeniden açılma. PR #27 commit
+  mesajının başında BOM var (PowerShell Set-Content; zararsız, force push reddedildiği için düzeltilmedi).
+- **Gerçek GitHub'dan 1.0.0 → 1.0.1 denemesi YARIM KALDI:** bant doğru çıktı ("royconvert 1.0.1 çıktı (sizdeki 1.0.0)"),
+  Güncelle'ye basıldı, ama indirme çok yavaş: GitHub `release-assets.githubusercontent.com` bu bağlantıya ~25 KB/sn
+  (curl ile de aynı; GitHub codeload ~12 KB/sn, Cloudflare ~380 KB/sn) → 312 MB 3+ saat. Kodda hata yok. 10 dk sonra
+  %6'da program kapatıldı, yarım `.part` silindi; **bu PC hâlâ Program Files 1.0.0**, settings.json LastUpdateCheck bugün.
+  Not: program zorla kapatılınca `%TEMP%\royconvert-update\*.part` kalıyor (finally çalışmıyor; bir sonraki indirme
+  üzerine yazar, sorun değil).
+- **Sıradaki (öneri):** (1) güncelleme denemesini GitHub hızlanınca tekrarla (settings.json'da LastUpdateCheck null yap,
+  1.0.0'ı aç, Güncelle, UAC "Evet"; 1.0.0'dan geçişte yeniden açılma YOK, beklenen). (2) Güncelleme boyutunu küçültme:
+  312 MB'ın çoğu her sürümde aynı LibreOffice; ayrı/isteğe bağlı paket ya da yalnız değişen dosyalar düşünülebilir.
+  (3) Win 11 denemesi → macOS → gerçek DVD.
+
 ## KALDIĞIMIZ YER (2026-11-02)
 - PR #21 birleşti (main a7f154b): güncellemeden sonra royconvert yeniden açılır (setup `/RELAUNCH`, `runasoriginaluser`).
   Canlı 1.0.1 → 1.0.2 (Program Files, UAC, sahte sunucu `E:\rc-deneme\upd2\server.ps1`) ~91 sn, normal yetkiyle açıldı.
